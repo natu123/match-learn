@@ -118,8 +118,8 @@ impl TwoSidedMarket {
             .map(|l| l.ranking())
             .collect();
         let matching = gale_shapley(&proposer_prefs, &receiver_prefs);
-        for p in 0..self.util_p.len() {
-            if let Some(r) = matching.proposer[p] {
+        for (p, &slot) in matching.proposer.iter().enumerate() {
+            if let Some(r) = slot {
                 let rp = self.rng.normal(self.util_p[p][r], self.noise);
                 self.proposer_learners[p].update(r, rp);
                 let rr = self.rng.normal(self.util_r[r][p], self.noise);
@@ -235,9 +235,9 @@ mod tests {
             let fixed: Vec<Vec<usize>> = (0..n).map(|_| (0..n).collect()).collect();
             let played = gale_shapley(&fixed, &fixed);
             let mut per_round = 0.0;
-            for p in 0..n {
-                let b = baseline.proposer[p].map_or(0.0, |r| util_p[p][r]);
-                let gp = played.proposer[p].map_or(0.0, |r| util_p[p][r]);
+            for (p, up) in util_p.iter().enumerate() {
+                let b = baseline.proposer[p].map_or(0.0, |r| up[r]);
+                let gp = played.proposer[p].map_or(0.0, |r| up[r]);
                 per_round += b - gp;
             }
             base_sum += per_round * rounds as f64;

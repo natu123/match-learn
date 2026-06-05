@@ -18,6 +18,7 @@ pub mod market;
 pub mod matching;
 pub mod prefs;
 pub mod rng;
+pub mod ttc;
 pub mod two_sided;
 
 pub use eval::{LearningMarket, Report, simulate};
@@ -27,4 +28,5 @@ pub use market::Market;
 pub use matching::{Matching, gale_shapley, is_stable};
 pub use prefs::{break_ties, rank_by_scores, rank_by_scores_random, restrict_to_acceptable};
 pub use rng::Rng;
+pub use ttc::top_trading_cycle;
 pub use two_sided::TwoSidedMarket;
