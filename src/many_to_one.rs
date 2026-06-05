@@ -212,7 +212,7 @@ mod tests {
 
     #[test]
     fn hr_matches_brute_force_oracle_on_random_instances() {
-        let mut rng = Rng::new(0x4D54_4F);
+        let mut rng = Rng::new(0x4D544F);
         for _ in 0..300 {
             let n_p = 1 + rng.below(4);
             let n_r = 1 + rng.below(3);

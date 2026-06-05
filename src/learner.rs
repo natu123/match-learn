@@ -34,14 +34,7 @@ pub trait PreferenceLearner {
     /// Ties are broken by arm index, keeping the ranking deterministic given the
     /// scores.
     fn ranking(&mut self) -> Vec<usize> {
-        let s = self.scores();
-        let mut idx: Vec<usize> = (0..s.len()).collect();
-        idx.sort_by(|&a, &b| {
-            s[b].partial_cmp(&s[a])
-                .unwrap_or(std::cmp::Ordering::Equal)
-                .then(a.cmp(&b))
-        });
-        idx
+        crate::prefs::rank_by_scores(&self.scores())
     }
 }
 
