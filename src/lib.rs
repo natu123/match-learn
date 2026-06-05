@@ -22,7 +22,7 @@ pub mod ttc;
 pub mod two_sided;
 
 pub use eval::{LearningMarket, Report, simulate};
-pub use learner::{GaussianThompson, PreferenceLearner, Ucb1};
+pub use learner::{DiscountedThompson, GaussianThompson, PreferenceLearner, Ucb1};
 pub use many_to_one::{ManyToOne, hospital_residents};
 pub use market::Market;
 pub use matching::{Matching, gale_shapley, is_stable};

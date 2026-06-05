@@ -170,6 +170,85 @@ impl PreferenceLearner for Ucb1 {
     }
 }
 
+/// Thompson Sampling that forgets, for *non-stationary* preferences.
+///
+/// Identical to [`GaussianThompson`] except each arm's statistics are discounted
+/// by `gamma` on every update of that arm: `count <- gamma*count + 1`,
+/// `sum <- gamma*sum + reward`. Old evidence decays, so the effective sample
+/// size saturates at `1/(1 - gamma)` and the posterior never fully hardens —
+/// letting the learner track a moving target (e.g. an arm whose true value
+/// drifts or whose ranking flips). `gamma == 1.0` recovers the stationary
+/// learner.
+#[derive(Debug, Clone)]
+pub struct DiscountedThompson {
+    obs_var: f64,
+    prior_mean: f64,
+    prior_var: f64,
+    gamma: f64,
+    count: Vec<f64>,
+    sum: Vec<f64>,
+    rng: Rng,
+}
+
+impl DiscountedThompson {
+    /// Create a discounting learner over `n_arms`. `gamma` is the per-update
+    /// discount in `(0, 1]`; smaller forgets faster.
+    pub fn new(
+        n_arms: usize,
+        prior_mean: f64,
+        prior_var: f64,
+        obs_var: f64,
+        gamma: f64,
+        seed: u64,
+    ) -> Self {
+        assert!(
+            prior_var > 0.0 && obs_var > 0.0,
+            "variances must be positive"
+        );
+        assert!(gamma > 0.0 && gamma <= 1.0, "gamma must be in (0, 1]");
+        Self {
+            obs_var,
+            prior_mean,
+            prior_var,
+            gamma,
+            count: vec![0.0; n_arms],
+            sum: vec![0.0; n_arms],
+            rng: Rng::new(seed),
+        }
+    }
+
+    fn posterior(&self, a: usize) -> (f64, f64) {
+        let precision = 1.0 / self.prior_var + self.count[a] / self.obs_var;
+        let var = 1.0 / precision;
+        let mean = (self.prior_mean / self.prior_var + self.sum[a] / self.obs_var) * var;
+        (mean, var)
+    }
+}
+
+impl PreferenceLearner for DiscountedThompson {
+    fn n_arms(&self) -> usize {
+        self.count.len()
+    }
+
+    fn scores(&mut self) -> Vec<f64> {
+        (0..self.count.len())
+            .map(|a| {
+                let (mean, var) = self.posterior(a);
+                self.rng.normal(mean, var.sqrt())
+            })
+            .collect()
+    }
+
+    fn update(&mut self, arm: usize, reward: f64) {
+        self.count[arm] = self.gamma * self.count[arm] + 1.0;
+        self.sum[arm] = self.gamma * self.sum[arm] + reward;
+    }
+
+    fn means(&self) -> Vec<f64> {
+        (0..self.count.len()).map(|a| self.posterior(a).0).collect()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -247,5 +326,63 @@ mod tests {
         assert_eq!(sorted, vec![0, 1, 2, 3, 4]);
         // Highest empirical mean (arm 4) ranks first.
         assert_eq!(r[0], 4);
+    }
+
+    /// Run a learner on a bandit whose arm means switch halfway, returning the
+    /// regret accumulated in the *second* half (after the switch).
+    fn second_half_regret<L: PreferenceLearner>(
+        learner: &mut L,
+        means_a: &[f64],
+        means_b: &[f64],
+        half: usize,
+        noise: f64,
+        seed: u64,
+    ) -> f64 {
+        let mut env = Rng::new(seed);
+        let mut regret = 0.0;
+        for t in 0..2 * half {
+            let means = if t < half { means_a } else { means_b };
+            let best = means.iter().cloned().fold(f64::MIN, f64::max);
+            let arm = learner.ranking()[0];
+            let reward = env.normal(means[arm], noise);
+            learner.update(arm, reward);
+            if t >= half {
+                regret += best - means[arm];
+            }
+        }
+        regret
+    }
+
+    #[test]
+    fn discounting_tracks_a_switch_better_than_stationary() {
+        // Arm 0 is best in the first half; arms swap in the second half.
+        let means_a = [1.0, 0.0];
+        let means_b = [0.0, 1.0];
+        let half = 1500;
+        let noise = 0.2;
+
+        let mut discounted = DiscountedThompson::new(2, 0.5, 1.0, 0.04, 0.95, 1);
+        let dr = second_half_regret(&mut discounted, &means_a, &means_b, half, noise, 7);
+
+        let mut stationary = GaussianThompson::new(2, 0.5, 1.0, 0.04, 1);
+        let sr = second_half_regret(&mut stationary, &means_a, &means_b, half, noise, 7);
+
+        // The forgetting learner recovers after the switch; the stationary one,
+        // having hardened onto arm 0, pays far more regret in the second half.
+        assert!(
+            dr < 0.5 * sr,
+            "discounted second-half regret {dr} not << stationary {sr}"
+        );
+    }
+
+    #[test]
+    fn discounting_with_gamma_one_matches_stationary() {
+        // gamma = 1.0 means no forgetting: same best-arm identification.
+        let true_means = [0.1, 0.5, 0.9, 0.3];
+        let mut d = DiscountedThompson::new(4, 0.0, 1.0, 0.25, 1.0, 1);
+        run_bandit(&mut d, &true_means, 2000, 0.5, 99);
+        let means = d.means();
+        let best = (0..4).max_by(|&a, &b| means[a].partial_cmp(&means[b]).unwrap());
+        assert_eq!(best, Some(2));
     }
 }
