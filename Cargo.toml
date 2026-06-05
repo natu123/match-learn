@@ -1,0 +1,11 @@
+[package]
+name = "match-learn"
+version = "0.1.0"
+edition = "2024"
+description = "Online preference learning x stable matching"
+license = "MIT"
+repository = "https://github.com/natu123/match-learn"
+keywords = ["matching", "bandit", "stable-matching", "online-learning"]
+categories = ["algorithms", "science"]
+
+[dependencies]
