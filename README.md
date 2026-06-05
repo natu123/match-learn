@@ -2,7 +2,7 @@
 
 **Stable matching that learns.** Online preference learning x stable matching, in Rust.
 
-> **Status: Phase 1 (mechanism proof), built in public.**
+> **Status: Phase 2 (matching coverage), built in public.**
 > Early and incomplete. The core is built from scratch, one phase at a time.
 
 ---
@@ -79,10 +79,10 @@ cargo run  --example converge           # watch regret flatten
 ### Phase 2 — Matching coverage
 From the textbook 1:1 case to real matching shapes.
 
-- [ ] Many-to-one matching (capacity / quotas)
-- [ ] Incomplete preference lists, tie-breaking
-- [ ] One-sided vs two-sided unknown preferences
-- [ ] Top Trading Cycle (TTC) and other mechanisms
+- [x] Many-to-one matching (capacity / quotas) — Hospital-Residents deferred acceptance
+- [x] Incomplete preference lists, tie-breaking
+- [x] One-sided vs two-sided unknown preferences — `TwoSidedMarket`, both sides learn
+- [x] Top Trading Cycle (TTC) and other mechanisms
 
 ### Phase 3 — Learning layer
 Make the learning predictive and adaptive.
