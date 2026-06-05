@@ -1,0 +1,256 @@
+//! Online preference learners (from scratch).
+//!
+//! Each agent in a market treats the other side as a multi-armed bandit: pulling
+//! arm `a` (being matched to partner `a`) yields a noisy reward whose mean is the
+//! agent's unknown utility for `a`. A [`PreferenceLearner`] turns the rewards
+//! seen so far into a per-round ranking of the arms, which the matching layer
+//! feeds to Gale-Shapley.
+//!
+//! Two strategies are provided, both for Gaussian rewards:
+//! - [`GaussianThompson`] — Bayesian posterior sampling (Thompson Sampling).
+//! - [`Ucb1`] — optimism in the face of uncertainty (UCB1).
+
+use crate::rng::Rng;
+
+/// An online estimator of an agent's preferences over a fixed set of arms.
+pub trait PreferenceLearner {
+    /// Number of arms (candidate partners).
+    fn n_arms(&self) -> usize;
+
+    /// Per-arm score for the current round; higher means more preferred.
+    ///
+    /// May be stochastic (Thompson Sampling draws a fresh posterior sample), so
+    /// it takes `&mut self`.
+    fn scores(&mut self) -> Vec<f64>;
+
+    /// Record an observed `reward` for `arm`.
+    fn update(&mut self, arm: usize, reward: f64);
+
+    /// Deterministic point estimate of each arm's mean utility (diagnostics).
+    fn means(&self) -> Vec<f64>;
+
+    /// A full preference ranking for this round, most preferred first.
+    ///
+    /// Ties are broken by arm index, keeping the ranking deterministic given the
+    /// scores.
+    fn ranking(&mut self) -> Vec<usize> {
+        let s = self.scores();
+        let mut idx: Vec<usize> = (0..s.len()).collect();
+        idx.sort_by(|&a, &b| {
+            s[b]
+                .partial_cmp(&s[a])
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .then(a.cmp(&b))
+        });
+        idx
+    }
+}
+
+/// Thompson Sampling for Gaussian rewards with known observation noise.
+///
+/// Each arm's mean utility has a Gaussian prior `N(prior_mean, prior_var)`. With
+/// a Gaussian likelihood of known variance `obs_var`, the posterior stays
+/// Gaussian and is updated in closed form. Each round, [`scores`] draws one
+/// sample per arm from its posterior.
+///
+/// [`scores`]: PreferenceLearner::scores
+#[derive(Debug, Clone)]
+pub struct GaussianThompson {
+    obs_var: f64,
+    prior_mean: f64,
+    prior_var: f64,
+    count: Vec<f64>,
+    sum: Vec<f64>,
+    rng: Rng,
+}
+
+impl GaussianThompson {
+    /// Create a learner over `n_arms` with the given prior and observation noise.
+    ///
+    /// `prior_var` and `obs_var` must be positive.
+    pub fn new(n_arms: usize, prior_mean: f64, prior_var: f64, obs_var: f64, seed: u64) -> Self {
+        assert!(prior_var > 0.0 && obs_var > 0.0, "variances must be positive");
+        Self {
+            obs_var,
+            prior_mean,
+            prior_var,
+            count: vec![0.0; n_arms],
+            sum: vec![0.0; n_arms],
+            rng: Rng::new(seed),
+        }
+    }
+
+    /// Posterior (mean, variance) of arm `a`'s mean utility.
+    fn posterior(&self, a: usize) -> (f64, f64) {
+        let precision = 1.0 / self.prior_var + self.count[a] / self.obs_var;
+        let var = 1.0 / precision;
+        let mean = (self.prior_mean / self.prior_var + self.sum[a] / self.obs_var) * var;
+        (mean, var)
+    }
+}
+
+impl PreferenceLearner for GaussianThompson {
+    fn n_arms(&self) -> usize {
+        self.count.len()
+    }
+
+    fn scores(&mut self) -> Vec<f64> {
+        (0..self.count.len())
+            .map(|a| {
+                let (mean, var) = self.posterior(a);
+                self.rng.normal(mean, var.sqrt())
+            })
+            .collect()
+    }
+
+    fn update(&mut self, arm: usize, reward: f64) {
+        self.count[arm] += 1.0;
+        self.sum[arm] += reward;
+    }
+
+    fn means(&self) -> Vec<f64> {
+        (0..self.count.len()).map(|a| self.posterior(a).0).collect()
+    }
+}
+
+/// UCB1 for bounded/Gaussian rewards.
+///
+/// The score of arm `a` is its empirical mean plus an exploration bonus
+/// `c * sqrt(ln(total) / n_a)`. Arms never pulled score `+inf`, so each is tried
+/// once before exploitation begins.
+#[derive(Debug, Clone)]
+pub struct Ucb1 {
+    c: f64,
+    total: f64,
+    count: Vec<f64>,
+    sum: Vec<f64>,
+}
+
+impl Ucb1 {
+    /// Create a UCB1 learner over `n_arms` with exploration constant `c`.
+    pub fn new(n_arms: usize, c: f64) -> Self {
+        Self {
+            c,
+            total: 0.0,
+            count: vec![0.0; n_arms],
+            sum: vec![0.0; n_arms],
+        }
+    }
+
+    fn mean(&self, a: usize) -> f64 {
+        if self.count[a] == 0.0 {
+            0.0
+        } else {
+            self.sum[a] / self.count[a]
+        }
+    }
+}
+
+impl PreferenceLearner for Ucb1 {
+    fn n_arms(&self) -> usize {
+        self.count.len()
+    }
+
+    fn scores(&mut self) -> Vec<f64> {
+        let ln_total = (self.total.max(1.0)).ln();
+        (0..self.count.len())
+            .map(|a| {
+                if self.count[a] == 0.0 {
+                    f64::INFINITY
+                } else {
+                    self.mean(a) + self.c * (ln_total / self.count[a]).sqrt()
+                }
+            })
+            .collect()
+    }
+
+    fn update(&mut self, arm: usize, reward: f64) {
+        self.count[arm] += 1.0;
+        self.sum[arm] += reward;
+        self.total += 1.0;
+    }
+
+    fn means(&self) -> Vec<f64> {
+        (0..self.count.len()).map(|a| self.mean(a)).collect()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Drive a learner as a plain bandit: each round pull the top-ranked arm,
+    /// observe a noisy reward, update. Return the cumulative pseudo-regret.
+    fn run_bandit<L: PreferenceLearner>(
+        learner: &mut L,
+        true_means: &[f64],
+        rounds: usize,
+        noise: f64,
+        seed: u64,
+    ) -> f64 {
+        let mut env = Rng::new(seed);
+        let best = true_means.iter().cloned().fold(f64::MIN, f64::max);
+        let mut regret = 0.0;
+        for _ in 0..rounds {
+            let arm = learner.ranking()[0];
+            let reward = env.normal(true_means[arm], noise);
+            learner.update(arm, reward);
+            regret += best - true_means[arm];
+        }
+        regret
+    }
+
+    #[test]
+    fn thompson_identifies_best_arm() {
+        let true_means = [0.1, 0.5, 0.9, 0.3];
+        let mut ts = GaussianThompson::new(4, 0.0, 1.0, 0.25, 1);
+        run_bandit(&mut ts, &true_means, 2000, 0.5, 99);
+        let means = ts.means();
+        let best = (0..4).max_by(|&a, &b| means[a].partial_cmp(&means[b]).unwrap());
+        assert_eq!(best, Some(2));
+    }
+
+    #[test]
+    fn ucb1_identifies_best_arm() {
+        let true_means = [0.1, 0.5, 0.9, 0.3];
+        let mut ucb = Ucb1::new(4, 1.0);
+        run_bandit(&mut ucb, &true_means, 2000, 0.5, 99);
+        let means = ucb.means();
+        let best = (0..4).max_by(|&a, &b| means[a].partial_cmp(&means[b]).unwrap());
+        assert_eq!(best, Some(2));
+    }
+
+    #[test]
+    fn thompson_regret_is_sublinear() {
+        // Regret over 2T rounds should be well below 2x the regret over T rounds
+        // if growth is sublinear; we check it grows much slower than linearly.
+        let true_means = [0.0, 0.4, 0.8];
+        let regret_t = {
+            let mut ts = GaussianThompson::new(3, 0.0, 1.0, 0.25, 5);
+            run_bandit(&mut ts, &true_means, 1000, 0.5, 7)
+        };
+        let regret_2t = {
+            let mut ts = GaussianThompson::new(3, 0.0, 1.0, 0.25, 5);
+            run_bandit(&mut ts, &true_means, 2000, 0.5, 7)
+        };
+        // Linear growth would give regret_2t ~= 2 * regret_t. Sublinear is well under.
+        assert!(
+            regret_2t < 1.6 * regret_t,
+            "regret_t={regret_t}, regret_2t={regret_2t} (not clearly sublinear)"
+        );
+    }
+
+    #[test]
+    fn ranking_is_a_permutation_and_deterministic_given_scores() {
+        let mut ucb = Ucb1::new(5, 1.0);
+        for a in 0..5 {
+            ucb.update(a, a as f64);
+        }
+        let r = ucb.ranking();
+        let mut sorted = r.clone();
+        sorted.sort_unstable();
+        assert_eq!(sorted, vec![0, 1, 2, 3, 4]);
+        // Highest empirical mean (arm 4) ranks first.
+        assert_eq!(r[0], 4);
+    }
+}
