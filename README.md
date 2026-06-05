@@ -48,13 +48,33 @@ parts borrowed later (clean separation, no premature dependencies).
 Prove that "learn preferences online while keeping the match stable" actually converges.
 
 - [x] Public repo + scaffold (build in public)
-- [ ] Gale-Shapley stable matching (from scratch)
-- [ ] Online preference learning (Thompson Sampling / UCB, from scratch)
-- [ ] Integration loop (learn -> match -> reward -> update)
-- [ ] Regret + stability evaluation harness
-- [ ] Convergence on synthetic data
+- [x] Gale-Shapley stable matching (from scratch)
+- [x] Online preference learning (Thompson Sampling / UCB, from scratch)
+- [x] Integration loop (learn -> match -> reward -> update)
+- [x] Regret + stability evaluation harness
+- [x] Convergence on synthetic data
 
-**Gate**: sublinear regret, and the matching stabilizes.
+**Gate**: sublinear regret, and the matching stabilizes. ✅ **passed** — see below.
+
+#### Phase 1 results
+
+Over 40 random 5×5 markets (well-specified Thompson Sampling, `tests/gate.rs`):
+
+| metric | value | meaning |
+| --- | --- | --- |
+| mean `R(2T)/R(T)` | **1.04** | regret is sublinear (linear would be 2.0); worst market 1.74 |
+| tail regret rate | **~0** | per-round regret collapses to zero after learning |
+| tail stable fraction | **0.92** | the matching is stable in the true market on most late rounds |
+| regret vs no-learning | **~125× lower** | learning massively beats a fixed, information-free policy |
+
+UCB1 also learns and is sublinear on aggregate, but its `ln t` exploration bonus
+keeps probing arms it has stopped pulling, leaving heavier regret tails — the
+explore/exploit cost that Phase 3 will tune.
+
+```text
+cargo test --test gate -- --nocapture   # the gate
+cargo run  --example converge           # watch regret flatten
+```
 
 ### Phase 2 — Matching coverage
 From the textbook 1:1 case to real matching shapes.
