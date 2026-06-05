@@ -13,12 +13,14 @@
 
 pub mod eval;
 pub mod learner;
+pub mod many_to_one;
 pub mod market;
 pub mod matching;
 pub mod rng;
 
 pub use eval::{Report, simulate};
 pub use learner::{GaussianThompson, PreferenceLearner, Ucb1};
+pub use many_to_one::{ManyToOne, hospital_residents};
 pub use market::Market;
 pub use matching::{Matching, gale_shapley, is_stable};
 pub use rng::Rng;

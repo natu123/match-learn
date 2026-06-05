@@ -28,7 +28,7 @@ impl Matching {
 /// Build `rank[a][b] = Some(position)` for each `b` on `a`'s list, else `None`.
 ///
 /// `n_other` is the size of the opposite side, so every list index is in range.
-fn rank_table(prefs: &[Vec<usize>], n_other: usize) -> Vec<Vec<Option<usize>>> {
+pub(crate) fn rank_table(prefs: &[Vec<usize>], n_other: usize) -> Vec<Vec<Option<usize>>> {
     let mut table = vec![vec![None; n_other]; prefs.len()];
     for (a, list) in prefs.iter().enumerate() {
         for (pos, &b) in list.iter().enumerate() {
