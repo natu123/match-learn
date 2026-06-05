@@ -12,6 +12,7 @@
 //! path toward dynamic pricing x supply-demand matching.
 
 pub mod contextual;
+pub mod data;
 pub mod eval;
 pub mod learner;
 pub mod linalg;
@@ -24,6 +25,7 @@ pub mod ttc;
 pub mod two_sided;
 
 pub use contextual::LinearThompson;
+pub use data::{correlated_market, from_text, to_text};
 pub use eval::{LearningMarket, Report, simulate};
 pub use learner::{DiscountedThompson, GaussianThompson, PreferenceLearner, Ucb1};
 pub use many_to_one::{ManyToOne, hospital_residents};
