@@ -11,11 +11,13 @@
 //! This is the Phase 1 (mechanism-proof) core; see the project Roadmap for the
 //! path toward dynamic pricing x supply-demand matching.
 
+pub mod eval;
 pub mod learner;
 pub mod market;
 pub mod matching;
 pub mod rng;
 
+pub use eval::{simulate, Report};
 pub use learner::{GaussianThompson, PreferenceLearner, Ucb1};
 pub use market::Market;
 pub use matching::{gale_shapley, is_stable, Matching};
