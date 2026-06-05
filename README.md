@@ -103,9 +103,9 @@ From synthetic to real, and against the competition.
 ### Phase 5 — Performance & bindings
 Make it the production layer ("research in Python, production in Rust").
 
-- [ ] Rayon parallelism
+- [x] Parallelism — `simulate_batch` over `std::thread` (dependency-free; Rayon could swap in)
 - [ ] PyO3 Python bindings
-- [ ] Latency / throughput benchmarks
+- [x] Latency / throughput benchmarks — `benchmark` example
 - [ ] WASM target
 
 ### Phase 6 — v1.0 stable release
