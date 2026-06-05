@@ -6,9 +6,13 @@
 //! seen so far into a per-round ranking of the arms, which the matching layer
 //! feeds to Gale-Shapley.
 //!
-//! Two strategies are provided, both for Gaussian rewards:
-//! - [`GaussianThompson`] — Bayesian posterior sampling (Thompson Sampling).
+//! Strategies provided, all for Gaussian rewards:
+//! - [`GaussianThompson`] — Bayesian posterior sampling (Thompson Sampling),
+//!   with an exploration-scale knob and exposed posterior mean / std / credible
+//!   intervals.
 //! - [`Ucb1`] — optimism in the face of uncertainty (UCB1).
+//! - [`DiscountedThompson`] — Thompson Sampling that forgets, for non-stationary
+//!   preferences.
 
 use crate::rng::Rng;
 
@@ -51,6 +55,7 @@ pub struct GaussianThompson {
     obs_var: f64,
     prior_mean: f64,
     prior_var: f64,
+    explore_scale: f64,
     count: Vec<f64>,
     sum: Vec<f64>,
     rng: Rng,
@@ -69,10 +74,21 @@ impl GaussianThompson {
             obs_var,
             prior_mean,
             prior_var,
+            explore_scale: 1.0,
             count: vec![0.0; n_arms],
             sum: vec![0.0; n_arms],
             rng: Rng::new(seed),
         }
+    }
+
+    /// Set the exploration scale (a builder method). Posterior samples are drawn
+    /// with their standard deviation multiplied by `scale`: `scale > 1` explores
+    /// more, `scale < 1` is greedier, `scale == 0` is pure exploitation of the
+    /// posterior mean. Default `1.0` is standard Thompson Sampling.
+    pub fn with_exploration(mut self, scale: f64) -> Self {
+        assert!(scale >= 0.0, "exploration scale must be non-negative");
+        self.explore_scale = scale;
+        self
     }
 
     /// Posterior (mean, variance) of arm `a`'s mean utility.
@@ -81,6 +97,23 @@ impl GaussianThompson {
         let var = 1.0 / precision;
         let mean = (self.prior_mean / self.prior_var + self.sum[a] / self.obs_var) * var;
         (mean, var)
+    }
+
+    /// Posterior mean of arm `a`'s utility (the Bayesian point estimate).
+    pub fn posterior_mean(&self, a: usize) -> f64 {
+        self.posterior(a).0
+    }
+
+    /// Posterior standard deviation of arm `a`'s utility (its uncertainty).
+    pub fn posterior_std(&self, a: usize) -> f64 {
+        self.posterior(a).1.sqrt()
+    }
+
+    /// A `z`-sigma credible interval `(low, high)` for arm `a`'s utility.
+    pub fn credible_interval(&self, a: usize, z: f64) -> (f64, f64) {
+        let (mean, var) = self.posterior(a);
+        let half = z * var.sqrt();
+        (mean - half, mean + half)
     }
 }
 
@@ -93,7 +126,7 @@ impl PreferenceLearner for GaussianThompson {
         (0..self.count.len())
             .map(|a| {
                 let (mean, var) = self.posterior(a);
-                self.rng.normal(mean, var.sqrt())
+                self.rng.normal(mean, self.explore_scale * var.sqrt())
             })
             .collect()
     }
@@ -384,5 +417,51 @@ mod tests {
         let means = d.means();
         let best = (0..4).max_by(|&a, &b| means[a].partial_cmp(&means[b]).unwrap());
         assert_eq!(best, Some(2));
+    }
+
+    #[test]
+    fn posterior_uncertainty_shrinks_with_evidence() {
+        let mut ts = GaussianThompson::new(2, 0.0, 1.0, 0.25, 1);
+        let std_prior = ts.posterior_std(0);
+        for _ in 0..100 {
+            ts.update(0, 0.7);
+        }
+        let std_after = ts.posterior_std(0);
+        assert!(
+            std_after < std_prior,
+            "posterior std did not shrink: {std_prior} -> {std_after}"
+        );
+        // The mean is pulled toward the observed reward, and a 2-sigma interval
+        // brackets it.
+        let (lo, hi) = ts.credible_interval(0, 2.0);
+        let mean = ts.posterior_mean(0);
+        assert!(lo < mean && mean < hi);
+        assert!(mean > 0.5, "mean did not move toward observed 0.7: {mean}");
+    }
+
+    #[test]
+    fn exploration_scale_controls_how_much_it_explores() {
+        // On the same bandit, a larger exploration scale pulls the suboptimal
+        // arms more often than a greedier (small-scale) learner.
+        let true_means = [0.9, 0.5, 0.3, 0.1];
+        let suboptimal_pulls = |scale: f64| {
+            let mut ts = GaussianThompson::new(4, 0.0, 1.0, 0.25, 5).with_exploration(scale);
+            let mut env = Rng::new(7);
+            let mut count = 0;
+            for _ in 0..600 {
+                let arm = ts.ranking()[0];
+                if arm != 0 {
+                    count += 1;
+                }
+                ts.update(arm, env.normal(true_means[arm], 0.5));
+            }
+            count
+        };
+        let greedy = suboptimal_pulls(0.2);
+        let exploratory = suboptimal_pulls(2.5);
+        assert!(
+            exploratory > greedy,
+            "more exploration should mean more suboptimal pulls: greedy={greedy}, exploratory={exploratory}"
+        );
     }
 }
