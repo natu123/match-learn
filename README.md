@@ -2,7 +2,7 @@
 
 **Stable matching that learns.** Online preference learning x stable matching, in Rust.
 
-> **Status: Phase 2 (matching coverage), built in public.**
+> **Status: Phase 4 (real data & benchmarks), built in public.**
 > Early and incomplete. The core is built from scratch, one phase at a time.
 
 ---
@@ -87,10 +87,10 @@ From the textbook 1:1 case to real matching shapes.
 ### Phase 3 — Learning layer
 Make the learning predictive and adaptive.
 
-- [ ] Contextual bandit (context-aware preference learning)
-- [ ] Non-stationary preferences (discounting, change-point detection)
-- [ ] Bayesian preference estimation (posterior uncertainty)
-- [ ] Explore / exploit tuning
+- [x] Contextual bandit (context-aware preference learning) — `LinearThompson`
+- [x] Non-stationary preferences (discounting) — `DiscountedThompson`
+- [x] Bayesian preference estimation (posterior uncertainty) — mean / std / credible intervals
+- [x] Explore / exploit tuning — `with_exploration(scale)`
 
 ### Phase 4 — Real data & benchmarks
 From synthetic to real, and against the competition.
