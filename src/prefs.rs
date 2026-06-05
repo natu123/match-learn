@@ -130,8 +130,8 @@ mod tests {
     #[test]
     fn incomplete_lists_feed_gale_shapley() {
         // Proposer 0 finds only receiver 1 acceptable; matching must respect it.
-        let full = vec![vec![0, 1], vec![0, 1]];
-        let acceptable_p0 = vec![false, true];
+        let full = [vec![0, 1], vec![0, 1]];
+        let acceptable_p0 = [false, true];
         let p0 = restrict_to_acceptable(&full[0], &acceptable_p0);
         let prop = [p0, full[1].clone()];
         let recv = [vec![0, 1], vec![0, 1]];

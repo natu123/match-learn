@@ -13,7 +13,26 @@
 //!   *stabilize* — to become and stay stable.
 
 use crate::market::Market;
-use crate::matching::{Matching, is_stable};
+use crate::matching::{Matching, gale_shapley, is_stable};
+
+/// A learning matching loop the harness can drive and score.
+///
+/// Implemented by both the one-sided [`Market`](crate::market::Market) and the
+/// two-sided market, so they share the same regret/stability harness. The "true"
+/// preferences are the ground truth the learners are converging toward; on a
+/// one-sided market the receiver side is simply the known fixed preferences.
+pub trait LearningMarket {
+    /// Play one round and return the realized matching.
+    fn step(&mut self) -> Matching;
+    /// Number of proposers (the side whose regret is measured).
+    fn n_proposers(&self) -> usize;
+    /// Proposer `p`'s true utility for receiver `r`.
+    fn proposer_util(&self, p: usize, r: usize) -> f64;
+    /// Proposers' true preference rankings.
+    fn true_proposer_prefs(&self) -> Vec<Vec<usize>>;
+    /// Receivers' true preference rankings.
+    fn true_receiver_prefs(&self) -> Vec<Vec<usize>>;
+}
 
 /// Per-round record of a run, plus convenience summaries.
 #[derive(Debug, Clone)]
@@ -75,22 +94,29 @@ impl Report {
     }
 }
 
-/// Regret of one realized `matching` against the true-market `baseline`.
-fn instantaneous_regret(market: &Market, baseline: &Matching, matching: &Matching) -> f64 {
+/// Proposer-side regret of one realized `matching` against the `baseline`.
+fn instantaneous_regret<M: LearningMarket>(
+    market: &M,
+    baseline: &Matching,
+    matching: &Matching,
+) -> f64 {
     let mut r = 0.0;
     for p in 0..market.n_proposers() {
-        let base = baseline.proposer[p].map_or(0.0, |r| market.true_util(p, r));
-        let got = matching.proposer[p].map_or(0.0, |r| market.true_util(p, r));
+        let base = baseline.proposer[p].map_or(0.0, |r| market.proposer_util(p, r));
+        let got = matching.proposer[p].map_or(0.0, |r| market.proposer_util(p, r));
         r += base - got;
     }
     r
 }
 
 /// Run `market` for `rounds` rounds, returning a [`Report`].
-pub fn simulate(market: &mut Market, rounds: usize) -> Report {
-    let baseline = market.true_stable_matching();
-    let true_prefs = market.true_proposer_prefs();
-    let receiver_prefs = market.receiver_prefs().to_vec();
+///
+/// Regret is measured against the proposer-optimal stable matching of the true
+/// market; stability is checked against both sides' true preferences.
+pub fn simulate<M: LearningMarket>(market: &mut M, rounds: usize) -> Report {
+    let true_pp = market.true_proposer_prefs();
+    let true_rp = market.true_receiver_prefs();
+    let baseline = gale_shapley(&true_pp, &true_rp);
 
     let mut cumulative_regret = Vec::with_capacity(rounds);
     let mut stable = Vec::with_capacity(rounds);
@@ -100,13 +126,31 @@ pub fn simulate(market: &mut Market, rounds: usize) -> Report {
         let matching = market.step();
         acc += instantaneous_regret(market, &baseline, &matching);
         cumulative_regret.push(acc);
-        stable.push(is_stable(&true_prefs, &receiver_prefs, &matching));
+        stable.push(is_stable(&true_pp, &true_rp, &matching));
     }
 
     Report {
         rounds,
         cumulative_regret,
         stable,
+    }
+}
+
+impl LearningMarket for crate::market::Market {
+    fn step(&mut self) -> Matching {
+        Market::step(self)
+    }
+    fn n_proposers(&self) -> usize {
+        Market::n_proposers(self)
+    }
+    fn proposer_util(&self, p: usize, r: usize) -> f64 {
+        Market::true_util(self, p, r)
+    }
+    fn true_proposer_prefs(&self) -> Vec<Vec<usize>> {
+        Market::true_proposer_prefs(self)
+    }
+    fn true_receiver_prefs(&self) -> Vec<Vec<usize>> {
+        Market::receiver_prefs(self).to_vec()
     }
 }
 
