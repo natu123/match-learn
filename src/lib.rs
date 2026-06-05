@@ -11,8 +11,10 @@
 //! This is the Phase 1 (mechanism-proof) core; see the project Roadmap for the
 //! path toward dynamic pricing x supply-demand matching.
 
+pub mod contextual;
 pub mod eval;
 pub mod learner;
+pub mod linalg;
 pub mod many_to_one;
 pub mod market;
 pub mod matching;
@@ -21,6 +23,7 @@ pub mod rng;
 pub mod ttc;
 pub mod two_sided;
 
+pub use contextual::LinearThompson;
 pub use eval::{LearningMarket, Report, simulate};
 pub use learner::{DiscountedThompson, GaussianThompson, PreferenceLearner, Ucb1};
 pub use many_to_one::{ManyToOne, hospital_residents};
