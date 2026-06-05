@@ -13,7 +13,7 @@
 //!   *stabilize* — to become and stay stable.
 
 use crate::market::Market;
-use crate::matching::{is_stable, Matching};
+use crate::matching::{Matching, is_stable};
 
 /// Per-round record of a run, plus convenience summaries.
 #[derive(Debug, Clone)]

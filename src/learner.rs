@@ -37,8 +37,7 @@ pub trait PreferenceLearner {
         let s = self.scores();
         let mut idx: Vec<usize> = (0..s.len()).collect();
         idx.sort_by(|&a, &b| {
-            s[b]
-                .partial_cmp(&s[a])
+            s[b].partial_cmp(&s[a])
                 .unwrap_or(std::cmp::Ordering::Equal)
                 .then(a.cmp(&b))
         });
@@ -69,7 +68,10 @@ impl GaussianThompson {
     ///
     /// `prior_var` and `obs_var` must be positive.
     pub fn new(n_arms: usize, prior_mean: f64, prior_var: f64, obs_var: f64, seed: u64) -> Self {
-        assert!(prior_var > 0.0 && obs_var > 0.0, "variances must be positive");
+        assert!(
+            prior_var > 0.0 && obs_var > 0.0,
+            "variances must be positive"
+        );
         Self {
             obs_var,
             prior_mean,

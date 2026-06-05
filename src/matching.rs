@@ -45,10 +45,7 @@ fn rank_table(prefs: &[Vec<usize>], n_other: usize) -> Vec<Vec<Option<usize>>> {
 /// `proposer_prefs[p]` is `p`'s ranking of receivers (most preferred first);
 /// `receiver_prefs[r]` is `r`'s ranking of proposers. A pair is acceptable only
 /// if each appears on the other's list. Runs in `O(P * R)` time.
-pub fn gale_shapley(
-    proposer_prefs: &[Vec<usize>],
-    receiver_prefs: &[Vec<usize>],
-) -> Matching {
+pub fn gale_shapley(proposer_prefs: &[Vec<usize>], receiver_prefs: &[Vec<usize>]) -> Matching {
     let n_p = proposer_prefs.len();
     let n_r = receiver_prefs.len();
     let recv_rank = rank_table(receiver_prefs, n_p);
@@ -189,10 +186,7 @@ mod tests {
     }
 
     /// Brute-force oracle: enumerate all stable matchings, confirm GS produces one.
-    fn all_stable_matchings(
-        prop: &[Vec<usize>],
-        recv: &[Vec<usize>],
-    ) -> Vec<Matching> {
+    fn all_stable_matchings(prop: &[Vec<usize>], recv: &[Vec<usize>]) -> Vec<Matching> {
         let n_p = prop.len();
         let n_r = recv.len();
         let mut out = Vec::new();
@@ -254,10 +248,7 @@ mod tests {
             );
             // ...and must appear in the brute-force set of stable matchings.
             let oracle = all_stable_matchings(&prop, &recv);
-            assert!(
-                oracle.iter().any(|o| *o == m),
-                "GS matching not in oracle set"
-            );
+            assert!(oracle.contains(&m), "GS matching not in oracle set");
         }
     }
 
@@ -273,10 +264,10 @@ mod tests {
             let gs = gale_shapley(&prop, &recv);
             let prop_rank = rank_table(&prop, n);
             for other in all_stable_matchings(&prop, &recv) {
-                for p in 0..n {
+                for (p, ranks) in prop_rank.iter().enumerate() {
                     if let (Some(g), Some(o)) = (gs.proposer[p], other.proposer[p]) {
                         // Lower rank = more preferred; GS is never worse.
-                        assert!(prop_rank[p][g] <= prop_rank[p][o]);
+                        assert!(ranks[g] <= ranks[o]);
                     }
                 }
             }

@@ -16,7 +16,7 @@
 //! matching approaches the stable matching of the *true* market.
 
 use crate::learner::{GaussianThompson, PreferenceLearner, Ucb1};
-use crate::matching::{gale_shapley, Matching};
+use crate::matching::{Matching, gale_shapley};
 use crate::rng::Rng;
 
 /// A two-sided market with learning proposers and known-preference receivers.

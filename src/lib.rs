@@ -17,8 +17,8 @@ pub mod market;
 pub mod matching;
 pub mod rng;
 
-pub use eval::{simulate, Report};
+pub use eval::{Report, simulate};
 pub use learner::{GaussianThompson, PreferenceLearner, Ucb1};
 pub use market::Market;
-pub use matching::{gale_shapley, is_stable, Matching};
+pub use matching::{Matching, gale_shapley, is_stable};
 pub use rng::Rng;
