@@ -8,6 +8,13 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `allocation` module: one-sided house allocation (no endowments), the companion
+  to `ttc`. `serial_dictatorship` (priority order), `random_serial_dictatorship`
+  (random priority, fractional), and `probabilistic_serial` — the
+  Bogomolnaia-Moulin simultaneous-eating algorithm whose fractional assignment is
+  ordinally efficient and envy-free (`sd_envy_free`). `is_pareto_efficient` checks
+  a discrete assignment via free-object and trading-cycle improvements, validated
+  against a brute-force oracle.
 - `many_to_many` module: stable matching where *both* sides have quotas (workers
   hold several firms, firms hold several workers) — worker-proposing deferred
   acceptance with responsive preferences, yielding a pairwise-stable matching

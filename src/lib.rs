@@ -59,6 +59,7 @@
 //! assert!((pricer.best_price() - clearing).abs() < 3.0);
 //! ```
 
+pub mod allocation;
 pub mod applications;
 pub mod assignment;
 pub mod auction;
@@ -87,6 +88,10 @@ pub mod strategyproof;
 pub mod ttc;
 pub mod two_sided;
 
+pub use allocation::{
+    is_pareto_efficient, probabilistic_serial, random_serial_dictatorship, sd_envy_free,
+    serial_dictatorship,
+};
 pub use applications::{
     Crowdsourcing, Delivery, RideHailing, random_crowdsourcing, random_delivery,
     random_ride_hailing,

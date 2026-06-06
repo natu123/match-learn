@@ -183,6 +183,9 @@ Real platforms.
 - [x] **Many-to-many matching** — `many_to_many`: both sides hold multiple partners
   (workers x firms with quotas); pairwise-stable, brute-force-verified, reducing to
   Gale-Shapley and Hospital-Residents as special cases.
+- [x] **House allocation** — `allocation`: one-sided assignment without endowments —
+  serial dictatorship, random priority, and the probabilistic-serial eating
+  algorithm (ordinally efficient, envy-free), with a Pareto-efficiency check.
 
 ---
 
