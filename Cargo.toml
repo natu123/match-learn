@@ -2,11 +2,21 @@
 name = "match-learn"
 version = "0.1.0"
 edition = "2024"
-description = "Online preference learning x stable matching"
+description = "Online preference learning x stable matching, with dynamic pricing"
 license = "MIT"
 repository = "https://github.com/natu123/match-learn"
+homepage = "https://github.com/natu123/match-learn"
+documentation = "https://docs.rs/match-learn"
+readme = "README.md"
 keywords = ["matching", "bandit", "stable-matching", "online-learning"]
 categories = ["algorithms", "science"]
+# Keep the published package lean: benchmark/Python scaffolding and CI are not
+# needed by Rust consumers.
+exclude = ["/bench", "/python", "/.github", "/pyproject.toml"]
+
+[package.metadata.docs.rs]
+# Document the optional features on docs.rs.
+features = ["serde"]
 
 [lib]
 # rlib for Rust consumers (tests, examples, downstream crates); cdylib for the
