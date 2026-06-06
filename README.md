@@ -99,6 +99,26 @@ cargo test --test gate -- --nocapture   # the gate
 cargo run  --example converge           # watch regret flatten
 ```
 
+#### Research track — beating the Thompson stall
+
+Greedy Thompson Sampling explores only through posterior variance, which
+**freezes** for an arm once the match stops pulling it. On rare hard markets a
+proposer's true partner is frozen out and the market locks into a *wrong* stable
+matching. `ForcedExploreThompson` cures this: it plays Thompson Sampling but,
+with vanishing probability `ε_t = min(1, c/t)`, forces a pull of the
+least-sampled arm — enough to keep a frozen arm probed `Ω(log T)` times, yet
+decaying so the tail stays calm (unlike UCB's perpetual bonus). On the same 40
+markets (`c = 0.25`):
+
+| metric | greedy Thompson | forced-explore |
+| --- | :---: | :---: |
+| sublinear markets (of 40) | 38 | **40** |
+| worst-case `R(2T)/R(T)` | 2.52 | **1.47** |
+| worst-case tail regret rate | 0.315 | **0.046** (~7× lighter) |
+
+Theory (regret `O(log T)` for `c > 8nσ²/Δ²`, sublinear for any `c > 0`, and
+stall probability → 0) is in [`docs/stall-avoidance.md`](docs/stall-avoidance.md).
+
 ### Phase 2 — Matching coverage
 From the textbook 1:1 case to real matching shapes.
 
