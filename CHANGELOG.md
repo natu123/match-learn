@@ -8,6 +8,11 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `ties` module: stable matching with indifferences. Weak / strong / super
+  stability checkers (`is_weakly_stable`, `is_strongly_stable`,
+  `is_super_stable`), a `weakly_stable` constructor (tie-break + Gale-Shapley,
+  always exists), and brute-force `super_stable` / `strongly_stable` finders.
+  Without ties all three collapse to ordinary stability; super ⟹ strong ⟹ weak.
 - `allocation` module: one-sided house allocation (no endowments), the companion
   to `ttc`. `serial_dictatorship` (priority order), `random_serial_dictatorship`
   (random priority, fractional), and `probabilistic_serial` — the

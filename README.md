@@ -186,6 +186,9 @@ Real platforms.
 - [x] **House allocation** — `allocation`: one-sided assignment without endowments —
   serial dictatorship, random priority, and the probabilistic-serial eating
   algorithm (ordinally efficient, envy-free), with a Pareto-efficiency check.
+- [x] **Ties / indifferences** — `ties`: weak / strong / super stability with
+  indifferent preferences (the school-choice setting), checkers plus constructors,
+  collapsing to ordinary stability when preferences are strict.
 
 ---
 

@@ -85,6 +85,7 @@ mod python;
 pub mod reserves;
 pub mod rng;
 pub mod strategyproof;
+pub mod ties;
 pub mod ttc;
 pub mod two_sided;
 
@@ -119,5 +120,9 @@ pub use pricing::{LearnedPricer, Objective, price_grid};
 pub use reserves::{deferred_acceptance_with_reserves, reserved_type_matched};
 pub use rng::Rng;
 pub use strategyproof::{proposer_manipulation, receiver_manipulation};
+pub use ties::{
+    is_strongly_stable, is_super_stable, is_weakly_stable, strongly_stable, super_stable,
+    weakly_stable,
+};
 pub use ttc::top_trading_cycle;
 pub use two_sided::TwoSidedMarket;
