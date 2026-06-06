@@ -95,6 +95,7 @@ impl Market {
     /// schedule on the least-sampled arm — the stall-resistant learner. `obs_var`
     /// is the assumed reward variance (well-specified when it equals `noise^2`)
     /// and `c` is the forced-exploration constant.
+    #[allow(clippy::too_many_arguments)]
     pub fn with_forced_explore(
         true_util: Vec<Vec<f64>>,
         receiver_prefs: Vec<Vec<usize>>,
