@@ -192,6 +192,15 @@ impl Market {
         self.learners.iter_mut().map(|l| l.ranking()).collect()
     }
 
+    /// Each proposer's posterior point estimate of its utility for every receiver
+    /// (`[n_proposers][n_receivers]`). A diagnostic window into the learned
+    /// beliefs — useful for visualizing convergence and for spotting a *frozen*
+    /// arm (an estimate stuck far from the truth because the arm stopped being
+    /// pulled).
+    pub fn belief_means(&self) -> Vec<Vec<f64>> {
+        self.learners.iter().map(|l| l.means()).collect()
+    }
+
     /// Play one round and return the matching that was realized.
     ///
     /// Proposers rank receivers from their beliefs, Gale-Shapley matches against
