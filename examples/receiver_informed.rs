@@ -65,7 +65,7 @@ fn receiver_informed_ranking(p: usize, means: &[f64], recv: &[Vec<usize>]) -> Ve
     let pos_of_p = |r: usize| recv[r].iter().position(|&q| q == p).unwrap_or(usize::MAX);
     let mut out = Vec::new();
     for mut g in tie_groups(means) {
-        g.sort_by(|&x, &y| pos_of_p(y).cmp(&pos_of_p(x))); // worst-preferring receiver first
+        g.sort_by_key(|&r| std::cmp::Reverse(pos_of_p(r))); // worst-preferring receiver first
         out.extend(g);
     }
     out
