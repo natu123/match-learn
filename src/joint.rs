@@ -231,4 +231,30 @@ mod tests {
             "learned joint price {learned_price} not near oracle {oracle_price}"
         );
     }
+
+    #[test]
+    fn best_price_recovers_most_of_the_efficient_welfare() {
+        // Price as a proxy for preference: the best single posted price, which
+        // must also respect the two-sided stable matching, recovers nearly all of
+        // the efficient (unconstrained) gains from trade.
+        use crate::auction::double_auction;
+
+        let grid = price_grid(0.02, 0.98, 25);
+        let mut rng = Rng::new(2026);
+        let mut efficient_sum = 0.0;
+        let mut best_sum = 0.0;
+        for _ in 0..400 {
+            let inst = random_joint_instance(&mut rng, 25, 25);
+            efficient_sum += double_auction(&inst.demand_values, &inst.supply_costs).welfare;
+            best_sum += grid
+                .iter()
+                .map(|&p| inst.welfare_at(p))
+                .fold(0.0_f64, f64::max);
+        }
+        // Empirically ~98%; require a robust 90%.
+        assert!(
+            best_sum > 0.9 * efficient_sum,
+            "best-price welfare {best_sum} below 90% of efficient {efficient_sum}"
+        );
+    }
 }

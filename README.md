@@ -164,7 +164,7 @@ Real platforms.
 - [x] Application adapters — `RideHailing`, `Delivery`, `Crowdsourcing` map onto `JointInstance` (proximity / effort / skill fit), with learned pricing
 - [ ] Large-scale / production deployment
 - [x] Market design extensions — double auction + truthful McAfee mechanism (`auction` module)
-- [ ] Price-as-preference, deepened
+- [x] Price-as-preference, deepened — a single price recovers ~98% of efficient welfare (`price_as_preference` example)
 
 ---
 
