@@ -67,6 +67,27 @@ impl Rng {
         (self.next_u64() % n as u64) as usize
     }
 
+    /// A Poisson sample with mean `lambda >= 0`, via Knuth's algorithm.
+    ///
+    /// Fine for the small-to-moderate rates used in the marketplace model; cost
+    /// grows linearly with `lambda`.
+    pub fn poisson(&mut self, lambda: f64) -> usize {
+        assert!(lambda >= 0.0, "lambda must be non-negative");
+        if lambda == 0.0 {
+            return 0;
+        }
+        let l = (-lambda).exp();
+        let mut k = 0usize;
+        let mut p = 1.0;
+        loop {
+            p *= self.uniform();
+            if p <= l {
+                return k;
+            }
+            k += 1;
+        }
+    }
+
     /// In-place Fisher-Yates shuffle.
     pub fn shuffle<T>(&mut self, slice: &mut [T]) {
         for i in (1..slice.len()).rev() {
@@ -120,6 +141,26 @@ mod tests {
         let var = sq / n as f64 - mean * mean;
         assert!(mean.abs() < 0.02, "mean = {mean}");
         assert!((var - 1.0).abs() < 0.05, "var = {var}");
+    }
+
+    #[test]
+    fn poisson_mean_and_variance_roughly_correct() {
+        // For Poisson, both mean and variance equal lambda.
+        let mut r = Rng::new(2024);
+        let lambda = 4.0;
+        let n = 200_000;
+        let mut sum = 0.0;
+        let mut sq = 0.0;
+        for _ in 0..n {
+            let x = r.poisson(lambda) as f64;
+            sum += x;
+            sq += x * x;
+        }
+        let mean = sum / n as f64;
+        let var = sq / n as f64 - mean * mean;
+        assert!((mean - lambda).abs() < 0.05, "mean = {mean}");
+        assert!((var - lambda).abs() < 0.1, "var = {var}");
+        assert_eq!(r.poisson(0.0), 0);
     }
 
     #[test]
