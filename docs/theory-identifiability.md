@@ -280,6 +280,27 @@ The `Θ(σ²/ε²)` activation assumes forcing reaches every arm at the Auer `c/
 rate; the exact constant couples to the matching dynamics (which arm is pulled
 depends on the current matching) and is stated here for the forced-uniform regime.
 
+**Empirical check — same-belief A/B (`examples/prop4_gating_study.rs`).** To
+isolate the gate from the learning-feedback loop, one Thompson loop generates the
+beliefs and each measured round forms the `plain` / `ungated` / `gated` decisions
+on the *same* posterior means/stds (300 random `5×5` markets, early vs late
+regime). It confirms the safety claim and sharpens its scope:
+
+- **Ungated coordination loses stability**, exact-stable `0.74–0.76` vs `plain`'s
+  `0.91–0.95` — the live negative finding, reproduced in isolation. Its regret goes
+  *negative* (proposers gain beyond `M*`) precisely *because* belief-welfare-max
+  picks proposer-favoring **unstable** matchings.
+- **Gating restores most of the stability** (`gated` `0.87–0.94`, and `≈ plain` at
+  the tight band `ε=0.02`): Prop. 4(1). The `gated` reorder-rate rises early→late
+  (`0.00→0.02` at `ε=0.02`, `0.05→0.11` at `ε=0.05`) — the Prop. 4(2) activation
+  curve; tighter `ε` ⇒ stricter gate ⇒ closer to `plain` (a safety/coverage knob).
+- **Honest limit.** Even with *accurate* beliefs `ungated` stays at `0.76`
+  stability, so belief-welfare-max is **not** the right objective (welfare-max ≠
+  stable-max even when beliefs are good). The gate *caps the damage* but does not
+  fix the objective; this is concrete evidence for the "optimize stability
+  directly" alternative above. Consistent with Prop. 4 guaranteeing `2ε`-stability,
+  `gated` does give up a little exact stability for coordination.
+
 ## 5. Consequences
 
 - **No-go for decentralized policies (Prop. 2, 2′):** forcing, annealing, UCB,
