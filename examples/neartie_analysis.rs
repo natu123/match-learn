@@ -85,6 +85,7 @@ fn main() {
                 .collect();
             let settled = gale_shapley(&rankings, market.receiver_prefs());
             let mut min_loss = f64::INFINITY;
+            #[allow(clippy::needless_range_loop)] // p also indexes the matchings
             for p in 0..N {
                 let (Some(star), Some(got)) = (stable.proposer[p], settled.proposer[p]) else {
                     continue;
