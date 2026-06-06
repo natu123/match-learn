@@ -2,9 +2,10 @@
 
 **Stable matching that learns.** Online preference learning x stable matching, in Rust.
 
-> **Status: Phases 1–4 done + Phase 5 in progress, built in public.**
+> **Status: Phases 1–5 done, Phase 7 (dynamic pricing) underway. Built in public.**
 > The core is built from scratch, one phase at a time. Verified against an
 > established library (identical matchings) and benchmarked across languages.
+> Pricing now gates participation and a bandit learns the market-clearing price.
 
 ---
 
@@ -143,7 +144,7 @@ Add the price axis: from matching to market.
 
 - [x] Queueing model — `Marketplace` (price-responsive Poisson arrivals, queues, clearing price)
 - [x] Dynamic pricing policy — `LearnedPricer` learns the clearing price online (bandit over a price grid)
-- [ ] Joint pricing x matching optimization
+- [x] Joint pricing x matching optimization — `JointInstance`: price gates entry, Gale-Shapley matches entrants
 - [ ] Regret-queue tradeoff
 
 ### Phase 8 — Productionization
