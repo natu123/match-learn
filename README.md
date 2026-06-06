@@ -154,7 +154,7 @@ Add the price axis: from matching to market.
 - [x] Queueing model — `Marketplace` (price-responsive Poisson arrivals, queues, clearing price)
 - [x] Dynamic pricing policy — `LearnedPricer` learns the clearing price online (bandit over a price grid)
 - [x] Joint pricing x matching optimization — `JointInstance`: price gates entry, Gale-Shapley matches entrants
-- [ ] Regret-queue tradeoff
+- [x] Regret-queue tradeoff — `regret_queue` example quantifies exploration's regret vs queue-imbalance cost
 
 ### Phase 8 — Productionization
 Real platforms.

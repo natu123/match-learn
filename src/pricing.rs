@@ -182,4 +182,37 @@ mod tests {
             "learned {learned} vs oracle-best fixed {oracle_best}"
         );
     }
+
+    /// Run a UCB pricer and return (total matched, mean absolute queue imbalance).
+    fn run_pricer(c: f64, rounds: usize) -> (usize, f64) {
+        let grid = price_grid(1.0, 18.0, 18);
+        let mut pricer = LearnedPricer::with_ucb(grid, c, Objective::Throughput);
+        let mut m = market(7);
+        let mut matched = 0usize;
+        let mut imbalance = 0.0;
+        for _ in 0..rounds {
+            let o = pricer.step(&mut m);
+            matched += o.matched;
+            imbalance += (o.demand_queue as f64 - o.supply_queue as f64).abs();
+        }
+        (matched, imbalance / rounds as f64)
+    }
+
+    #[test]
+    fn moderate_exploration_beats_under_exploration_on_both_costs() {
+        // The regret-queue tradeoff: too little exploration locks onto a wrong
+        // price, which hurts *both* matched volume (regret) and queue balance.
+        // A moderate exploration constant matches more and keeps queues calmer.
+        let (matched_low, imbalance_low) = run_pricer(0.1, 12_000);
+        let (matched_mid, imbalance_mid) = run_pricer(0.7, 12_000);
+
+        assert!(
+            matched_mid > matched_low,
+            "moderate exploration should match more: mid={matched_mid}, low={matched_low}"
+        );
+        assert!(
+            imbalance_mid < imbalance_low,
+            "moderate exploration should balance queues better: mid={imbalance_mid}, low={imbalance_low}"
+        );
+    }
 }
