@@ -32,6 +32,15 @@ An honest correction to our first result: the clean 40-market gate
 (`tests/gate.rs`) where forced exploration took every market sublinear was partly
 **seed luck**. On 400 markets per size the picture is the nuanced one above.
 
+**Sharpening — the stalls are stable, just not proposer-optimal**
+(`examples/eps_stability.rs`). The settled "stalled" matchings are *not* unstable:
+7/10 are **exactly stable** (no blocking pair at all) and 10/10 are **ε-stable**
+(`ε=0.05`). A near-tie stall converges to a *different* stable matching, not the
+proposer-**optimal** one. So the regret-vs-proposer-optimal is an **optimality
+gap**, not instability — against an any-stable or ε-stable benchmark the stall
+vanishes. The three cures below recover proposer-optimality *among* stable
+matchings; they do not rescue stability (which is already attained).
+
 ## 1. Setup
 
 One-sided learned matching (`src/market.rs`): `n` proposers each treat the `n`

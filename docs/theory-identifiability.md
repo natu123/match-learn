@@ -81,6 +81,14 @@ own rewards, so this applies regardless of the other agents. Hence
 `Δ_p` below the floor) for the whole horizon when `Δ_p ≲ σ/√T`. (iii) Each such
 round costs `≥ Δ_q` by construction. Summing gives the bound. ∎
 
+**What kind of floor (sharpening).** The cascade does not produce an *unstable*
+matching: it lands on a *different stable* matching in which `q` is worse off but
+cannot block (the receiver it covets prefers its current holder). So the floor of
+Prop. 2 is on **proposer-optimality-gap regret**, not on instability — consistent
+with `eps_stability.rs` finding the settled stalls exactly/ε-stable. The bound
+stands as a regret statement; "regret" here means distance from the proposer-
+optimal stable matching.
+
 **Gaps to close (for full rigor).** The base-instance "unique swing variable"
 claim is checked numerically, not proved in general; a fully general lower bound
 needs an instance family with a proved GS sensitivity. The constant `c` and the
