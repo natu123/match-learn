@@ -122,7 +122,7 @@ impl Marketplace {
         if self.abandon == 0.0 {
             return;
         }
-        let mut leave = |queue: usize, rng: &mut Rng| -> usize {
+        let leave = |queue: usize, rng: &mut Rng| -> usize {
             (0..queue).filter(|_| rng.uniform() < self.abandon).count()
         };
         self.demand_queue -= leave(self.demand_queue, &mut self.rng);

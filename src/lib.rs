@@ -22,6 +22,7 @@ pub mod marketplace;
 pub mod matching;
 pub mod parallel;
 pub mod prefs;
+pub mod pricing;
 #[cfg(feature = "python")]
 mod python;
 pub mod rng;
@@ -38,6 +39,7 @@ pub use marketplace::{Demand, Marketplace, RoundOutcome, Supply};
 pub use matching::{Matching, gale_shapley, is_stable};
 pub use parallel::simulate_batch;
 pub use prefs::{break_ties, rank_by_scores, rank_by_scores_random, restrict_to_acceptable};
+pub use pricing::{LearnedPricer, Objective, price_grid};
 pub use rng::Rng;
 pub use ttc::top_trading_cycle;
 pub use two_sided::TwoSidedMarket;
