@@ -39,7 +39,10 @@ An honest correction to our first result: the clean 40-market gate
 proposer-**optimal** one. So the regret-vs-proposer-optimal is an **optimality
 gap**, not instability — against an any-stable or ε-stable benchmark the stall
 vanishes. The three cures below recover proposer-optimality *among* stable
-matchings; they do not rescue stability (which is already attained).
+matchings; they do not rescue stability (which is already attained). At scale
+(`examples/stability_vs_optimality.rs`, 800 markets) the settled matching is
+**ε-stable in 100%** of markets and **exactly stable in 98.1% (5×5) / 93.4%
+(8×8)**; the optimality gap is non-trivial on only **1.2% / 4.1%** of markets.
 
 ## 1. Setup
 
