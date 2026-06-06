@@ -11,6 +11,8 @@
 #[derive(Debug, Clone)]
 pub struct Rng {
     state: u64,
+    /// The spare Box-Muller normal sample, kept until the next `gaussian` call.
+    spare_gaussian: Option<f64>,
 }
 
 impl Rng {
@@ -18,6 +20,7 @@ impl Rng {
     pub fn new(seed: u64) -> Self {
         Self {
             state: seed.wrapping_add(0x9E37_79B9_7F4A_7C15),
+            spare_gaussian: None,
         }
     }
 
@@ -37,10 +40,20 @@ impl Rng {
     }
 
     /// Standard normal sample (mean 0, variance 1) via Box-Muller.
+    ///
+    /// Box-Muller yields *two* independent normals per pair of uniforms; we
+    /// return one and cache the other, so amortized cost is one `ln`/`sqrt`/
+    /// `sin_cos` per two samples instead of per sample.
     pub fn gaussian(&mut self) -> f64 {
+        if let Some(g) = self.spare_gaussian.take() {
+            return g;
+        }
         let u1 = self.uniform().max(1e-12); // avoid ln(0)
         let u2 = self.uniform();
-        (-2.0 * u1.ln()).sqrt() * (std::f64::consts::TAU * u2).cos()
+        let r = (-2.0 * u1.ln()).sqrt();
+        let (sin, cos) = (std::f64::consts::TAU * u2).sin_cos();
+        self.spare_gaussian = Some(r * sin);
+        r * cos
     }
 
     /// Normal sample with the given `mean` and standard deviation `std`.
