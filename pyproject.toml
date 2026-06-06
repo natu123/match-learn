@@ -1,0 +1,17 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "match-learn"
+version = "0.1.0"
+description = "Online preference learning x stable matching (Rust core, Python bindings)"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+readme = "README.md"
+
+[tool.maturin]
+# Build the optional `python` feature (which pulls in PyO3) and expose the
+# extension module as `match_learn`.
+features = ["python"]
+module-name = "match_learn"

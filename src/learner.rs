@@ -17,7 +17,10 @@
 use crate::rng::Rng;
 
 /// An online estimator of an agent's preferences over a fixed set of arms.
-pub trait PreferenceLearner {
+///
+/// `Send + Sync` so a `Market` of boxed learners can cross threads and satisfy
+/// PyO3's thread-safety requirements; every learner here meets it trivially.
+pub trait PreferenceLearner: Send + Sync {
     /// Number of arms (candidate partners).
     fn n_arms(&self) -> usize;
 

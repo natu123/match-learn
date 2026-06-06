@@ -21,6 +21,8 @@ pub mod market;
 pub mod matching;
 pub mod parallel;
 pub mod prefs;
+#[cfg(feature = "python")]
+mod python;
 pub mod rng;
 pub mod ttc;
 pub mod two_sided;

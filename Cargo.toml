@@ -8,4 +8,14 @@ repository = "https://github.com/natu123/match-learn"
 keywords = ["matching", "bandit", "stable-matching", "online-learning"]
 categories = ["algorithms", "science"]
 
+[lib]
+# rlib for Rust consumers (tests, examples, downstream crates); cdylib for the
+# optional Python extension module built via maturin.
+crate-type = ["rlib", "cdylib"]
+
+[features]
+# Opt-in Python bindings. The pure-Rust core stays dependency-free by default.
+python = ["dep:pyo3"]
+
 [dependencies]
+pyo3 = { version = "0.23", features = ["extension-module", "abi3-py39"], optional = true }

@@ -26,6 +26,27 @@ loop {
 
 ---
 
+## From Python
+
+The Rust core is also callable from Python (optional `python` feature, built
+with [maturin]):
+
+```python
+import match_learn as ml
+
+ml.gale_shapley(proposer_prefs, receiver_prefs)        # stable matching
+market = ml.Market.thompson(util_p, receiver_prefs, noise=0.2, seed=42)
+report = market.simulate(3000)                          # learn x match loop
+report.total_regret(), report.tail_stable_fraction(600)
+```
+
+```bash
+pip install maturin && maturin develop --release
+python python/example.py
+```
+
+[maturin]: https://www.maturin.rs/
+
 ## Goal
 
 - **Near-term**: a self-built core for **online preference learning x stable matching**.
@@ -105,7 +126,7 @@ From synthetic to real, and against the competition.
 Make it the production layer ("research in Python, production in Rust").
 
 - [x] Parallelism — `simulate_batch` over `std::thread` (dependency-free; Rayon could swap in)
-- [ ] PyO3 Python bindings
+- [x] PyO3 Python bindings — optional `python` feature, `import match_learn` (see [`python/`](python/))
 - [x] Latency / throughput benchmarks — `benchmark` example
 - [ ] WASM target
 
