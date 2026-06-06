@@ -19,6 +19,14 @@
 //! tie-breaking is a real cure for the cascade mode — motivating a market-level
 //! mechanism above `PreferenceLearner`.
 //!
+//! ⚠ IMPORTANT (post-hoc only): this runs on **converged** belief means. The
+//! result does NOT transfer to a live loop. The implementation team's live
+//! `CoordinatedMarket` (coordinating each round on *current* beliefs) lost
+//! stability to plain Thompson, because belief-welfare-max on inaccurate
+//! mid-learning beliefs picks welfare-optimal-but-unstable matchings. See
+//! `docs/stall-anatomy.md` §4.2. A live cure needs confidence-gating or a
+//! stability objective.
+//!
 //! ```text
 //! cargo run --release --example coordinated_poc
 //! ```

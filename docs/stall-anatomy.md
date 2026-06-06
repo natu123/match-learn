@@ -24,9 +24,12 @@ by **near-ties in the true preferences relative to the reward noise**.
    sampling temperature (`with_anneal`, §4). Forcing makes this mode **worse**.
 3. **Near-tie cascade** (the hard residue): a near-indifferent proposer's
    arbitrary order is **amplified by Gale-Shapley** into a far matching that costs
-   *other* proposers large regret. No per-agent policy fixes this. *Cure:
-   coordination* — a market-level tie-break among near-equal arms that maximizes
-   total belief welfare (§4.2). Fixes 9/10 cascades, oracle-free.
+   *other* proposers large regret. No per-agent policy fixes this. *Candidate
+   cure:* coordination — a market-level tie-break among near-equal arms that
+   maximizes total belief welfare (§4.2). Fixes 9/10 cascades **post-hoc on
+   converged beliefs**, but ⚠ **does not transfer to the live loop** (with
+   mid-learning beliefs, welfare-max ≠ stable, so it *loses* stability — see §4.2).
+   A live cure is an open problem.
 
 An honest correction to our first result: the clean 40-market gate
 (`tests/gate.rs`) where forced exploration took every market sublinear was partly
@@ -180,9 +183,22 @@ dwarfed by another proposer's `0.84` gain.
 exact true stable matching (regret `0.93 → 0.00`), matching the true-regret-
 optimal (oracle) choice. Over 800 markets it **fully fixes 9/10 settled cascades**
 (mean settled regret `0.359 → 0.012`); the one it misses is a frozen-arm case
-(wrong beliefs) — forcing's job, not the coordinator's. This validates the
-coordinator concept; folding it into the live market loop (a `CoordinatedMarket`
-above `PreferenceLearner`) is the natural next build.
+(wrong beliefs) — forcing's job, not the coordinator's.
+
+> **⚠ Negative result — this is a *post-hoc* result and does NOT transfer to the
+> live loop.** The POC above runs on **converged** belief means. When the
+> implementation team built the live `CoordinatedMarket` (coordinating every round
+> on *current* beliefs), it **lost stability to plain Thompson** (tail-stable
+> `0.699` vs `0.919`; tail regret `−0.096` vs `0.0011`). The reason: maximizing
+> belief welfare with *inaccurate, mid-learning* beliefs picks a welfare-optimal
+> matching that is **not stable** — welfare-max `≠` stable-max once beliefs are
+> wrong. So coordination raises proposer welfare (regret goes negative) but
+> *lowers* `is_stable`. The live coordinator is shipped **experimental** with this
+> caveat. Fixing it is an open research problem: gate coordination by belief
+> *confidence* (only reorder near-ties once the relevant posteriors are tight), or
+> make **stability** (not welfare) the coordinator's objective. The post-hoc
+> success shows the *information* is there at convergence; converting it to a live
+> algorithm is unsolved.
 
 ### Generality: two-sided markets
 
@@ -198,8 +214,9 @@ artifacts of the one-sided setting.
 
 - **Default**: annealed Thompson with slow cooling (`tau ≈ horizon`) and light
   forcing (`c ≈ 0.25–0.5`). Annealing handles the dominant near-tie churn;
-  forcing insures the rare frozen arm. Add **coordinated near-tie tie-breaking**
-  at the matching layer to remove the cascade residue (§4.2).
+  forcing insures the rare frozen arm. Coordinated near-tie tie-breaking (§4.2)
+  is **not** recommended live yet — it lowers stability with mid-learning beliefs;
+  it is shipped experimental pending a confidence-gated or stability-objective fix.
 - **Report regret honestly**: the `is_stable` flag and regret-vs-unique-stable
   both punish near-tie swaps that the proposer is indifferent to. An ε-stability
   or welfare-based benchmark would not charge a proposer for a swap below its own
@@ -207,12 +224,16 @@ artifacts of the one-sided setting.
 
 ## 6. Open problems
 
-- **Live coordinated market.** §4.2 validates coordinated near-tie tie-breaking
-  post-hoc; the next build is a `CoordinatedMarket` that applies it every round in
-  the live loop and a broad-study confirmation that it removes cascade stalls
-  end-to-end (not just on converged beliefs). Scaling the near-tie ordering search
-  beyond small `n` (it is exponential in the largest near-tie group) is the open
-  engineering question.
+- **Live coordinated market (now a known-hard problem).** The implementation
+  team's live `CoordinatedMarket` *lost* stability to plain Thompson (§4.2):
+  belief-welfare maximization on mid-learning beliefs picks welfare-optimal but
+  unstable matchings. The open problem is a coordinator that helps *live*:
+  (i) **confidence-gating** — only reorder a near-tie group once its posteriors
+  are tight enough that welfare-max ≈ stable-max; (ii) a **stability-direct
+  objective** — minimize blocking pairs rather than maximize belief welfare;
+  (iii) characterize when the post-hoc information becomes usable as beliefs
+  converge. Plus the original scaling issue (search exponential in the largest
+  near-tie group).
 - **Anytime annealing.** `tau ≈ horizon` needs the horizon. A pull-count-based or
   doubling schedule would be horizon-free.
 - **Identifiability-aware regret bound.** A bound of the form

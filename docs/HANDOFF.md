@@ -40,7 +40,23 @@ All tests green; `cargo fmt`/`clippy` clean. Nothing here touches `master`/`dev`
 
 ## 3. Implementation handoff (delegate these)
 
-### 3a. Live `CoordinatedMarket` (highest value) — de-risked by `coordinated_poc.rs`
+### 3a. Live `CoordinatedMarket` — ⚠ BUILT, and the naive version FAILED live
+
+**Status update (implementation team):** the spec below was built and **lost
+stability to plain Thompson** (tail-stable `0.699` vs `0.919`, tail regret
+`−0.096` vs `0.0011`). Belief-welfare maximization on *inaccurate mid-learning*
+beliefs picks welfare-optimal-but-**unstable** matchings (welfare-max ≠
+stable-max when beliefs are wrong). It ships **experimental**. The post-hoc POC
+worked only because it used *converged* beliefs. **Do not deploy the naive spec.**
+The real task is now a *correct* live coordinator:
+- **Confidence-gate**: only coordinate a near-tie group once its posteriors are
+  `ε`-tight (so the Prop. 3 accuracy premise holds); leave un-converged groups to
+  the default ranking.
+- **Or optimize stability directly**: minimize blocking pairs instead of belief
+  welfare.
+- Re-validate against plain Thompson on **both** tail-stability and regret.
+
+The original (now-known-insufficient) spec, for reference:
 
 Build a market that applies coordinated near-tie tie-breaking **every round**,
 not just post-hoc. Spec:

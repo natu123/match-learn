@@ -117,6 +117,16 @@ the cure is *information-free re-coordination*, exactly what exploration cannot 
 and a market-level mechanism can. This is the theory companion to the 9/10
 empirical coverage in `coordinated_poc.rs`.
 
+> **⚠ The premise is the catch (live-transfer failure).** Prop. 3 assumes belief
+> means are `ε`-accurate outside the near-tie groups — a **converged-belief**
+> condition. *During* learning this fails, and then belief-welfare-max picks an
+> *unstable* matching: the implementation team's live `CoordinatedMarket` lost
+> stability to plain Thompson (tail-stable `0.699` vs `0.919`). So Prop. 3
+> characterizes the *target once beliefs are accurate*, not a live algorithm. A
+> live coordinator must restrict coordination to groups whose posteriors are
+> already `ε`-tight (confidence-gating) so the premise holds — or optimize
+> stability directly. Making Prop. 3 actionable online is the open problem.
+
 ## 5. Consequences
 
 - **No-go for decentralized policies (Prop. 2):** forcing, annealing, UCB,
