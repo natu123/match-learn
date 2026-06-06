@@ -6,6 +6,7 @@
 //! - p0 is near-indifferent between ra,rb (gap `Δ_p`), dislikes rc.
 //! - p1 wants rb, falls back to rc (gap `Δ_q`); ra is its worst.
 //! - p2 wants ra.
+//!
 //! Receiver prefs (known): ra likes p0>p2>p1, rb likes p0>p1>p2.
 //!
 //! True optimal stable matching M* = {p0-ra, p1-rb, p2-rc}. If p0 (mis)ranks rb
