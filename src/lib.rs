@@ -79,7 +79,7 @@ pub mod rng;
 pub mod ttc;
 pub mod two_sided;
 
-pub use applications::{RideHailing, random_ride_hailing};
+pub use applications::{Delivery, RideHailing, random_delivery, random_ride_hailing};
 pub use contextual::LinearThompson;
 pub use data::{correlated_market, from_text, to_text};
 pub use eval::{LearningMarket, Report, simulate};
