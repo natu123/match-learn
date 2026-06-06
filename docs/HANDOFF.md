@@ -1,0 +1,149 @@
+# Stall research — handoff
+
+Status of the `research/stall-avoidance` track, written so an **implementer** can
+pick up the remaining builds and a **theorist** can pick up the open proofs. The
+detailed scientific account is [`stall-anatomy.md`](stall-anatomy.md); the
+frozen-arm theory is [`stall-avoidance.md`](stall-avoidance.md). This file is the
+short, actionable index.
+
+## 1. What we found (TL;DR)
+
+Greedy Thompson Sampling in a learned stable matching occasionally locks into a
+wrong outcome. "The stall" is **three failure modes, all rooted in near-ties**
+(true preference gaps below the reward-noise floor `σ`), each with a different
+cure:
+
+| # | mode | frequency | mechanism | cure | status |
+|---|------|-----------|-----------|------|--------|
+| 1 | frozen-arm | rare | an unmatched arm's posterior freezes at an underestimate | **forcing** — `ForcedExploreThompson` (`ε_t=c/t` probe of least-sampled arm), `O(log T)` regret | **implemented + tested** |
+| 2 | near-tie churn | dominant | Thompson re-samples near-equal arms forever; never settles | **annealing** — `with_anneal(tau)` cools sample temperature | **implemented + tested** |
+| 3 | near-tie cascade | hard residue | an indifferent proposer's order is amplified by Gale-Shapley, hurting others | **coordination** — market-level tie-break maximizing belief welfare | **validated (POC), not yet a library type** |
+
+Key honesty note: the first 40-market gate where forcing made every market
+sublinear was **partly seed luck**. The 400-market study is the real picture:
+forcing helps only the rare frozen mode; the dominant cure is annealing; the
+cascade residue needs coordination.
+
+## 2. What is implemented (pointers)
+
+- `src/learner.rs` — `ForcedExploreThompson` with forcing (`c`) and annealing
+  (`with_anneal(tau)`); `c=0, tau=inf` recovers plain Thompson. Unit tests incl.
+  `annealing_suppresses_near_tie_churn`, `forced_exploration_keeps_probing_a_frozen_arm`.
+- `src/market.rs` — `Market::with_forced_explore(...)`, `belief_means()` diagnostic.
+- `src/two_sided.rs` — `TwoSidedMarket::new(...)` (pluggable learners).
+- `tests/gate.rs` — frozen-arm gate (forced vs greedy vs UCB).
+- Examples (all `cargo run --release --example <name>`): `stall_study`,
+  `dissect_stall`, `neartie_analysis`, `anneal_study`, `two_sided_stall`,
+  `coordinated_poc`.
+
+All tests green; `cargo fmt`/`clippy` clean. Nothing here touches `master`/`dev`.
+
+## 3. Implementation handoff (delegate these)
+
+### 3a. Live coordinator — ✅ RESOLVED: stability-targeting wins
+
+**Resolution (build + theory done).** The recommended live coordinator is
+`StabilityCoordinatedMarket`: among near-tie reorderings, **minimize estimated
+blocking pairs** (not belief welfare). Dev live loop (200 near-tie `5×5`,
+gap `0.01`): tail-stable **`0.961`**, the best of all six policies, beating
+plain (`0.919`), forced-explore (`0.924`), and gated belief-welfare
+(`0.804`/`0.909`) — with **no `2ε` ceiling**. Theory:
+[`theory-stability-objective.md`](theory-stability-objective.md) (Prop. 5: the
+belief-welfare objective is stability-*biased* even at perfect info, `27.4 %`
+unstable, while the stability objective is unbiased, `0 %`; Prop. 6: the regret
+sign — `+` for stability, `−` for welfare — diagnoses the objective). The two
+coordinators below (gated belief-welfare, Prop. 4) remain as `2ε`-bounded siblings
+for proposer-welfare-weighted settings.
+
+---
+
+**Earlier status (belief-welfare line, for the record).** the spec below was built
+and **lost
+stability to plain Thompson** (tail-stable `0.699` vs `0.919`, tail regret
+`−0.096` vs `0.0011`). Belief-welfare maximization on *inaccurate mid-learning*
+beliefs picks welfare-optimal-but-**unstable** matchings (welfare-max ≠
+stable-max when beliefs are wrong). It ships **experimental**. The post-hoc POC
+worked only because it used *converged* beliefs. **Do not deploy the naive spec.**
+The real task is now a *correct* live coordinator. **The theory is done** —
+`theory-identifiability.md` §4a (Prop. 4) gives a proved gating rule; build to it:
+- **Confidence-gate (Prop. 4)**: certify a near-tie pair only when
+  `|m̂_a−m̂_b| + z·√(s_a²+s_b²) ≤ ε` (`z = Φ^{-1}(1−η)`); equivalently each arm's
+  posterior std `s_r < g(ε)=ε/(z√2)`, i.e. `N_r > 2z²σ²/ε²` pulls. Coordinate only
+  certified groups; leave everything else in belief order. Prop. 4 proves this is
+  `2ε`-stable (never worse than plain Thompson) and reaches `O(nε)` regret once all
+  groups are certified — activation guaranteed by composing with forcing.
+  - **Plumbing**: expose posterior std `s_r` (or `N_r`) beside `belief_means()`
+    through `Market` / the learner trait. This is the one new piece of state.
+- **Or optimize stability directly**: minimize blocking pairs instead of belief
+  welfare (alternative, no gating proof attached).
+- Re-validate against plain Thompson on **both** tail-stability and regret;
+  Prop. 4 predicts tail-stability `≥` plain Thompson.
+
+The original (now-known-insufficient) spec, for reference:
+
+Build a market that applies coordinated near-tie tie-breaking **every round**,
+not just post-hoc. Spec:
+
+- **Per round**: read each proposer's belief means; form its ranking; partition
+  into contiguous **near-tie groups** (adjacent means within `ε`, e.g. `ε≈0.05`).
+- **Search**: over the Cartesian product of within-group orderings, run
+  Gale-Shapley and pick the matching maximizing **total belief welfare**
+  `Σ_p mean_p[partner(p)]` (no true utilities — oracle-free; this is what works in
+  the POC). Reference implementation: `coordinated_match()` in `coordinated_poc.rs`.
+- **Compose** with annealing + light forcing on the learners (modes 1–2).
+- **API shape**: mirror `Market` (a `step()` returning `Matching`, implement
+  `LearningMarket`), e.g. `Market::with_coordination(eps)` or a wrapper type.
+- **Validate**: a broad-study confirmation that end-to-end (live-loop) stall rate
+  drops on the cascade population, comparable to the 9/10 post-hoc coverage.
+- **Caveat to solve**: the ordering search is exponential in the **largest
+  near-tie group** size. Fine for small `n` / few ties; for large groups, cap the
+  group size, sample orderings, or use a local-improvement search. Log any cap
+  (no silent truncation).
+
+### 3b. Anytime annealing (small)
+
+`with_anneal(tau)` needs `tau ≈ horizon`. Add a horizon-free schedule (cool by
+total pulls or a doubling schedule) so the cure works without knowing `T`.
+
+## 4. Theory agenda — EXPLOIT (solidify; the main track)
+
+1. **Identifiability-aware regret bound.** Formalize §4 of `stall-anatomy.md`: a
+   bound `E[R_T] ≲ Σ_p f(Δ_p, σ, T)` where markets with `Δ_p ≪ σ` saturate at an
+   **irreducible floor** (you need `≈ σ²/Δ²` pulls to order two arms `Δ` apart).
+   This explains why no exploration schedule removes the near-tie modes.
+2. **Forced-exploration bound, tighten.** `stall-avoidance.md` gives
+   `O(log T)` for `c > 8nσ²/Δ²`. Tighten constants and state the coupled-market
+   version under the stable-matching uniqueness assumption.
+3. **Annealing convergence.** Prove that `sqrt(tau/(tau+t))` cooling drives the
+   churn flip-rate to zero while preserving best-arm identification, and
+   characterize the cooling-too-fast lock-in trade-off (when does a fast schedule
+   commit to a wrong stable matching?).
+4. **Coordination optimality — DONE.** `theory-identifiability.md` §4: Prop. 3
+   (belief-welfare tie-break is within `O(nε)` of `M*` given `ε`-accurate beliefs)
+   and §4a Prop. 4 (gating on posterior width `s_r < g(ε)` makes it safe *online*:
+   `2ε`-stable always, `O(nε)` regret once certified; Lemmas 2–3). This is the
+   theorem the live `CoordinatedMarket` (§3a) should be built to.
+
+## 5. New-theory seeds — EXPLORE (sub-track)
+
+- **ε-stability benchmark.** Regret-vs-unique-stable over-charges indifferent
+  swaps. Define regret against the *set* of ε-stable matchings; conjecture the
+  near-tie modes vanish under it. Could reframe the whole problem.
+- **Welfare vs stability under learning.** The coordinator optimizes welfare via
+  free tie-breaks; when does that conflict with strategy-proofness / stability?
+- **Receiver-informed tie-breaking** (partial result, `examples/receiver_informed.rs`).
+  A search-free `O(n log n)` rule — an indifferent proposer takes the receiver that
+  prefers it *least* — fixes **5/10** cascades (mean cascade regret `0.359 → 0.129`),
+  vs **9/10** for the exponential belief-welfare search. So the known receiver
+  preferences alone carry about half the coordination signal; closing the gap to
+  the full coordinator cheaply is open.
+- **Coupled-exploration lower bound.** Is there an instance-dependent lower bound
+  showing the cascade externality is unavoidable for *any* decentralized
+  (per-agent) policy, making a coordinator provably necessary?
+
+## 6. Repo / process
+
+- Branch `research/stall-avoidance` (worktree `~/match-learn-research`), pushed to
+  `origin`. Do **not** push to `master`/`dev` (other sessions own those).
+- Merge decision is the maintainer's; this branch rebases onto `master`'s
+  crates.io work when merged (it forked at `ae18cb1`).
