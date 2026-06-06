@@ -14,6 +14,14 @@
 //! The search is exponential in the largest near-tie group and in the number of
 //! tied agents, so it is capped (`max_group`, and a total-combination limit);
 //! beyond the cap it falls back to the plain mean-greedy matching for the round.
+//!
+//! **Honest status (validated by `examples/coordinated_validation.rs`).** This
+//! *live* coordinator does not yet beat plain Thompson on the strict is-stable
+//! metric: maximizing belief welfare every round raises proposer welfare (regret
+//! goes negative) but, with imperfect mid-learning beliefs, the welfare-optimal
+//! matching is often not the stable one. The post-hoc cascade cure (coordinating
+//! *converged* beliefs) does not transfer naively. Treat this as experimental; a
+//! coordinator that gates on belief confidence or targets stability is open work.
 
 use crate::eval::LearningMarket;
 use crate::learner::GaussianThompson;
@@ -64,6 +72,46 @@ pub fn near_tie_rankings(means: &[f64], eps: f64, max_group: usize) -> Vec<Vec<u
             permutations(g)
         } else {
             vec![g.clone()] // cap: do not permute oversized groups
+        };
+        let mut next = Vec::new();
+        for prefix in &rankings {
+            for perm in &perms {
+                let mut r = prefix.clone();
+                r.extend(perm);
+                next.push(r);
+            }
+        }
+        rankings = next;
+    }
+    rankings
+}
+
+/// Like [`near_tie_rankings`] but the *base order* comes from `order` (e.g. a
+/// Thompson sample, preserving exploration) while the near-tie grouping is
+/// decided by `means` — so only arms that are a genuine near-tie in the means
+/// are permuted, and exploration elsewhere is untouched.
+fn near_tie_rankings_masked(
+    order: &[f64],
+    means: &[f64],
+    eps: f64,
+    max_group: usize,
+) -> Vec<Vec<usize>> {
+    let base = rank_by_scores(order);
+    let mut groups: Vec<Vec<usize>> = vec![vec![base[0]]];
+    for &arm in &base[1..] {
+        let prev = *groups.last().unwrap().last().unwrap();
+        if (means[prev] - means[arm]).abs() < eps {
+            groups.last_mut().unwrap().push(arm);
+        } else {
+            groups.push(vec![arm]);
+        }
+    }
+    let mut rankings = vec![vec![]];
+    for g in &groups {
+        let perms = if g.len() <= max_group {
+            permutations(g)
+        } else {
+            vec![g.clone()]
         };
         let mut next = Vec::new();
         for prefix in &rankings {
@@ -200,21 +248,29 @@ impl CoordinatedMarket {
     pub fn step(&mut self) -> Matching {
         let n_p = self.true_util.len();
         let n_r = self.receiver_prefs.len();
+        // Beliefs: means drive the welfare objective and near-tie grouping;
+        // Thompson samples drive exploration (so the loop explores like plain
+        // Thompson, which coordination then refines rather than replaces).
         let means: Vec<Vec<f64>> = self.learners.iter().map(|l| l.means()).collect();
+        let samples: Vec<Vec<f64>> = self.learners.iter_mut().map(|l| l.scores()).collect();
 
         let eps_t = (self.force_c / (self.round as f64 + 1.0)).min(1.0);
         let candidates: Vec<Vec<Vec<usize>>> = (0..n_p)
             .map(|p| {
                 if self.force_c > 0.0 && self.rng.uniform() < eps_t {
-                    // Forced round for p: frozen arm first, rest by mean.
+                    // Forced round for p: frozen arm first, rest by sampled order.
                     let frozen = self.least_sampled(p);
-                    let mut rest = rank_by_scores(&means[p]);
+                    let mut rest = rank_by_scores(&samples[p]);
                     rest.retain(|&a| a != frozen);
                     let mut ranking = vec![frozen];
                     ranking.extend(rest);
                     vec![ranking]
                 } else {
-                    near_tie_rankings(&means[p], self.eps, self.max_group)
+                    // Explore via the Thompson sample, but coordinate the arms
+                    // that are a genuine near-tie *in the means* (the cascade
+                    // trigger): permute only those, keeping the sampled order
+                    // elsewhere.
+                    near_tie_rankings_masked(&samples[p], &means[p], self.eps, self.max_group)
                 }
             })
             .collect();

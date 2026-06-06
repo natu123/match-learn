@@ -8,12 +8,16 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
-- `CoordinatedMarket` — the research-track *cascade* cure made live: each round
-  it searches within-near-tie orderings and picks the Gale-Shapley matching that
-  maximizes belief welfare (oracle-free), with vanishing forced exploration for
-  frozen arms. Implements `LearningMarket`. The search is capped by `max_group`
-  and a total-combination limit (falling back to mean-greedy beyond it). Public
-  `near_tie_rankings` helper.
+- `CoordinatedMarket` (experimental) — a live near-tie coordinator that each
+  round searches within-near-tie orderings and picks the Gale-Shapley matching
+  maximizing belief welfare, with vanishing forced exploration for frozen arms.
+  Implements `LearningMarket`; the search is capped (`max_group` + a
+  total-combination limit). Public `near_tie_rankings` helper. **Honest caveat:**
+  validation (`examples/coordinated_validation.rs`) shows the live coordinator
+  does not yet beat plain Thompson on stability — it maximizes belief welfare, so
+  it raises proposer welfare but lowers the is-stable fraction. The post-hoc
+  cascade cure does not transfer naively to the live loop; a confidence-gated or
+  stability-targeting coordinator is open work.
 
 ## [0.1.1] - 2026-06-06
 
