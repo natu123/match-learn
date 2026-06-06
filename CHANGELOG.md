@@ -8,6 +8,10 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `assignment` module: the assignment problem (welfare-optimal matching) via a
+  from-scratch O(n^3) Hungarian algorithm — `min_cost_assignment` and
+  `max_weight_assignment`, verified against brute force. The welfare-optimal
+  counterpart to stable matching.
 - `CoordinatedMarket` (experimental) — a live near-tie coordinator that each
   round searches within-near-tie orderings and picks the Gale-Shapley matching
   maximizing belief welfare, with vanishing forced exploration for frozen arms.

@@ -60,6 +60,7 @@
 //! ```
 
 pub mod applications;
+pub mod assignment;
 pub mod auction;
 pub mod contextual;
 pub mod coordinated;
@@ -88,6 +89,7 @@ pub use applications::{
     Crowdsourcing, Delivery, RideHailing, random_crowdsourcing, random_delivery,
     random_ride_hailing,
 };
+pub use assignment::{max_weight_assignment, min_cost_assignment};
 pub use auction::{AuctionResult, double_auction, efficient_quantity, mcafee_auction};
 pub use contextual::LinearThompson;
 pub use coordinated::{CoordinatedMarket, near_tie_rankings};

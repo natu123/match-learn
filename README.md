@@ -175,6 +175,9 @@ Real platforms.
   sex-equal stable matchings that correct Gale-Shapley's one-sidedness.
 - [x] **Diversity reserves** — `reserves`: deferred acceptance with minority-reserve
   choice functions (school-choice / residency style distributional constraints).
+- [x] **Assignment problem** — `assignment`: from-scratch Hungarian algorithm for
+  the welfare-optimal (max-weight / min-cost) matching, the planner's counterpart
+  to stable matching.
 
 ---
 
