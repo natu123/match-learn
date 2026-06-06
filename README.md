@@ -1,6 +1,15 @@
 # match-learn
 
+[![crates.io](https://img.shields.io/crates/v/match-learn.svg)](https://crates.io/crates/match-learn)
+[![docs.rs](https://img.shields.io/docsrs/match-learn)](https://docs.rs/match-learn)
+[![license](https://img.shields.io/crates/l/match-learn.svg)](LICENSE)
+
 **Stable matching that learns.** Online preference learning x stable matching, in Rust.
+
+```toml
+[dependencies]
+match-learn = "0.1"
+```
 
 > **Status: Phases 1–5 done, Phase 7 (dynamic pricing) underway. Built in public.**
 > The core is built from scratch, one phase at a time. Verified against an
