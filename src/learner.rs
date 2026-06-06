@@ -13,6 +13,9 @@
 //! - [`Ucb1`] — optimism in the face of uncertainty (UCB1).
 //! - [`DiscountedThompson`] — Thompson Sampling that forgets, for non-stationary
 //!   preferences.
+//! - [`ForcedExploreThompson`] — Thompson Sampling with vanishing forced
+//!   exploration (and optional annealing) that beats the greedy-Thompson
+//!   matching stall.
 
 use crate::rng::Rng;
 
@@ -285,6 +288,157 @@ impl PreferenceLearner for DiscountedThompson {
     }
 }
 
+/// Thompson Sampling with vanishing forced exploration, to beat the matching
+/// *stall* (the research-track cure for greedy Thompson's frozen-arm failure).
+///
+/// Greedy Thompson can lock a market onto a wrong stable matching: once an agent
+/// stops being matched to an arm, that arm freezes and is never re-checked. This
+/// learner adds two knobs:
+/// - **forcing**: with probability `eps_t = min(1, c/t)` it forces a probe of
+///   the least-sampled arm, so no arm stays frozen — `c == 0` is plain greedy
+///   Thompson;
+/// - **annealing** (optional, via [`with_anneal`]): the posterior-sample std is
+///   scaled by `sqrt(tau / (tau + t))`, cooling toward exploitation to stop the
+///   near-tie *churn* that keeps a matching from settling.
+///
+/// [`with_anneal`]: ForcedExploreThompson::with_anneal
+#[derive(Debug, Clone)]
+pub struct ForcedExploreThompson {
+    obs_var: f64,
+    prior_mean: f64,
+    prior_var: f64,
+    /// Forced-exploration constant: `eps_t = min(1, c / t)`.
+    c: f64,
+    /// Annealing timescale: Thompson sample std is scaled by
+    /// `sqrt(tau / (tau + t))`. `inf` disables annealing (full Thompson forever).
+    anneal_tau: f64,
+    /// Rounds elapsed (the `t` in `eps_t`); incremented once per `scores` call.
+    t: u64,
+    count: Vec<f64>,
+    sum: Vec<f64>,
+    rng: Rng,
+}
+
+impl ForcedExploreThompson {
+    /// Create a forced-exploration learner over `n_arms`.
+    ///
+    /// `prior_var` and `obs_var` must be positive; `c` (the forced-exploration
+    /// constant) must be non-negative — `c == 0` recovers plain greedy Thompson
+    /// Sampling. Larger `c` probes frozen arms more aggressively.
+    pub fn new(
+        n_arms: usize,
+        prior_mean: f64,
+        prior_var: f64,
+        obs_var: f64,
+        c: f64,
+        seed: u64,
+    ) -> Self {
+        assert!(
+            prior_var > 0.0 && obs_var > 0.0,
+            "variances must be positive"
+        );
+        assert!(c >= 0.0, "forced-exploration constant must be non-negative");
+        Self {
+            obs_var,
+            prior_mean,
+            prior_var,
+            c,
+            anneal_tau: f64::INFINITY,
+            t: 0,
+            count: vec![0.0; n_arms],
+            sum: vec![0.0; n_arms],
+            rng: Rng::new(seed),
+        }
+    }
+
+    /// Anneal the Thompson sampling temperature (a builder method).
+    ///
+    /// The posterior-sample standard deviation is multiplied by
+    /// `sqrt(tau / (tau + t))`, decaying from full Thompson exploration toward
+    /// pure posterior-mean exploitation. Smaller `tau` cools faster. This
+    /// suppresses the near-tie churn that keeps a matching from settling. `tau`
+    /// must be positive; the default (no call) leaves annealing off.
+    pub fn with_anneal(mut self, tau: f64) -> Self {
+        assert!(tau > 0.0, "annealing timescale must be positive");
+        self.anneal_tau = tau;
+        self
+    }
+
+    /// The annealing factor applied to the Thompson sample std this round.
+    fn anneal_factor(&self) -> f64 {
+        if self.anneal_tau.is_infinite() {
+            1.0
+        } else {
+            (self.anneal_tau / (self.anneal_tau + self.t as f64)).sqrt()
+        }
+    }
+
+    /// Posterior (mean, variance) of arm `a`'s mean utility.
+    fn posterior(&self, a: usize) -> (f64, f64) {
+        let precision = 1.0 / self.prior_var + self.count[a] / self.obs_var;
+        let var = 1.0 / precision;
+        let mean = (self.prior_mean / self.prior_var + self.sum[a] / self.obs_var) * var;
+        (mean, var)
+    }
+
+    /// Index of the least-sampled arm (ties broken by lowest index): the frozen
+    /// arm a forced round targets.
+    fn least_sampled(&self) -> usize {
+        let mut best = 0;
+        for a in 1..self.count.len() {
+            if self.count[a] < self.count[best] {
+                best = a;
+            }
+        }
+        best
+    }
+}
+
+impl PreferenceLearner for ForcedExploreThompson {
+    fn n_arms(&self) -> usize {
+        self.count.len()
+    }
+
+    fn scores(&mut self) -> Vec<f64> {
+        self.t += 1;
+        let eps = (self.c / self.t as f64).min(1.0);
+        if self.c > 0.0 && self.rng.uniform() < eps {
+            // Forced round: the least-sampled arm dominates the ranking; the rest
+            // fall back to their posterior means, so if a receiver rejects the
+            // forced proposal the agent still proposes sensibly down its list.
+            let forced = self.least_sampled();
+            (0..self.count.len())
+                .map(|a| {
+                    if a == forced {
+                        f64::INFINITY
+                    } else {
+                        self.posterior(a).0
+                    }
+                })
+                .collect()
+        } else {
+            // Ordinary Thompson round: one posterior sample per arm, with the
+            // sampling std optionally annealed toward zero to stop near-tie churn.
+            let a_factor = self.anneal_factor();
+            (0..self.count.len())
+                .map(|a| {
+                    let (mean, var) = self.posterior(a);
+                    self.rng.normal(mean, a_factor * var.sqrt())
+                })
+                .collect()
+        }
+    }
+
+    fn update(&mut self, arm: usize, reward: f64) {
+        self.count[arm] += 1.0;
+        self.sum[arm] += reward;
+    }
+
+    fn means(&self) -> Vec<f64> {
+        (0..self.count.len()).map(|a| self.posterior(a).0).collect()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -466,5 +620,42 @@ mod tests {
             exploratory > greedy,
             "more exploration should mean more suboptimal pulls: greedy={greedy}, exploratory={exploratory}"
         );
+    }
+
+    #[test]
+    fn forced_exploration_probes_every_arm() {
+        // Even an arm whose mean is far worse keeps getting probed under forcing,
+        // so it never freezes — the property that escapes the matching stall.
+        let true_means = [1.0, 0.2, 0.0, 0.0];
+        let mut fe = ForcedExploreThompson::new(4, 0.0, 1.0, 0.25, 1.0, 3);
+        let mut env = Rng::new(9);
+        for _ in 0..3000 {
+            let arm = fe.ranking()[0];
+            fe.update(arm, env.normal(true_means[arm], 0.5));
+        }
+        // Every arm has been pulled at least once.
+        for a in 0..4 {
+            assert!(fe.count[a] > 0.0, "arm {a} never probed under forcing");
+        }
+        // Still identifies the best arm.
+        let means = fe.means();
+        let best = (0..4).max_by(|&a, &b| means[a].partial_cmp(&means[b]).unwrap());
+        assert_eq!(best, Some(0));
+    }
+
+    #[test]
+    fn forced_explore_with_c_zero_is_greedy_thompson() {
+        // c = 0 disables forcing: behaves like plain Thompson, identifying the
+        // best arm without the forced probes.
+        let true_means = [0.1, 0.5, 0.9, 0.3];
+        let mut fe = ForcedExploreThompson::new(4, 0.0, 1.0, 0.25, 0.0, 1);
+        let mut env = Rng::new(99);
+        for _ in 0..2000 {
+            let arm = fe.ranking()[0];
+            fe.update(arm, env.normal(true_means[arm], 0.5));
+        }
+        let means = fe.means();
+        let best = (0..4).max_by(|&a, &b| means[a].partial_cmp(&means[b]).unwrap());
+        assert_eq!(best, Some(2));
     }
 }

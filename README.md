@@ -16,7 +16,7 @@ match-learn = "0.1"
 > established library (identical matchings) and benchmarked across languages.
 > Pricing now gates participation and a bandit learns the market-clearing price.
 
-📖 [Tutorial](docs/TUTORIAL.md) · [API docs](https://docs.rs/match-learn) · [Benchmarks](bench/) · [Changelog](CHANGELOG.md)
+📖 [Tutorial](docs/TUTORIAL.md) · [API docs](https://docs.rs/match-learn) · [Benchmarks](bench/) · [Changelog](CHANGELOG.md) · [Stall theory](docs/theory-identifiability.md)
 
 ---
 

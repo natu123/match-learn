@@ -1,6 +1,6 @@
 [package]
 name = "match-learn"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Online preference learning x stable matching, with dynamic pricing"
 license = "MIT"

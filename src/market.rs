@@ -15,7 +15,7 @@
 //! Over time the belief-rankings approach the true preferences, so the played
 //! matching approaches the stable matching of the *true* market.
 
-use crate::learner::{GaussianThompson, PreferenceLearner, Ucb1};
+use crate::learner::{ForcedExploreThompson, GaussianThompson, PreferenceLearner, Ucb1};
 use crate::matching::{Matching, gale_shapley};
 use crate::rng::Rng;
 
@@ -100,6 +100,35 @@ impl Market {
         let n_r = receiver_prefs.len();
         let learners: Vec<Box<dyn PreferenceLearner>> = (0..true_util.len())
             .map(|_| Box::new(Ucb1::new(n_r, c)) as Box<dyn PreferenceLearner>)
+            .collect();
+        Self::new(true_util, receiver_prefs, learners, noise, seed)
+    }
+
+    /// Build a market whose proposers use forced-exploration Thompson Sampling
+    /// (the stall-resistant learner). `c` is the forced-exploration constant.
+    #[allow(clippy::too_many_arguments)]
+    pub fn with_forced_explore(
+        true_util: Vec<Vec<f64>>,
+        receiver_prefs: Vec<Vec<usize>>,
+        prior_mean: f64,
+        prior_var: f64,
+        obs_var: f64,
+        c: f64,
+        noise: f64,
+        seed: u64,
+    ) -> Self {
+        let n_r = receiver_prefs.len();
+        let learners: Vec<Box<dyn PreferenceLearner>> = (0..true_util.len())
+            .map(|p| {
+                Box::new(ForcedExploreThompson::new(
+                    n_r,
+                    prior_mean,
+                    prior_var,
+                    obs_var,
+                    c,
+                    seed ^ (0x2000 + p as u64),
+                )) as Box<dyn PreferenceLearner>
+            })
             .collect();
         Self::new(true_util, receiver_prefs, learners, noise, seed)
     }

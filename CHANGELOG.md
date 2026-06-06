@@ -7,7 +7,15 @@ contain breaking changes).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-06
+
 ### Added
+- `ForcedExploreThompson` — Thompson Sampling with vanishing forced exploration
+  (`eps_t = min(1, c/t)`) and optional annealing, which beats greedy Thompson's
+  frozen-arm matching *stall*; `Market::with_forced_explore` builds a market
+  with it. Backed by a research-track analysis in `docs/` (`stall-anatomy.md`,
+  `stall-avoidance.md`, `theory-identifiability.md`) that proves near-tie stalls
+  resist exploration and yield to coordination.
 - `reserves` module: deferred acceptance with diversity reserves
   (minority-reserve choice functions, Hafalir-Yenmez-Yildirim style) for
   distributional constraints like school-choice or residency reserves.
@@ -52,5 +60,6 @@ direction, built from scratch in Rust.
   (identical matchings, ~520x faster) and MABWiser, plus an integrated NumPy
   reference.
 
-[Unreleased]: https://github.com/natu123/match-learn/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/natu123/match-learn/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/natu123/match-learn/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/natu123/match-learn/releases/tag/v0.1.0
