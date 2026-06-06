@@ -44,6 +44,9 @@ pub struct Report {
     pub cumulative_regret: Vec<f64>,
     /// `stable[t]` is whether round `t`'s matching was stable in the true market.
     pub stable: Vec<bool>,
+    /// `welfare[t]` is the realized proposer-side welfare (sum of true utilities
+    /// of matched partners) in round `t`.
+    pub welfare: Vec<f64>,
 }
 
 impl Report {
@@ -93,6 +96,17 @@ impl Report {
         };
         (end - start) / k as f64
     }
+
+    /// Mean realized welfare over the final `k` rounds — what the matching is
+    /// actually worth to the proposers once learning has settled.
+    pub fn tail_mean_welfare(&self, k: usize) -> f64 {
+        let k = k.min(self.rounds);
+        if k == 0 {
+            return 0.0;
+        }
+        let start = self.rounds - k;
+        self.welfare[start..].iter().sum::<f64>() / k as f64
+    }
 }
 
 /// Proposer-side regret of one realized `matching` against the `baseline`.
@@ -121,6 +135,7 @@ pub fn simulate<M: LearningMarket>(market: &mut M, rounds: usize) -> Report {
 
     let mut cumulative_regret = Vec::with_capacity(rounds);
     let mut stable = Vec::with_capacity(rounds);
+    let mut welfare = Vec::with_capacity(rounds);
     let mut acc = 0.0;
 
     for _ in 0..rounds {
@@ -128,12 +143,17 @@ pub fn simulate<M: LearningMarket>(market: &mut M, rounds: usize) -> Report {
         acc += instantaneous_regret(market, &baseline, &matching);
         cumulative_regret.push(acc);
         stable.push(is_stable(&true_pp, &true_rp, &matching));
+        let w: f64 = (0..market.n_proposers())
+            .map(|p| matching.proposer[p].map_or(0.0, |r| market.proposer_util(p, r)))
+            .sum();
+        welfare.push(w);
     }
 
     Report {
         rounds,
         cumulative_regret,
         stable,
+        welfare,
     }
 }
 
@@ -175,7 +195,19 @@ mod tests {
         let rep = simulate(&mut m, 500);
         assert_eq!(rep.cumulative_regret.len(), 500);
         assert_eq!(rep.stable.len(), 500);
+        assert_eq!(rep.welfare.len(), 500);
         assert_eq!(rep.rounds, 500);
+    }
+
+    #[test]
+    fn welfare_rises_as_learning_settles() {
+        // Late-round welfare exceeds early-round welfare: the matching the agents
+        // learn is worth more to them than the exploring matches early on.
+        let mut m = aligned_market(7);
+        let rep = simulate(&mut m, 3000);
+        let early = rep.welfare[..300].iter().sum::<f64>() / 300.0;
+        let tail = rep.tail_mean_welfare(500);
+        assert!(tail > early, "tail welfare {tail} not above early {early}");
     }
 
     #[test]
@@ -216,6 +248,7 @@ mod tests {
             rounds: 3,
             cumulative_regret: vec![1.0, 1.0, 2.0],
             stable: vec![true, true, false],
+            welfare: vec![0.0; 3],
         };
         assert_eq!(rep.settled_round(), None);
         // ...and one with a stable tail reports the start of that run.
@@ -223,6 +256,7 @@ mod tests {
             rounds: 4,
             cumulative_regret: vec![1.0, 2.0, 2.0, 2.0],
             stable: vec![false, false, true, true],
+            welfare: vec![0.0; 4],
         };
         assert_eq!(rep.settled_round(), Some(2));
     }

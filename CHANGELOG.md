@@ -8,6 +8,8 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `Report` now records per-round `welfare` (realized proposer-side utility), with
+  `tail_mean_welfare`.
 - Optional `serde` feature deriving `Serialize`/`Deserialize` on the public data
   types (`Matching`, `ManyToOne`, `JointInstance`, `AuctionResult`, `Report`,
   `Demand`/`Supply`/`RoundOutcome`, `Objective`, and the application markets).
