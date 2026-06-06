@@ -285,6 +285,148 @@ impl PreferenceLearner for DiscountedThompson {
     }
 }
 
+/// Thompson Sampling with a *vanishing forced-exploration* schedule, designed to
+/// defeat the frozen-arm stall of greedy Thompson Sampling in matching markets.
+///
+/// # The stall it cures
+///
+/// Plain [`GaussianThompson`] explores *only* through posterior variance. When an
+/// arm stops being matched (Gale-Shapley sends the agent elsewhere), that arm's
+/// posterior never updates: its count, mean, and variance **freeze**. If the
+/// frozen mean is an underestimate of the agent's true stable partner, the agent
+/// never proposes there again and the whole market can settle into a *wrong*
+/// stable matching with no way out. This is exactly the rare hard-instance stall
+/// the Phase 1 gate documents for greedy Thompson Sampling.
+///
+/// # The fix
+///
+/// Each round, with probability `eps_t = min(1, c / t)` the learner ignores its
+/// posterior and **forces a pull of the least-sampled arm** (ranking it first);
+/// otherwise it plays ordinary Thompson Sampling. The schedule is the classic
+/// Auer–Cesa-Bianchi–Fischer `eps_t = O(1/t)` rule, which makes the *cumulative*
+/// number of forced rounds grow like `c * ln T` — enough to guarantee every arm,
+/// including a frozen one, keeps being probed `Ω(log T)` times, yet vanishing
+/// fast enough that:
+///
+/// - **regret stays `O(log T)`**: forced rounds cost at most `Δ_max` each and
+///   there are only `O(log T)` of them; the Thompson rounds are themselves
+///   sublinear.
+/// - **the tail stays calm**: by late rounds `eps_t ≈ c/t → 0`, so forcing
+///   essentially never fires and the matching is left undisturbed — unlike UCB,
+///   whose `sqrt(ln t / n_a)` bonus perturbs the coupled match *forever*.
+///
+/// Targeting the **least-sampled** arm (rather than a uniformly random one)
+/// spends the forced-exploration budget precisely on the frozen arm, which is by
+/// definition the one with the fewest pulls.
+#[derive(Debug, Clone)]
+pub struct ForcedExploreThompson {
+    obs_var: f64,
+    prior_mean: f64,
+    prior_var: f64,
+    /// Forced-exploration constant: `eps_t = min(1, c / t)`.
+    c: f64,
+    /// Rounds elapsed (the `t` in `eps_t`); incremented once per `scores` call.
+    t: u64,
+    count: Vec<f64>,
+    sum: Vec<f64>,
+    rng: Rng,
+}
+
+impl ForcedExploreThompson {
+    /// Create a forced-exploration learner over `n_arms`.
+    ///
+    /// `prior_var` and `obs_var` must be positive; `c` (the forced-exploration
+    /// constant) must be non-negative — `c == 0` recovers plain greedy Thompson
+    /// Sampling. Larger `c` probes frozen arms more aggressively.
+    pub fn new(
+        n_arms: usize,
+        prior_mean: f64,
+        prior_var: f64,
+        obs_var: f64,
+        c: f64,
+        seed: u64,
+    ) -> Self {
+        assert!(
+            prior_var > 0.0 && obs_var > 0.0,
+            "variances must be positive"
+        );
+        assert!(c >= 0.0, "forced-exploration constant must be non-negative");
+        Self {
+            obs_var,
+            prior_mean,
+            prior_var,
+            c,
+            t: 0,
+            count: vec![0.0; n_arms],
+            sum: vec![0.0; n_arms],
+            rng: Rng::new(seed),
+        }
+    }
+
+    /// Posterior (mean, variance) of arm `a`'s mean utility.
+    fn posterior(&self, a: usize) -> (f64, f64) {
+        let precision = 1.0 / self.prior_var + self.count[a] / self.obs_var;
+        let var = 1.0 / precision;
+        let mean = (self.prior_mean / self.prior_var + self.sum[a] / self.obs_var) * var;
+        (mean, var)
+    }
+
+    /// Index of the least-sampled arm (ties broken by lowest index): the frozen
+    /// arm a forced round targets.
+    fn least_sampled(&self) -> usize {
+        let mut best = 0;
+        for a in 1..self.count.len() {
+            if self.count[a] < self.count[best] {
+                best = a;
+            }
+        }
+        best
+    }
+}
+
+impl PreferenceLearner for ForcedExploreThompson {
+    fn n_arms(&self) -> usize {
+        self.count.len()
+    }
+
+    fn scores(&mut self) -> Vec<f64> {
+        self.t += 1;
+        let eps = (self.c / self.t as f64).min(1.0);
+        if self.c > 0.0 && self.rng.uniform() < eps {
+            // Forced round: the least-sampled arm dominates the ranking; the rest
+            // fall back to their posterior means, so if a receiver rejects the
+            // forced proposal the agent still proposes sensibly down its list.
+            let forced = self.least_sampled();
+            (0..self.count.len())
+                .map(|a| {
+                    if a == forced {
+                        f64::INFINITY
+                    } else {
+                        self.posterior(a).0
+                    }
+                })
+                .collect()
+        } else {
+            // Ordinary Thompson round: one posterior sample per arm.
+            (0..self.count.len())
+                .map(|a| {
+                    let (mean, var) = self.posterior(a);
+                    self.rng.normal(mean, var.sqrt())
+                })
+                .collect()
+        }
+    }
+
+    fn update(&mut self, arm: usize, reward: f64) {
+        self.count[arm] += 1.0;
+        self.sum[arm] += reward;
+    }
+
+    fn means(&self) -> Vec<f64> {
+        (0..self.count.len()).map(|a| self.posterior(a).0).collect()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -466,5 +608,98 @@ mod tests {
             exploratory > greedy,
             "more exploration should mean more suboptimal pulls: greedy={greedy}, exploratory={exploratory}"
         );
+    }
+
+    #[test]
+    fn forced_explore_identifies_best_arm() {
+        let true_means = [0.1, 0.5, 0.9, 0.3];
+        let mut fe = ForcedExploreThompson::new(4, 0.0, 1.0, 0.25, 2.0, 1);
+        run_bandit(&mut fe, &true_means, 2000, 0.5, 99);
+        let means = fe.means();
+        let best = (0..4).max_by(|&a, &b| means[a].partial_cmp(&means[b]).unwrap());
+        assert_eq!(best, Some(2));
+    }
+
+    #[test]
+    fn forced_explore_regret_is_sublinear() {
+        let true_means = [0.0, 0.4, 0.8];
+        let regret_t = {
+            let mut fe = ForcedExploreThompson::new(3, 0.0, 1.0, 0.25, 2.0, 5);
+            run_bandit(&mut fe, &true_means, 1000, 0.5, 7)
+        };
+        let regret_2t = {
+            let mut fe = ForcedExploreThompson::new(3, 0.0, 1.0, 0.25, 2.0, 5);
+            run_bandit(&mut fe, &true_means, 2000, 0.5, 7)
+        };
+        assert!(
+            regret_2t < 1.6 * regret_t,
+            "regret_t={regret_t}, regret_2t={regret_2t} (not clearly sublinear)"
+        );
+    }
+
+    #[test]
+    fn forced_exploration_keeps_probing_a_frozen_arm() {
+        // Hammer arm 0 so it is both the obvious greedy choice and the most-pulled
+        // arm; arms 1 and 2 are never updated, so they stay the least-sampled and
+        // would freeze under pure greedy play.
+        let mut fe = ForcedExploreThompson::new(3, 0.0, 1.0, 0.25, 2.0, 1);
+        for _ in 0..50 {
+            fe.update(0, 1.0);
+        }
+        let mut probes = 0;
+        for _ in 0..2000 {
+            if fe.ranking()[0] != 0 {
+                probes += 1;
+            }
+        }
+        // eps_t = 2/t gives ~2*ln(2000) ≈ 15 forced rounds, all aimed at the
+        // never-pulled underdogs, so the frozen arms keep getting probed.
+        assert!(
+            probes >= 5,
+            "forced exploration should keep probing frozen arms, got {probes}"
+        );
+
+        // A pure-greedy learner (exploration scale 0) freezes completely: with arm
+        // 0's posterior mean pinned at 1.0 it is always ranked first.
+        let mut greedy = GaussianThompson::new(3, 0.0, 1.0, 0.25, 1).with_exploration(0.0);
+        for _ in 0..50 {
+            greedy.update(0, 1.0);
+        }
+        let frozen = (0..2000).filter(|_| greedy.ranking()[0] != 0).count();
+        assert_eq!(
+            frozen, 0,
+            "greedy should freeze onto arm 0, got {frozen} probes"
+        );
+    }
+
+    #[test]
+    fn forced_exploration_probability_decays() {
+        // The forced-exploration rate eps_t = c/t falls over time, so an early
+        // window of rounds forces far more often than a late window of equal size.
+        let mut fe = ForcedExploreThompson::new(4, 0.0, 1.0, 0.25, 3.0, 7);
+        for _ in 0..50 {
+            fe.update(0, 1.0); // make arm 0 the greedy pick; 1..4 stay least-sampled
+        }
+        let probes_in = |fe: &mut ForcedExploreThompson, rounds: usize| {
+            (0..rounds).filter(|_| fe.ranking()[0] != 0).count()
+        };
+        let early = probes_in(&mut fe, 200);
+        let late = probes_in(&mut fe, 200); // rounds 201..400, eps_t roughly halved
+        assert!(
+            early > late,
+            "forced-exploration rate should decay: early={early}, late={late}"
+        );
+    }
+
+    #[test]
+    fn forced_explore_with_c_zero_is_greedy_thompson() {
+        // c = 0 disables forcing, recovering ordinary Thompson Sampling: same
+        // best-arm identification, no forced probes.
+        let true_means = [0.1, 0.5, 0.9, 0.3];
+        let mut fe = ForcedExploreThompson::new(4, 0.0, 1.0, 0.25, 0.0, 1);
+        run_bandit(&mut fe, &true_means, 2000, 0.5, 99);
+        let means = fe.means();
+        let best = (0..4).max_by(|&a, &b| means[a].partial_cmp(&means[b]).unwrap());
+        assert_eq!(best, Some(2));
     }
 }

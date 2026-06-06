@@ -15,7 +15,7 @@
 //! Over time the belief-rankings approach the true preferences, so the played
 //! matching approaches the stable matching of the *true* market.
 
-use crate::learner::{GaussianThompson, PreferenceLearner, Ucb1};
+use crate::learner::{ForcedExploreThompson, GaussianThompson, PreferenceLearner, Ucb1};
 use crate::matching::{Matching, gale_shapley};
 use crate::rng::Rng;
 
@@ -83,6 +83,38 @@ impl Market {
                     prior_var,
                     obs_var,
                     seed ^ (0x1000 + p as u64),
+                )) as Box<dyn PreferenceLearner>
+            })
+            .collect();
+        Self::new(true_util, receiver_prefs, learners, noise, seed)
+    }
+
+    /// Build a market whose proposers all use [`ForcedExploreThompson`].
+    ///
+    /// Thompson Sampling with a vanishing `eps_t = c/t` forced-exploration
+    /// schedule on the least-sampled arm — the stall-resistant learner. `obs_var`
+    /// is the assumed reward variance (well-specified when it equals `noise^2`)
+    /// and `c` is the forced-exploration constant.
+    pub fn with_forced_explore(
+        true_util: Vec<Vec<f64>>,
+        receiver_prefs: Vec<Vec<usize>>,
+        prior_mean: f64,
+        prior_var: f64,
+        obs_var: f64,
+        c: f64,
+        noise: f64,
+        seed: u64,
+    ) -> Self {
+        let n_r = receiver_prefs.len();
+        let learners: Vec<Box<dyn PreferenceLearner>> = (0..true_util.len())
+            .map(|p| {
+                Box::new(ForcedExploreThompson::new(
+                    n_r,
+                    prior_mean,
+                    prior_var,
+                    obs_var,
+                    c,
+                    seed ^ (0x2000 + p as u64),
                 )) as Box<dyn PreferenceLearner>
             })
             .collect();
@@ -230,6 +262,25 @@ mod tests {
             last = m.step();
         }
         // After enough learning, the played matching is the true stable one.
+        assert_eq!(last.proposer, target.proposer);
+    }
+
+    #[test]
+    fn converges_to_true_stable_matching_forced_explore() {
+        let true_util = vec![
+            vec![1.0, 0.4, 0.1],
+            vec![0.2, 1.0, 0.5],
+            vec![0.1, 0.3, 1.0],
+        ];
+        let receiver_prefs = vec![vec![0, 1, 2], vec![1, 0, 2], vec![2, 1, 0]];
+        let mut m =
+            Market::with_forced_explore(true_util, receiver_prefs, 0.0, 1.0, 0.09, 1.0, 0.3, 42);
+        let target = m.true_stable_matching();
+        assert_eq!(target.proposer, vec![Some(0), Some(1), Some(2)]);
+        let mut last = m.step();
+        for _ in 0..3000 {
+            last = m.step();
+        }
         assert_eq!(last.proposer, target.proposer);
     }
 
