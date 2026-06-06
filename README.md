@@ -4,7 +4,7 @@
 [![docs.rs](https://img.shields.io/docsrs/match-learn)](https://docs.rs/match-learn)
 [![license](https://img.shields.io/crates/l/match-learn.svg)](LICENSE)
 
-**Stable matching that learns.** Online preference learning x stable matching, in Rust.
+**Stable matching that learns.** Online preference learning x stable matching, in safe and fast Rust.
 
 ```toml
 [dependencies]
