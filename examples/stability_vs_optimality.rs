@@ -52,7 +52,7 @@ fn has_blocking(util: &[Vec<f64>], recv: &[Vec<usize>], m: &Matching, eps: f64) 
         (0..recv.len()).any(|r| {
             m.proposer[p] != Some(r)
                 && util[p][r] - cur > eps
-                && holder[r].map_or(true, |h| pos(r, p) < pos(r, h))
+                && holder[r].is_none_or(|h| pos(r, p) < pos(r, h))
         })
     })
 }
