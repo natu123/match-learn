@@ -138,6 +138,25 @@ let welfare = market.welfare_at(0.5);   // gains from trade
 Raising the price thins demand but thickens supply, so matched volume peaks at
 an interior price — which a bandit learns over a stream of markets.
 
+## 5b. Online (dynamic) matching
+
+Real platforms are dynamic: agents arrive and leave over time. `OnlineMarket`
+models this on the plane, and a `Policy` decides *when* to match — greedily every
+tick, or batched to accumulate a richer pool.
+
+```rust
+use match_learn::online::{OnlineMarket, Policy};
+
+let mut market = OnlineMarket::new(3.0 /* arrivals/tick */, 0.04 /* abandon */, 7);
+let stats = market.run(10_000, Policy::Batched(8));
+println!("matched {}, abandoned {}, mean distance {:.3}",
+    stats.matched, stats.abandoned, stats.mean_distance());
+```
+
+Longer batching pairs closer partners but abandons more waiting agents — and a
+bandit can learn the net-value-maximizing interval online (see the
+`online_matching` example and the `online` module tests).
+
 ## 6. Applications
 
 `RideHailing` and `Delivery` map concrete platforms onto `JointInstance`: agents
