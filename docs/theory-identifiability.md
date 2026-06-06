@@ -125,7 +125,93 @@ empirical coverage in `coordinated_poc.rs`.
 > characterizes the *target once beliefs are accurate*, not a live algorithm. A
 > live coordinator must restrict coordination to groups whose posteriors are
 > already `ε`-tight (confidence-gating) so the premise holds — or optimize
-> stability directly. Making Prop. 3 actionable online is the open problem.
+> stability directly. **Section 4a (Prop. 4) closes this**, turning the gating
+> idea into a posterior-width test with safety and eventual-optimality guarantees.
+
+## 4a. Confidence-gating: a safe online coordinator (Prop. 4)
+
+The ⚠ above says Prop. 3 describes a *target*, not an algorithm: its
+`ε`-accuracy premise fails mid-learning, and the naive live coordinator that
+ignored this lost stability. We now turn Prop. 3 into an online rule by **gating
+coordination on posterior width** — coordinate a near-tie group only once its
+posteriors are tight enough to *certify* the premise. This is the spec the
+implementation team needs and the guarantee the live failure was missing.
+
+**Posterior width.** With a `N(m₀, τ₀²)` prior and `N_r` observations of variance
+`σ²`, arm `r`'s posterior is `N(m̂_r, s_r²)` with
+`s_r² = (1/τ₀² + N_r/σ²)^{-1} ≈ σ²/N_r`. Write `s_r` for the posterior std.
+
+**The certification test.** For an adjacent pair `(a,b)` in a proposer's belief
+ranking, the posterior on the gap `δ = μ_a − μ_b` is `N(m̂_a − m̂_b, s_a²+s_b²)`.
+Call the pair **certified `ε`-tied** when the whole credible interval for `δ` lies
+in the indifference band:
+```
+|m̂_a − m̂_b| + z·√(s_a² + s_b²) ≤ ε,     z = Φ^{-1}(1 − η).
+```
+By construction this guarantees `P(|δ| > ε) ≤ η`: with confidence `1−η` the pair
+is genuinely within the band, so reordering it is information-free for the agent.
+
+> **Lemma 2 (gate ⇒ tightness).** The test can pass only if
+> `√(s_a²+s_b²) ≤ ε/z`, hence each arm's posterior std satisfies `s_r ≤ ε/z`
+> (and `s_r ≤ ε/(z√2)` in the symmetric case). Define the **gating threshold**
+> ```
+> g(ε) := ε / (z√2),     equivalently     N_r > 2z²σ²/ε² pulls.
+> ```
+> The required pull count is `Θ(σ²/ε²)` — finite, and set by the band `ε` the
+> coordinator chooses, **not** by the (possibly sub-floor) true gap `Δ`.
+
+*Proof.* Since `|m̂_a − m̂_b| ≥ 0`, the test forces `z√(s_a²+s_b²) ≤ ε`, i.e.
+`√(s_a²+s_b²) ≤ ε/z`; each term is bounded by the sum, giving `s_r ≤ ε/z`, with
+equality split symmetrically at `ε/(z√2)`. Substituting `s_r ≈ σ/√N_r` and solving
+for `N_r` gives `N_r ≥ 2z²σ²/ε²`. ∎
+
+> **Lemma 3 (belief-stability ⇒ approximate true-stability).** If matching `M` is
+> stable w.r.t. belief utilities `m̂` with `|m̂_{p,r} − μ_{p,r}| ≤ ε` on every
+> `(p,r)` it compares, then `M` is `2ε`-stable w.r.t. the true `μ`: no pair `(p,r)`
+> has `μ_{p,r} − μ_{p,M(p)} > 2ε` while `r` also prefers `p` to its match.
+
+*Proof.* A true `2ε`-blocking pair `(p,r)` has belief gain
+`m̂_{p,r} − m̂_{p,M(p)} ≥ (μ_{p,r}−ε) − (μ_{p,M(p)}+ε) = (μ_{p,r}−μ_{p,M(p)}) − 2ε > 0`;
+receiver preferences are known/exact, so `(p,r)` would block under beliefs too,
+contradicting belief-stability. ∎
+
+> **Proposition 4 (gated coordination is safe and eventually optimal).** Run the
+> coordinator of Prop. 3 but restrict it to reorder only **certified `ε`-tied**
+> groups (test above), leaving every other pair in its belief order. Then:
+> 1. **(Safety — resolves the live failure.)** Each reorder is, w.p. `≥ 1−η` per
+>    pair, within the true `ε`-band; non-certified pairs are untouched, so the
+>    output coincides with the plain belief-GS matching except inside certified
+>    bands. By Lemma 3 it is `2ε`-stable w.r.t. truth wherever the acted beliefs
+>    are `ε`-accurate — the coordinator can no longer convert a belief-stable
+>    matching into an unstable one (the naive version's failure mode).
+> 2. **(Eventual activation.)** Under forced exploration (mode 1) `min_r N_r → ∞`,
+>    so `max_r s_r → 0` and every true-`ε`-tied group passes the gate after
+>    `Θ(σ²/ε²)` pulls/arm — independent of the unresolvable `Δ`.
+> 3. **(Optimality once active.)** After activation Prop. 3's premise holds by
+>    construction, so the matching is within `O(nε)` of the proposer-optimal `M*`.
+
+*Proof sketch.* (1) The gate passes only when `P(|δ|>ε) ≤ η` for the reordered
+pair, so within-band w.p. `≥ 1−η`; the output is GS-stable w.r.t. a belief profile
+that is `ε`-accurate on every acted pair (post-gate), and Lemma 3 lifts this to
+`2ε`-true-stability. The decisive point is that *non*-certified pairs are left in
+belief order, so the coordinator never performs the welfare-chasing reorder of an
+un-converged pair that sank the naive build. (2) Forcing's `ε_t = c/t`
+least-sampled probe drives `min_r N_r(t) → ∞`, hence `max_r s_r(t) → 0`; Lemma 2
+gives the `Θ(σ²/ε²)` activation horizon. (3) Immediate from Prop. 3. ∎
+
+**The spec this hands the implementer.** Plumb the posterior std `s_r` (or `N_r`)
+through `Market` / the learner trait, exposed beside `belief_means()`. In the
+coordinator, replace the unconditional near-tie grouping with the certification
+test `|m̂_a−m̂_b| + z√(s_a²+s_b²) ≤ ε`. Compose with forcing (guarantees eventual
+activation) and annealing (churn). Re-validate on **both** tail-stability and
+regret: Prop. 4 predicts tail-stability `≥` plain Thompson (deviations are
+certified-safe) while regret falls toward the `O(nε)` floor.
+
+**Gaps to close.** `η` is per-pair; a union bound over the `≤ n` near-tie pairs
+per proposer gives per-round failure `≤ n²η`, so pick `η = δ/n²` for a global `δ`.
+The `Θ(σ²/ε²)` activation assumes forcing reaches every arm at the Auer `c/t`
+rate; the exact constant couples to the matching dynamics (which arm is pulled
+depends on the current matching) and is stated here for the forced-uniform regime.
 
 ## 5. Consequences
 
@@ -134,7 +220,11 @@ empirical coverage in `coordinated_poc.rs`.
   instances. This is *why* the 400-market study showed exploration tweaks moving
   the dominant modes only modestly.
 - **Coordination is both sufficient (Prop. 3) and, on these instances, necessary.**
-  It motivates the live `CoordinatedMarket` (handoff §3a) as the principled fix.
+  The *naive* live coordinator failed (welfare-max on un-converged beliefs is
+  unstable); **Prop. 4 fixes it** by gating coordination on posterior width
+  (`s_r < g(ε)`), giving a safe online rule that recovers Prop. 3's `O(nε)` once
+  every near-tie group is certified. This is the principled `CoordinatedMarket`
+  spec for handoff §3a.
 - **Annealing's role is sharpened:** it is the right cure for *churn* (it stops a
   coin-flip that costs the agent itself), but it cannot help *cascade* (the cost
   is an externality the agent is indifferent to).

@@ -48,13 +48,20 @@ stability to plain Thompson** (tail-stable `0.699` vs `0.919`, tail regret
 beliefs picks welfare-optimal-but-**unstable** matchings (welfare-max ≠
 stable-max when beliefs are wrong). It ships **experimental**. The post-hoc POC
 worked only because it used *converged* beliefs. **Do not deploy the naive spec.**
-The real task is now a *correct* live coordinator:
-- **Confidence-gate**: only coordinate a near-tie group once its posteriors are
-  `ε`-tight (so the Prop. 3 accuracy premise holds); leave un-converged groups to
-  the default ranking.
+The real task is now a *correct* live coordinator. **The theory is done** —
+`theory-identifiability.md` §4a (Prop. 4) gives a proved gating rule; build to it:
+- **Confidence-gate (Prop. 4)**: certify a near-tie pair only when
+  `|m̂_a−m̂_b| + z·√(s_a²+s_b²) ≤ ε` (`z = Φ^{-1}(1−η)`); equivalently each arm's
+  posterior std `s_r < g(ε)=ε/(z√2)`, i.e. `N_r > 2z²σ²/ε²` pulls. Coordinate only
+  certified groups; leave everything else in belief order. Prop. 4 proves this is
+  `2ε`-stable (never worse than plain Thompson) and reaches `O(nε)` regret once all
+  groups are certified — activation guaranteed by composing with forcing.
+  - **Plumbing**: expose posterior std `s_r` (or `N_r`) beside `belief_means()`
+    through `Market` / the learner trait. This is the one new piece of state.
 - **Or optimize stability directly**: minimize blocking pairs instead of belief
-  welfare.
-- Re-validate against plain Thompson on **both** tail-stability and regret.
+  welfare (alternative, no gating proof attached).
+- Re-validate against plain Thompson on **both** tail-stability and regret;
+  Prop. 4 predicts tail-stability `≥` plain Thompson.
 
 The original (now-known-insufficient) spec, for reference:
 
@@ -95,9 +102,11 @@ total pulls or a doubling schedule) so the cure works without knowing `T`.
    churn flip-rate to zero while preserving best-arm identification, and
    characterize the cooling-too-fast lock-in trade-off (when does a fast schedule
    commit to a wrong stable matching?).
-4. **Coordination optimality.** Show the belief-welfare tie-break recovers the
-   true proposer-optimal stable matching whenever every misordered pair is within
-   the indifference band `ε` and all other beliefs are `ε`-accurate.
+4. **Coordination optimality — DONE.** `theory-identifiability.md` §4: Prop. 3
+   (belief-welfare tie-break is within `O(nε)` of `M*` given `ε`-accurate beliefs)
+   and §4a Prop. 4 (gating on posterior width `s_r < g(ε)` makes it safe *online*:
+   `2ε`-stable always, `O(nε)` regret once certified; Lemmas 2–3). This is the
+   theorem the live `CoordinatedMarket` (§3a) should be built to.
 
 ## 5. New-theory seeds — EXPLORE (sub-track)
 
