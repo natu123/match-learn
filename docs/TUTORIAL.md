@@ -31,6 +31,11 @@ differ in size. Two more mechanisms come built in:
 - `top_trading_cycle(prefs)` — one-sided allocation by trading (the housing
   market), yielding the unique core allocation.
 
+Gale-Shapley is *proposer-optimal* — best for one side, worst for the other. The
+`fairness` module measures that imbalance (rank cost per side) and finds the
+`egalitarian_stable` (min total cost) and `sex_equal_stable` (min imbalance)
+matchings instead.
+
 ## 2. Learning preferences online
 
 Real markets don't hand you preferences — agents discover them by interacting.
