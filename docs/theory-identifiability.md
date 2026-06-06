@@ -156,11 +156,32 @@ The two Gale-Shapley runs and the net-regret arithmetic are reproduced exactly b
 `+0.010`). The seed-235418470 `4×4` (`dissect_stall.rs`) is a *random* witness of
 the same mechanism; this family is its clean parametric form.
 
-**Remaining open.** Only the **multi-pair** generalization is left: with several
-independent near-tie swings the individual/net floors are conjectured to add, but a
-general proof needs an instance family with provably independent GS-sensitive
-swings. The single-swing net floor (Prop. 2′) and individual floor (Prop. 2) are
-now rigorous.
+**Multi-pair additivity.** The floor adds over near-tie swings whose rejection
+chains are **vertex-disjoint** (share no proposer or receiver).
+
+> **Proposition 2″ (additivity over disjoint swings).** For any `k`, there is a
+> market with `k` near-tie agents whose swings are vertex-disjoint, in which the
+> per-round **net** floor is `≥ k · 1.20 = Θ(k)`. Hence the linear lower bound
+> scales as `E[R_T] ≥ c · k · 1.20 · (T − T₀)`.
+
+*Proof.* Tile `k` copies of the Prop. 2′ block on disjoint proposer/receiver
+index sets and make every cross-block receiver unacceptable (cross utilities `0`,
+omitted from rankings). Then no proposer ever proposes outside its block and no
+receiver holds a cross-block proposer, so Gale-Shapley runs independently on each
+connected component; `M*` and every mis-order outcome decompose blockwise. Each
+block contributes its Prop. 2′ net floor `1.20`, and each block's near-tie agent
+sees only its own rewards, so by Lemma 1 the `k` mis-order events are independent
+with probability `≥ c` each. Summing the per-block floors gives `k · 1.20`. ∎
+
+`examples/multipair_floor.rs` confirms it: net floor `= k · 1.21` for `k = 1..4`,
+and mis-ordering a single block adds exactly one block's `1.21` (independence).
+
+**Remaining open.** Only **vertex-sharing** swings are uncovered: when two
+near-tie chains route through a common proposer or receiver, GS couples them and
+the floors need not add (they can even partially cancel, as the `3×3`
+redistribution shows). A general bound for overlapping swings is instance-
+dependent and remains open; the disjoint case (Prop. 2″), the single-swing net
+floor (Prop. 2′), and the individual floor (Prop. 2) are rigorous.
 
 ## 4. Why coordination escapes the floor (rigorous, given the band)
 
@@ -303,10 +324,11 @@ regime). It confirms the safety claim and sharpens its scope:
 
 ## 5. Consequences
 
-- **No-go for decentralized policies (Prop. 2, 2′):** forcing, annealing, UCB,
-  Thompson — any per-agent rule — suffer a cascade floor on near-tie instances:
-  `Θ(Δ_q)` on the victim (Prop. 2), and `Θ(1)` on *net* welfare in the
-  descending-chain family (Prop. 2′), both linear in `T`. This is *why* the
+- **No-go for decentralized policies (Prop. 2, 2′, 2″):** forcing, annealing,
+  UCB, Thompson — any per-agent rule — suffer a cascade floor on near-tie
+  instances: `Θ(Δ_q)` on the victim (Prop. 2), `Θ(1)` on *net* welfare in the
+  descending-chain family (Prop. 2′), and `Θ(k)` over `k` disjoint swings
+  (Prop. 2″), all linear in `T`. This is *why* the
   400-market study showed exploration tweaks moving the dominant modes only
   modestly.
 - **Coordination is both sufficient (Prop. 3) and, on these instances, necessary.**
