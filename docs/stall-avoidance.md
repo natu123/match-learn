@@ -95,27 +95,35 @@ min_a N_a(t) ≥ ⌊F(t)/n⌋ ≥ (c/n)·ln t − O(1)   (w.h.p.).
 So **every arm is pulled `Ω(log t)` times**. The frozen-arm pathology is
 impossible for any `c > 0`: no posterior can stay frozen.
 
-### 4.2 Lemma 2 — posteriors concentrate, rankings become correct
+### 4.2 Lemma 2 — adjacent pairs become correctly ordered
 
-With `N_a(t) ≥ k` Gaussian observations, the posterior mean `μ̂_a` obeys
+A proposer's belief ranking equals its true ranking iff, for every pair of arms
+**consecutive in its true order**, the beliefs rank that pair correctly: a
+correctly-ordered chain of consecutive pairs is a correctly-ordered list. So we
+bound the probability of a *consecutive-pair inversion* directly — tighter than
+forcing each arm to within `±Δ/2`.
 
-```
-P(|μ̂_a − μ_a| ≥ Δ/2) ≤ 2·exp(−k·Δ² / (8σ²)).
-```
-
-Substituting `k ≥ (c/n)·ln t` from Lemma 1,
-
-```
-P(|μ̂_a − μ_a| ≥ Δ/2) ≤ 2·t^{−α},   α := c·Δ² / (8 n σ²).
-```
-
-If *every* arm of a proposer is estimated within `Δ/2` of truth, its
-belief-ranking equals its true ranking. By a union bound over the `n` arms and
-`n` proposers, the probability that **any** proposer misranks at round `t` is
+Fix a proposer and a consecutive true-pair `(a,b)` with `μ_a − μ_b = Δ_{ab} ≥ Δ`.
+With `N_a, N_b ≥ k` pulls, the belief-mean difference `μ̂_a − μ̂_b` is Gaussian
+with mean `Δ_{ab}` and variance `σ²(1/N_a + 1/N_b) ≤ 2σ²/k`. The pair is inverted
+iff this difference is negative, so by the Gaussian tail `Φ(−x) ≤ ½·e^{−x²/2}`,
 
 ```
-P(misranking at t) ≤ 2 n² · t^{−α}.                       (★)
+P(invert (a,b)) ≤ ½·exp(−Δ_{ab}²·k / (4σ²)) ≤ ½·exp(−Δ²·k / (4σ²)).
 ```
+
+Substituting `k ≥ (c/n)·ln t` (Lemma 1) and a union bound over the `< n²`
+consecutive pairs across all proposers,
+
+```
+P(misranking at t) ≤ (n²/2)·t^{−α},   α := c·Δ² / (4 n σ²).      (★)
+```
+
+**This exponent is information-theoretically optimal.** `Δ²k/(4σ²)` is exactly the
+two-Gaussian sign-test rate of Lemma 1 in `theory-identifiability.md` (`N=k` pulls
+each, difference variance `2σ²/k`), so *no* estimator orders the pair with a faster
+rate from `k` pulls. The earlier `Δ²k/(8σ²)` lost a factor of 2 to the wasteful
+`±Δ/2` per-arm split; ordering pairs by the sign of their difference recovers it.
 
 When all proposers rank correctly, Gale–Shapley returns the true stable matching
 (under the uniqueness assumption of §4.4), so that round has **zero regret**.
@@ -127,16 +135,18 @@ Split the cumulative regret into three parts:
 1. **Forced rounds.** At most `F(T)` of them, each costing `≤ Δ_max`:
    `E[forced regret] ≤ Δ_max·E[F(T)] = O(Δ_max·c·log T)`.
 2. **Correct Thompson rounds.** Zero regret.
-3. **Misranked Thompson rounds.** Expected count `Σ_{t≤T} 2n²·t^{−α}` by (★),
+3. **Misranked Thompson rounds.** Expected count `Σ_{t≤T} (n²/2)·t^{−α}` by (★),
    each costing `≤ Δ_max`.
 
 Therefore
 
 ```
-E[R_T] ≤ O(Δ_max·c·log T) + Δ_max·Σ_{t=1}^{T} 2n²·t^{−α}.
+E[R_T] ≤ O(Δ_max·c·log T) + Δ_max·Σ_{t=1}^{T} (n²/2)·t^{−α}.
 ```
 
-- If `α > 1`, i.e. **`c > 8 n σ² / Δ²`**, the tail sum converges to `O(1)` and
+- If `α > 1`, i.e. **`c > 4 n σ² / Δ²`** (the tightened threshold; the optimal
+  sign-test exponent of §4.2 halves the old `8 n σ² / Δ²`), the tail sum converges
+  to `O(1)` and
 
   ```
   E[R_T] = O( (n σ² / Δ²)·Δ_max·log T ) = O(log T).
@@ -154,7 +164,7 @@ E[R_T] ≤ O(Δ_max·c·log T) + Δ_max·Σ_{t=1}^{T} 2n²·t^{−α}.
 ### 4.4 Corollary — stall probability → 0
 
 By (★), the per-round probability that the realized matching differs from the
-true stable matching is `≤ 2n²·t^{−α} → 0`. Greedy Thompson has no such
+true stable matching is `≤ (n²/2)·t^{−α} → 0`. Greedy Thompson has no such
 guarantee: a frozen underestimate gives a *fixed*, non-vanishing misranking
 probability, so its stall persists. Forcing replaces that fixed floor with a
 `t^{−α}` decay.
@@ -207,8 +217,10 @@ them.
 
 ## 6. Choosing `c`
 
-- The `O(log T)` rate needs `c > 8 n σ² / Δ²`: harder markets (small gap `Δ`,
-  large noise `σ`, many arms `n`) want more forcing.
+- The `O(log T)` rate needs `c > 4 n σ² / Δ²` (§4.2–4.3; the exponent is the
+  optimal sign-test rate, so the `4` cannot be improved — only the `n` and the
+  worst-case min-gap `Δ` are conservative): harder markets (small gap `Δ`, large
+  noise `σ`, many arms `n`) want more forcing.
 - In practice a *small* constant suffices when gaps are not pathological — the
   sweep in `tests/gate.rs::sweep_c` shows `c = 0.25` already lifts all 40 markets
   to sublinear while forcing only `~0.25·ln T ≈ 2` probes over the whole run.
