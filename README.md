@@ -195,6 +195,10 @@ Real platforms.
 - [x] **Boston mechanism** — `boston`: the immediate-acceptance school-choice
   mechanism, shown against deferred acceptance to be unstable and manipulable yet
   student-Pareto-efficient when truthful.
+- [x] **Kidney exchange** — `kidney`: clearing incompatible patient-donor pairs
+  by Top Trading Cycles (ABO blood-type compatibility), finding multi-way exchange
+  cycles that are individually rational, Pareto efficient, and strategy-proof
+  (Roth-Sönmez-Ünver) — market design that saves lives.
 
 ---
 

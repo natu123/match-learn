@@ -8,6 +8,17 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `kidney` module: kidney exchange for incompatible patient-donor pairs, the
+  market-design problem that has given tens of thousands of patients a transplant.
+  Models the pool as a housing market (each patient is endowed with its own
+  incompatible donor, ranked last as the no-exchange option) and clears it by
+  Top Trading Cycles, so the outcome is individually rational, Pareto efficient,
+  and strategy-proof (Roth-Sönmez-Ünver 2004). `kidney_exchange` takes ABO
+  blood-typed `Pair`s (`abo_compatible`), `ttc_kidney_exchange` takes explicit
+  compatibility lists; both find multi-way cycles, not just pairwise swaps.
+  Verified for validity, individual rationality, Pareto efficiency (brute force),
+  and strategy-proofness. Altruistic-donor *chains* (w-chains) are a noted
+  extension, not yet implemented.
 - `boston` module: the Boston (immediate-acceptance) school-choice mechanism — each
   round students apply to their next choice and schools admit by priority up to
   remaining capacity *permanently* (no deferral). Demonstrates, against the

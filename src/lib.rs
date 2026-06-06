@@ -70,6 +70,7 @@ pub mod data;
 pub mod eval;
 pub mod fairness;
 pub mod joint;
+pub mod kidney;
 pub mod learner;
 pub mod linalg;
 pub mod many_to_many;
@@ -107,6 +108,7 @@ pub use data::{correlated_market, from_text, to_text};
 pub use eval::{LearningMarket, Report, simulate};
 pub use fairness::{egalitarian_cost, egalitarian_stable, sex_equal_stable, sex_equality_cost};
 pub use joint::{JointInstance, random_joint_instance};
+pub use kidney::{Blood, Pair, abo_compatible, kidney_exchange, ttc_kidney_exchange};
 pub use learner::{
     DiscountedThompson, ForcedExploreThompson, GaussianThompson, PreferenceLearner, Ucb1,
 };
