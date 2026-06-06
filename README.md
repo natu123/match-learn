@@ -173,6 +173,8 @@ Real platforms.
   between match quality and abandonment (`online_matching` example).
 - [x] **Fairness / equity** — `fairness`: rank-cost metrics plus egalitarian and
   sex-equal stable matchings that correct Gale-Shapley's one-sidedness.
+- [x] **Diversity reserves** — `reserves`: deferred acceptance with minority-reserve
+  choice functions (school-choice / residency style distributional constraints).
 
 ---
 

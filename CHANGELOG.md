@@ -8,6 +8,9 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `reserves` module: deferred acceptance with diversity reserves
+  (minority-reserve choice functions, Hafalir-Yenmez-Yildirim style) for
+  distributional constraints like school-choice or residency reserves.
 - `fairness` module: rank-cost metrics and egalitarian / sex-equal stable
   matchings (correcting Gale-Shapley's proposer-optimal one-sidedness), plus a
   public `all_stable_matchings` enumerator.

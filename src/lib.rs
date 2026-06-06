@@ -78,6 +78,7 @@ pub mod prefs;
 pub mod pricing;
 #[cfg(feature = "python")]
 mod python;
+pub mod reserves;
 pub mod rng;
 pub mod ttc;
 pub mod two_sided;
@@ -101,6 +102,7 @@ pub use online::{OnlineMarket, OnlineStats, Policy};
 pub use parallel::simulate_batch;
 pub use prefs::{break_ties, rank_by_scores, rank_by_scores_random, restrict_to_acceptable};
 pub use pricing::{LearnedPricer, Objective, price_grid};
+pub use reserves::{deferred_acceptance_with_reserves, reserved_type_matched};
 pub use rng::Rng;
 pub use ttc::top_trading_cycle;
 pub use two_sided::TwoSidedMarket;
