@@ -11,6 +11,7 @@
 /// `proposer[p] == Some(r)` iff proposer `p` is matched to receiver `r`, and
 /// symmetrically for `receiver`. The two views are always consistent.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Matching {
     /// Partner of each proposer, if matched.
     pub proposer: Vec<Option<usize>>,

@@ -25,6 +25,7 @@ fn dist(a: (f64, f64), b: (f64, f64)) -> f64 {
 /// A snapshot of a ride-hailing market: riders and drivers with positions,
 /// values, and costs.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RideHailing {
     /// Each rider's value for a ride (maximum fare they will pay).
     pub rider_values: Vec<f64>,
@@ -96,6 +97,7 @@ pub fn random_ride_hailing(rng: &mut Rng, n_riders: usize, n_drivers: usize) -> 
 /// effort (deadhead to pickup plus the delivery leg). A delivery fee gates
 /// participation, just like ride-hailing's surge.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Delivery {
     /// Each order's value (maximum delivery fee it will pay).
     pub order_values: Vec<f64>,
@@ -177,6 +179,7 @@ fn skill_fit(a: &[f64], b: &[f64]) -> f64 {
 /// dot product). Tasks are demand, workers are supply, and a task reward gates
 /// participation.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Crowdsourcing {
     /// Each task's value (maximum reward it will pay).
     pub task_values: Vec<f64>,

@@ -36,6 +36,7 @@ pub trait LearningMarket {
 
 /// Per-round record of a run, plus convenience summaries.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Report {
     /// Number of rounds played.
     pub rounds: usize,

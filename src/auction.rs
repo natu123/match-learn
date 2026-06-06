@@ -16,6 +16,7 @@
 
 /// Outcome of a double auction.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AuctionResult {
     /// Number of buyer-seller pairs that trade.
     pub quantity: usize,

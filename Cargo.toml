@@ -16,6 +16,12 @@ crate-type = ["rlib", "cdylib"]
 [features]
 # Opt-in Python bindings. The pure-Rust core stays dependency-free by default.
 python = ["dep:pyo3"]
+# Opt-in Serialize/Deserialize on the public data types.
+serde = ["dep:serde"]
 
 [dependencies]
 pyo3 = { version = "0.23", features = ["extension-module", "abi3-py39"], optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+
+[dev-dependencies]
+serde_json = "1"

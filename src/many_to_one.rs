@@ -13,6 +13,7 @@ use crate::matching::rank_table;
 /// most `capacity[r]` proposers. The two views are consistent: `proposer[p] ==
 /// Some(r)` iff `p` appears in `receiver[r]`.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ManyToOne {
     /// Receiver each proposer is assigned to, if any.
     pub proposer: Vec<Option<usize>>,

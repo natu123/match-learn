@@ -13,6 +13,7 @@ use crate::marketplace::{Marketplace, RoundOutcome};
 
 /// What the platform is optimizing for.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Objective {
     /// Matched volume per round (maximized at the clearing price).
     Throughput,

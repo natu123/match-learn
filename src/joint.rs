@@ -19,6 +19,7 @@ use crate::rng::Rng;
 
 /// One realized two-sided market with values, costs, and preferences.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct JointInstance {
     /// Each demand agent's value (its maximum willingness to pay).
     pub demand_values: Vec<f64>,
@@ -110,6 +111,25 @@ pub fn random_joint_instance(rng: &mut Rng, n_d: usize, n_s: usize) -> JointInst
         supply_costs: (0..n_s).map(|_| rng.uniform()).collect(),
         demand_prefs: (0..n_d).map(|_| rng.permutation(n_s)).collect(),
         supply_prefs: (0..n_s).map(|_| rng.permutation(n_d)).collect(),
+    }
+}
+
+#[cfg(all(test, feature = "serde"))]
+mod serde_tests {
+    use super::*;
+
+    #[test]
+    fn joint_instance_round_trips_through_json() {
+        let inst = JointInstance {
+            demand_values: vec![0.8, 0.3],
+            supply_costs: vec![0.1, 0.5],
+            demand_prefs: vec![vec![0, 1], vec![1, 0]],
+            supply_prefs: vec![vec![0, 1], vec![1, 0]],
+        };
+        let json = serde_json::to_string(&inst).unwrap();
+        let back: JointInstance = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.demand_values, inst.demand_values);
+        assert_eq!(back.demand_prefs, inst.demand_prefs);
     }
 }
 

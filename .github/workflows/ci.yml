@@ -26,6 +26,8 @@ jobs:
         run: cargo test --all-targets
       - name: Doctests
         run: cargo test --doc
+      - name: Tests (serde feature)
+        run: cargo test --features serde
 
   wasm:
     name: wasm32 build

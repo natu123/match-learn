@@ -18,6 +18,7 @@ use crate::rng::Rng;
 ///
 /// `mean(p) = base * max(0, 1 - p / max_price)`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Demand {
     /// Arrival intensity at price zero.
     pub base: f64,
@@ -37,6 +38,7 @@ impl Demand {
 ///
 /// `mean(p) = base * min(1, p / ref_price)` for `p >= 0`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Supply {
     /// Arrival intensity once price reaches `ref_price`.
     pub base: f64,
@@ -53,6 +55,7 @@ impl Supply {
 
 /// What happened in one round.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RoundOutcome {
     /// Price posted this round.
     pub price: f64,

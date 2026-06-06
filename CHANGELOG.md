@@ -7,6 +7,14 @@ contain breaking changes).
 
 ## [Unreleased]
 
+### Added
+- Optional `serde` feature deriving `Serialize`/`Deserialize` on the public data
+  types (`Matching`, `ManyToOne`, `JointInstance`, `AuctionResult`, `Report`,
+  `Demand`/`Supply`/`RoundOutcome`, `Objective`, and the application markets).
+- Phase 7 dynamic pricing and Phase 8 applications: `Marketplace`,
+  `LearnedPricer`, `JointInstance`, double/McAfee auctions, and ride-hailing /
+  delivery / crowdsourcing adapters.
+
 ## [0.1.0] - 2026-06-06
 
 First public release: the mechanism-proof core plus the dynamic-pricing
