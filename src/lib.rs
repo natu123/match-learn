@@ -8,8 +8,56 @@
 //! every step. As preferences are learned, the matching converges toward the
 //! stable optimum.
 //!
-//! This is the Phase 1 (mechanism-proof) core; see the project Roadmap for the
-//! path toward dynamic pricing x supply-demand matching.
+//! See the project Roadmap for the path from this core toward dynamic pricing x
+//! supply-demand matching.
+//!
+//! # Examples
+//!
+//! A stable matching:
+//!
+//! ```
+//! use match_learn::gale_shapley;
+//!
+//! // Two proposers and two receivers, both sides preferring index 0.
+//! let proposers = vec![vec![0, 1], vec![0, 1]];
+//! let receivers = vec![vec![0, 1], vec![0, 1]];
+//! let m = gale_shapley(&proposers, &receivers);
+//! assert_eq!(m.proposer, vec![Some(0), Some(1)]);
+//! ```
+//!
+//! Learning a market online — proposers do not know their own utilities and
+//! learn them while a stable matching is kept every round:
+//!
+//! ```
+//! use match_learn::{Market, simulate};
+//!
+//! let util = vec![vec![1.0, 0.2], vec![0.3, 1.0]]; // true utilities (unknown to agents)
+//! let receiver_prefs = vec![vec![0, 1], vec![1, 0]];
+//! let mut market = Market::with_thompson(util, receiver_prefs, 0.5, 1.0, 0.04, 0.2, 42);
+//!
+//! let report = simulate(&mut market, 2000);
+//! assert!(report.tail_stable_fraction(400) > 0.9); // converged to the stable match
+//! ```
+//!
+//! Learning the market-clearing price for a supply-demand queue:
+//!
+//! ```
+//! use match_learn::marketplace::{Demand, Marketplace, Supply};
+//! use match_learn::pricing::{LearnedPricer, Objective, price_grid};
+//!
+//! let demand = Demand { base: 12.0, max_price: 20.0 };
+//! let supply = Supply { base: 12.0, ref_price: 10.0 };
+//! let mut market = Marketplace::new(demand, supply, 0.02, 7);
+//!
+//! let grid = price_grid(1.0, 18.0, 18);
+//! let mut pricer = LearnedPricer::with_ucb(grid, 0.7, Objective::Throughput);
+//! for _ in 0..5000 {
+//!     pricer.step(&mut market);
+//! }
+//! // The learned price sits near the analytic clearing price.
+//! let clearing = market.clearing_price();
+//! assert!((pricer.best_price() - clearing).abs() < 3.0);
+//! ```
 
 pub mod contextual;
 pub mod data;

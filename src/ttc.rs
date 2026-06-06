@@ -26,6 +26,14 @@ fn top_available(prefs_a: &[usize], available: &[bool]) -> usize {
 /// `prefs[a]` is agent `a`'s strict ranking over all `n` objects (a permutation
 /// of `0..n`). Returns `assignment` where `assignment[a]` is the object agent
 /// `a` ends up with; the result is always a permutation.
+///
+/// ```
+/// use match_learn::top_trading_cycle;
+///
+/// // Agent 0 wants object 1, agent 1 wants object 0: they trade.
+/// let prefs = vec![vec![1, 0], vec![0, 1]];
+/// assert_eq!(top_trading_cycle(&prefs), vec![1, 0]);
+/// ```
 pub fn top_trading_cycle(prefs: &[Vec<usize>]) -> Vec<usize> {
     let n = prefs.len();
     let mut assignment = vec![usize::MAX; n];

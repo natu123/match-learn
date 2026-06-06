@@ -32,6 +32,18 @@ impl ManyToOne {
 /// `proposer_prefs[p]` ranks receivers; `receiver_prefs[r]` ranks proposers;
 /// `capacities[r]` is `r`'s quota. A pair is acceptable only if each appears on
 /// the other's list. Runs in `O(P * R)`.
+///
+/// ```
+/// use match_learn::hospital_residents;
+///
+/// // Three residents all want the one hospital, which has two slots and
+/// // prefers 0 > 1 > 2. Resident 2 is left unmatched (-1 in `proposer`).
+/// let residents = vec![vec![0], vec![0], vec![0]];
+/// let hospitals = vec![vec![0, 1, 2]];
+/// let m = hospital_residents(&residents, &hospitals, &[2]);
+/// assert_eq!(m.matched(), 2);
+/// assert_eq!(m.proposer[2], None);
+/// ```
 pub fn hospital_residents(
     proposer_prefs: &[Vec<usize>],
     receiver_prefs: &[Vec<usize>],
