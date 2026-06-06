@@ -141,8 +141,8 @@ Ship it and become the reference.
 ### Phase 7 — Dynamic pricing x matching
 Add the price axis: from matching to market.
 
-- [ ] Queueing model
-- [ ] Dynamic pricing policy
+- [x] Queueing model — `Marketplace` (price-responsive Poisson arrivals, queues, clearing price)
+- [x] Dynamic pricing policy — `LearnedPricer` learns the clearing price online (bandit over a price grid)
 - [ ] Joint pricing x matching optimization
 - [ ] Regret-queue tradeoff
 
