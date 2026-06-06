@@ -123,6 +123,18 @@ Slow annealing cuts the genuine-stall rate **2.8×** and turns mean regret from
 `29` to `≈0`, exactly where forcing failed. (At 8×8 the stall rate drops 7.25% →
 4.5% similarly.)
 
+**Variance caveat (honest).** This aggregate benefit is **high-variance** and does
+*not* hold as a clean per-subset inequality. Mean total regret is dominated by a
+handful of near-tie outliers and is often *negative* (on a near-tie market the
+played matching can beat the true-stable baseline, since the proposer is
+indifferent), so on a different 120-market subset Thompson and annealing come out
+roughly tied. The robust, low-variance evidence for the churn cure is therefore
+the **controlled** unit test `annealing_suppresses_near_tie_churn` (a pure
+near-tie bandit, where annealing cuts top-arm flips by >2×), not a market-level
+regret inequality — which is why this repository guards the mechanism at the unit
+level and merely *documents* the market-level aggregate here rather than asserting
+it as a test.
+
 ### The annealing trade-off
 
 Cooling too fast (`tau` small) *deepens* the rare lock-in: it commits before the
