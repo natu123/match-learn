@@ -14,6 +14,7 @@
 pub mod contextual;
 pub mod data;
 pub mod eval;
+pub mod joint;
 pub mod learner;
 pub mod linalg;
 pub mod many_to_one;
@@ -32,6 +33,7 @@ pub mod two_sided;
 pub use contextual::LinearThompson;
 pub use data::{correlated_market, from_text, to_text};
 pub use eval::{LearningMarket, Report, simulate};
+pub use joint::{JointInstance, random_joint_instance};
 pub use learner::{DiscountedThompson, GaussianThompson, PreferenceLearner, Ucb1};
 pub use many_to_one::{ManyToOne, hospital_residents};
 pub use market::Market;
