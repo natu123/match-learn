@@ -128,7 +128,7 @@ Make it the production layer ("research in Python, production in Rust").
 - [x] Parallelism — `simulate_batch` over `std::thread` (dependency-free; Rayon could swap in)
 - [x] PyO3 Python bindings — optional `python` feature, `import match_learn` (see [`python/`](python/))
 - [x] Latency / throughput benchmarks — `benchmark` example
-- [ ] WASM target
+- [x] WASM target — compiles to `wasm32-unknown-unknown` (parallel falls back to sequential)
 
 ### Phase 6 — v1.0 stable release
 Ship it and become the reference.

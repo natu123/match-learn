@@ -9,9 +9,9 @@
 //!
 //! Results are returned in market-index order and are bit-for-bit identical to
 //! running the same factory sequentially, so parallelism never changes outcomes.
+//! On `wasm32` (no thread spawning) it transparently runs sequentially.
 
 use crate::eval::{LearningMarket, Report, simulate};
-use std::thread;
 
 /// Run `n_markets` simulations of `rounds` rounds each, across up to `threads`
 /// worker threads.
@@ -32,39 +32,56 @@ where
     if n_markets == 0 {
         return Vec::new();
     }
-    let threads = threads.clamp(1, n_markets);
-    let factory = &factory;
 
-    // Each worker handles a strided subset of indices and returns (index, report)
-    // pairs, which we scatter back into the right slots.
-    let mut out: Vec<Option<Report>> = (0..n_markets).map(|_| None).collect();
-
-    thread::scope(|scope| {
-        let handles: Vec<_> = (0..threads)
-            .map(|w| {
-                scope.spawn(move || {
-                    let mut local = Vec::new();
-                    let mut i = w;
-                    while i < n_markets {
-                        let mut market = factory(i);
-                        local.push((i, simulate(&mut market, rounds)));
-                        i += threads;
-                    }
-                    local
-                })
+    // wasm32 has no thread spawning, so run sequentially there. The result is
+    // identical to the threaded path (which is itself bit-for-bit sequential).
+    #[cfg(target_arch = "wasm32")]
+    {
+        let _ = threads;
+        return (0..n_markets)
+            .map(|i| {
+                let mut market = factory(i);
+                simulate(&mut market, rounds)
             })
             .collect();
+    }
 
-        for h in handles {
-            for (i, report) in h.join().expect("worker thread panicked") {
-                out[i] = Some(report);
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        let threads = threads.clamp(1, n_markets);
+        let factory = &factory;
+
+        // Each worker handles a strided subset of indices and returns (index,
+        // report) pairs, which we scatter back into the right slots.
+        let mut out: Vec<Option<Report>> = (0..n_markets).map(|_| None).collect();
+
+        std::thread::scope(|scope| {
+            let handles: Vec<_> = (0..threads)
+                .map(|w| {
+                    scope.spawn(move || {
+                        let mut local = Vec::new();
+                        let mut i = w;
+                        while i < n_markets {
+                            let mut market = factory(i);
+                            local.push((i, simulate(&mut market, rounds)));
+                            i += threads;
+                        }
+                        local
+                    })
+                })
+                .collect();
+
+            for h in handles {
+                for (i, report) in h.join().expect("worker thread panicked") {
+                    out[i] = Some(report);
+                }
             }
-        }
-    });
+        });
 
-    out.into_iter()
-        .map(|r| r.expect("every market was simulated"))
-        .collect()
+        out.into_iter()
+            .map(|r| r.expect("every market was simulated"))
+            .collect()
+    }
 }
 
 #[cfg(test)]
