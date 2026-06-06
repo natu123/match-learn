@@ -139,7 +139,7 @@ fn main() {
     let mut best_welfare = f64::NEG_INFINITY; // practical objective
     let mut best_match = index_match.clone();
     // Enumerate the Cartesian product of per-proposer candidate rankings.
-    let mut idx = vec![0usize; N];
+    let mut idx = [0usize; N];
     'outer: loop {
         let rankings: Vec<Vec<usize>> = (0..N).map(|p| per_proposer[p][idx[p]].clone()).collect();
         let m = gale_shapley(&rankings, &recv);
