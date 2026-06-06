@@ -7,6 +7,14 @@ contain breaking changes).
 
 ## [Unreleased]
 
+### Added
+- `CoordinatedMarket` — the research-track *cascade* cure made live: each round
+  it searches within-near-tie orderings and picks the Gale-Shapley matching that
+  maximizes belief welfare (oracle-free), with vanishing forced exploration for
+  frozen arms. Implements `LearningMarket`. The search is capped by `max_group`
+  and a total-combination limit (falling back to mean-greedy beyond it). Public
+  `near_tie_rankings` helper.
+
 ## [0.1.1] - 2026-06-06
 
 ### Added

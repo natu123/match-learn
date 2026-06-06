@@ -62,6 +62,7 @@
 pub mod applications;
 pub mod auction;
 pub mod contextual;
+pub mod coordinated;
 pub mod data;
 pub mod eval;
 pub mod fairness;
@@ -89,6 +90,7 @@ pub use applications::{
 };
 pub use auction::{AuctionResult, double_auction, efficient_quantity, mcafee_auction};
 pub use contextual::LinearThompson;
+pub use coordinated::{CoordinatedMarket, near_tie_rankings};
 pub use data::{correlated_market, from_text, to_text};
 pub use eval::{LearningMarket, Report, simulate};
 pub use fairness::{egalitarian_cost, egalitarian_stable, sex_equal_stable, sex_equality_cost};
