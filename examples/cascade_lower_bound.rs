@@ -23,7 +23,7 @@
 //! cargo run --release --example cascade_lower_bound
 //! ```
 
-use match_learn::{Market, Rng, simulate};
+use match_learn::Market;
 
 const NOISE: f64 = 0.2;
 const DQ: f64 = 0.6; // victim's rb→rc drop
