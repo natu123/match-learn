@@ -8,6 +8,9 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `strategyproof` module: brute-force manipulation checks (`proposer_manipulation`,
+  `receiver_manipulation`) — verifies Gale-Shapley is strategy-proof for proposers
+  but manipulable by receivers.
 - `assignment` module: the assignment problem (welfare-optimal matching) via a
   from-scratch O(n^3) Hungarian algorithm — `min_cost_assignment` and
   `max_weight_assignment`, verified against brute force. The welfare-optimal

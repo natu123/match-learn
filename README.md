@@ -178,6 +178,8 @@ Real platforms.
 - [x] **Assignment problem** — `assignment`: from-scratch Hungarian algorithm for
   the welfare-optimal (max-weight / min-cost) matching, the planner's counterpart
   to stable matching.
+- [x] **Strategy-proofness** — `strategyproof`: checks whether an agent can gain by
+  lying; verifies Gale-Shapley is proposer-strategy-proof but receivers can manipulate.
 
 ---
 
