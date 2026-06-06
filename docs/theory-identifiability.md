@@ -109,16 +109,58 @@ That gain is the *near-tie gap* `Δ_p ≪ ε`, so the matching is ε-stable for 
 on (ε-)instability — consistent with `eps_stability.rs` finding the settled stalls
 ε-stable. ("Regret" here = distance from the proposer-optimal stable matching.)
 
-**Individual vs net (the honest caveat).** In this `3×3` family the cascade is a
-**redistribution**: while `q` loses `Δ_q`, proposer `s` *gains* (`C→A`,
-`+0.60`), so the *net* proposer regret is `Δ_p + Δ_q − 0.60 < 0` — a per-victim
-floor, not a net one. A **net** `Θ(1)` floor needs the swing to push the market
-onto an `M*`-dominated matching where no one absorbs the loss; the dissected `4×4`
-(seed 235418470, `dissect_stall.rs`) is such an instance numerically, but a hand
-proof of its GS sensitivity is the remaining work. The multi-pair case (several
-independent near-tie swings) is conjectured to add the individual floors. So:
-**Prop. 2 is rigorous as an individual-regret floor; the net-floor generalization
-is the open part.**
+**Individual vs net.** In the `3×3` family the cascade is a **redistribution**:
+while `q` loses `Δ_q`, proposer `s` *gains* (`C→A`, `+0.60`), so the *net*
+proposer regret is `Δ_p + Δ_q − 0.60 < 0` — a per-victim floor, not a net one. The
+gain is possible only because the mis-order matching is `Δ_p`-stable (not exactly
+stable): a *true*-stable matching is weakly `M*`-dominated for all proposers by the
+proposer-optimality theorem, so no one could gain. To get a **net** floor we make
+the cascade a pure **descending chain** in which even the last displaced proposer
+is downgraded — proved next.
+
+> **Proposition 2′ (net cascade floor — rigorous).** There is an explicit family
+> of `4×4` markets, parameterized by `Δ_p ≪ σ`, in which a single near-tie
+> mis-order by proposer `p` makes **every** proposer strictly worse off, so the
+> per-round **net** proposer regret is `≥ 1.20 = Θ(1)` (no proposer absorbs the
+> loss). Hence, by the same Lemma 1 argument, any decentralized policy has
+> `E[R_T] ≥ c · 1.20 · (T − T₀)` — a **linear net** floor.
+
+**The instance** (proposers `p,q,r,s`, receivers `A,B,C,D`; `examples/net_floor_4x4.rs`):
+
+| util | A | B | C | D | true order |
+|------|----|----|----|----|-----------|
+| `p` | `1.00` | `1.00−Δ_p` | `0.10` | `0.00` | `A ≻ B ≻ C ≻ D` (top gap `Δ_p`) |
+| `q` | `0.00` | `0.90` | `0.40` | `0.05` | `B ≻ C ≻ D ≻ A` |
+| `r` | `0.00` | `0.10` | `0.80` | `0.50` | `C ≻ D ≻ B ≻ A` |
+| `s` | `0.30` | `0.20` | `0.10` | `0.70` | `D ≻ A ≻ B ≻ C` |
+
+Receivers (known, exact): `A: p≻q≻r≻s`, `B: p≻q≻r≻s`, `C: q≻r≻p≻s`, `D: r≻s≻p≻q`.
+
+*Proof.* In the correct branch every proposer proposes to its rank-1 receiver and
+they are **all distinct** (`p→A, q→B, r→C, s→D`), so `M* = {p-A, q-B, r-C, s-D}`
+forms at once; since every proposer holds its top choice, `M*` is trivially stable
+**and** proposer-optimal. In the mis-order branch (`p` reports `B≻A`, legal since
+`A,B` differ by `Δ_p`) Gale-Shapley is a single rejection chain:
+`p→B` displaces `q` (`B: p≻q`); `q→C` displaces `r` (`C: q≻r`); `r→D` displaces `s`
+(`D: r≻s`); `s→A`, which is now free (`p` left it), and `A` accepts. Result
+`M' = {p-B, q-C, r-D, s-A}`, stable w.r.t. the misreport profile (each proposer's
+strictly-preferred receivers all prefer their current holders). True per-proposer
+losses: `p: A→B = Δ_p`, `q: B→C = 0.50`, `r: C→D = 0.30`, `s: D→A = 0.40`. The
+sum is `Δ_p + 1.20`; **every term is `≥ 0`** (no beneficiary — the freed receiver
+`A` is a downgrade even for `s`, its taker), so the net floor is `1.20 = Θ(1)` as
+`Δ_p → 0`. The decentralized lower-bound argument of Prop. 2 then applies verbatim
+with per-round cost `1.20` in place of `Δ_q`. ∎
+
+The two Gale-Shapley runs and the net-regret arithmetic are reproduced exactly by
+`examples/net_floor_4x4.rs` (net `1.210` at `Δ_p = 0.01`, min individual loss
+`+0.010`). The seed-235418470 `4×4` (`dissect_stall.rs`) is a *random* witness of
+the same mechanism; this family is its clean parametric form.
+
+**Remaining open.** Only the **multi-pair** generalization is left: with several
+independent near-tie swings the individual/net floors are conjectured to add, but a
+general proof needs an instance family with provably independent GS-sensitive
+swings. The single-swing net floor (Prop. 2′) and individual floor (Prop. 2) are
+now rigorous.
 
 ## 4. Why coordination escapes the floor (rigorous, given the band)
 
@@ -240,10 +282,12 @@ depends on the current matching) and is stated here for the forced-uniform regim
 
 ## 5. Consequences
 
-- **No-go for decentralized policies (Prop. 2):** forcing, annealing, UCB,
-  Thompson — any per-agent rule — suffer the `Θ(Δ_q)` cascade floor on near-tie
-  instances. This is *why* the 400-market study showed exploration tweaks moving
-  the dominant modes only modestly.
+- **No-go for decentralized policies (Prop. 2, 2′):** forcing, annealing, UCB,
+  Thompson — any per-agent rule — suffer a cascade floor on near-tie instances:
+  `Θ(Δ_q)` on the victim (Prop. 2), and `Θ(1)` on *net* welfare in the
+  descending-chain family (Prop. 2′), both linear in `T`. This is *why* the
+  400-market study showed exploration tweaks moving the dominant modes only
+  modestly.
 - **Coordination is both sufficient (Prop. 3) and, on these instances, necessary.**
   The *naive* live coordinator failed (welfare-max on un-converged beliefs is
   unstable); **Prop. 4 fixes it** by gating coordination on posterior width
