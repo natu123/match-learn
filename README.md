@@ -11,7 +11,7 @@
 match-learn = "0.1"
 ```
 
-> **Status: Phases 1–5 done, Phase 7 (dynamic pricing) underway. Built in public.**
+> **Status: v0.1.0 on crates.io. Phases 1–5 done, Phase 7 (dynamic pricing) underway. Built in public.**
 > The core is built from scratch, one phase at a time. Verified against an
 > established library (identical matchings) and benchmarked across languages.
 > Pricing now gates participation and a bandit learns the market-clearing price.
@@ -143,7 +143,7 @@ Make it the production layer ("research in Python, production in Rust").
 ### Phase 6 — v1.0 stable release
 Ship it and become the reference.
 
-- [ ] Publish to crates.io
+- [x] Publish to crates.io — [`match-learn` v0.1.0](https://crates.io/crates/match-learn)
 - [ ] Documentation & tutorials
 - [ ] Issue / PR workflow
 - [ ] Write-up / paper draft
