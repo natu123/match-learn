@@ -8,6 +8,17 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `StabilityCoordinatedMarket` — a live near-tie coordinator that fixes the
+  *objective* behind the negative finding rather than gating it. The research
+  track's controlled A/B (`docs/theory-identifiability.md` §4a) showed that
+  maximizing belief welfare is unstable even with accurate beliefs
+  (`welfare-max ≠ stable-max`), so the Prop-4 gate can only *bound* the damage
+  to `2·eps`-stability. This coordinator instead minimizes the *expected number
+  of blocking pairs* over the near-tie orderings (Thompson-sampled profiles),
+  targeting stability directly: it has no `2·eps` ceiling and reaches the highest
+  tail-stability of all (≈0.96, above plain Thompson's ≈0.92) at the cost of some
+  proposer welfare. Validated in `examples/coordinated_validation.rs`; the
+  private `count_blocking_pairs` is cross-checked against `is_stable`.
 - `lattice` module: the lattice of stable matchings and median stable matchings.
   Conway's lattice operations (`stable_join` / `stable_meet`: each proposer keeps
   the better / worse of its two partners, again a stable matching) and the

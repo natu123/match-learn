@@ -5,9 +5,10 @@
 //! ```
 //!
 //! Builds markets with a deliberate near-tie (one proposer nearly indifferent
-//! between two receivers) — the cascade trigger — and compares four policies on
+//! between two receivers) — the cascade trigger — and compares five policies on
 //! tail stability and regret: plain Thompson, forced-explore Thompson, the
-//! ungated `CoordinatedMarket`, and the Prop-4 `GatedCoordinatedMarket`.
+//! ungated `CoordinatedMarket`, the Prop-4 `GatedCoordinatedMarket`, and the
+//! `StabilityCoordinatedMarket`.
 //!
 //! The story:
 //! - the **ungated** `CoordinatedMarket` maximizes belief welfare every round and
@@ -17,9 +18,15 @@
 //!   reorders an un-converged pair. It recovers nearly all the lost stability
 //!   (~0.91 at a tight band) and bounds the rest — Prop 4 guarantees
 //!   `2·eps`-stability, not strict stability, so a small eps-controlled gap to
-//!   plain Thompson remains by design. `eps` tunes the welfare/stability tradeoff.
+//!   plain Thompson remains by design. `eps` tunes the welfare/stability tradeoff;
+//! - the **stability** coordinator fixes the *objective* rather than gating it:
+//!   it minimizes expected blocking pairs instead of belief welfare, so it has no
+//!   `2·eps` ceiling and reaches the *highest* stability of all — above plain
+//!   Thompson — at the cost of some proposer welfare (positive regret).
 
-use match_learn::{CoordinatedMarket, GatedCoordinatedMarket, Market, Rng, simulate};
+use match_learn::{
+    CoordinatedMarket, GatedCoordinatedMarket, Market, Rng, StabilityCoordinatedMarket, simulate,
+};
 
 /// A market with `n` proposers where proposer 0 is nearly indifferent between
 /// receivers 0 and 1 (means within `gap`), a near-tie that can cascade.
@@ -48,6 +55,7 @@ fn main() {
     let (mut co_stable, mut co_regret) = (0.0, 0.0);
     let (mut ga_stable, mut ga_regret) = (0.0, 0.0);
     let (mut gt_stable, mut gt_regret) = (0.0, 0.0);
+    let (mut st_stable, mut st_regret) = (0.0, 0.0);
 
     for _ in 0..markets {
         let seed = (seedgen.below(1_000_000_000) as u64) + 1;
@@ -115,8 +123,8 @@ fn main() {
         // A tighter near-tie band certifies fewer pairs, trading welfare back for
         // strict stability (eps -> 0 recovers the forced-explore baseline).
         let mut gt = GatedCoordinatedMarket::new(
-            util,
-            recv,
+            util.clone(),
+            recv.clone(),
             0.5,
             1.0,
             noise * noise,
@@ -129,6 +137,23 @@ fn main() {
         let r = simulate(&mut gt, rounds);
         gt_stable += r.tail_stable_fraction(tail);
         gt_regret += r.tail_mean_regret(tail);
+
+        // The stability-targeting coordinator: minimizes expected blocking pairs
+        // instead of belief welfare, so it has no 2*eps stability ceiling.
+        let mut st = StabilityCoordinatedMarket::new(
+            util,
+            recv,
+            0.5,
+            1.0,
+            noise * noise,
+            0.05,
+            0.5,
+            noise,
+            seed ^ 0xABCD,
+        );
+        let r = simulate(&mut st, rounds);
+        st_stable += r.tail_stable_fraction(tail);
+        st_regret += r.tail_mean_regret(tail);
     }
 
     let m = markets as f64;
@@ -143,19 +168,24 @@ fn main() {
     row("CoordinatedMarket", co_stable, co_regret);
     row("GatedCoordinatedMarket eps=.05", ga_stable, ga_regret);
     row("GatedCoordinatedMarket eps=.02", gt_stable, gt_regret);
+    row("StabilityCoordinatedMarket", st_stable, st_regret);
     println!();
-    println!("Honest reading: the ungated CoordinatedMarket maximizes *belief welfare*, so it");
-    println!("raises proposer welfare (negative regret) but is *much* less stable than plain");
-    println!("Thompson -- the negative finding. The GATED coordinator certifies a near-tie before");
-    println!("coordinating it (|dmean| + 1.96*sqrt(s_a^2+s_b^2) <= eps), so it never reorders an");
-    println!("un-converged pair. This recovers most of the lost stability and bounds the rest:");
+    println!("Honest reading (judge by stability, not regret-vs-M*): the ungated");
+    println!("CoordinatedMarket maximizes *belief welfare*, so it raises proposer welfare");
+    println!("(negative regret) but is *much* less stable than plain Thompson -- the negative");
     println!(
-        "Prop 4 guarantees *2-eps-stability*, not strict stability, so on the strict is-stable"
+        "finding. It is not a learning artifact: belief-welfare maximization is unstable even"
     );
+    println!("with accurate beliefs (welfare-max != stable-max). So the GATED coordinator, which");
+    println!("only coordinates a *certified* near-tie, can *bound* the damage (Prop 4:");
+    println!("2*eps-stability) but not erase it -- gated eps=.02 reaches ~0.91, still an");
     println!(
-        "metric the gated coordinator still trails plain Thompson by an eps-controlled margin"
+        "eps-controlled margin under plain Thompson. The StabilityCoordinatedMarket fixes the"
     );
-    println!("(tighten eps to trade welfare back for stability; eps -> 0 recovers the baseline).");
-    println!("The gate turns the ungated coordinator's unbounded instability into a tunable,");
-    println!("bounded welfare/stability tradeoff. (Cf. docs/theory-identifiability.md, Prop 4.)");
+    println!("*objective*: it minimizes expected blocking pairs (not welfare), so it has no 2*eps");
+    println!("ceiling and reaches the *highest* stability of all, above plain Thompson. Its");
+    println!("positive regret-vs-M* is the tell that regret is the wrong metric here -- it lands");
+    println!("on stable matchings that need not be proposer-optimal, trading a little proposer");
+    println!("welfare for strictly more stable matchings. (Cf. docs/theory-identifiability.md,");
+    println!("Prop 4 and section 4a.)");
 }

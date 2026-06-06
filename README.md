@@ -192,6 +192,10 @@ Real platforms.
 - [x] **Confidence-gated coordination** — `GatedCoordinatedMarket`: the Prop-4 cure
   that coordinates a near-tie only once its posterior is certified tight, resolving
   the ungated coordinator's instability with a bounded, tunable tradeoff.
+- [x] **Stability-targeting coordination** — `StabilityCoordinatedMarket`: fixes the
+  coordinator's *objective*, minimizing expected blocking pairs instead of belief
+  welfare, so it reaches the highest tail-stability of all (above plain Thompson)
+  with no `2·eps` ceiling — the research track's recommended live coordinator.
 - [x] **Boston mechanism** — `boston`: the immediate-acceptance school-choice
   mechanism, shown against deferred acceptance to be unstable and manipulable yet
   student-Pareto-efficient when truthful.
