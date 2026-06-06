@@ -10,7 +10,8 @@ contain breaking changes).
 ### Added
 - `online` module: dynamic matching where agents arrive and depart over time
   (`OnlineMarket`, `Policy`), with the greedy-vs-batched timing tradeoff between
-  match quality and abandonment.
+  match quality and abandonment. A bandit can learn the net-value-maximizing
+  batch interval online when the arrival/abandonment regime is unknown.
 - `Report` now records per-round `welfare` (realized proposer-side utility), with
   `tail_mean_welfare`.
 - Optional `serde` feature deriving `Serialize`/`Deserialize` on the public data

@@ -46,8 +46,6 @@ fn main() {
         );
     }
 
-    println!(
-        "\nLonger batching lowers mean match distance (better pairs) but abandons more"
-    );
+    println!("\nLonger batching lowers mean match distance (better pairs) but abandons more");
     println!("waiting agents — the timing tradeoff a dynamic platform must set.");
 }

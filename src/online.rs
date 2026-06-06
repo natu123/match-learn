@@ -216,4 +216,62 @@ mod tests {
             greedy.abandoned
         );
     }
+
+    #[test]
+    fn a_bandit_learns_a_near_optimal_batching_policy() {
+        // The platform does not know the arrival/abandonment regime; it learns
+        // the batch interval that maximizes net value -- here each match is worth
+        // 1 minus its distance, so the policy trades quantity against quality --
+        // by experimenting, episode by episode. We require the learned policy to
+        // be near-optimal (robust to near-ties between adjacent intervals).
+        use crate::learner::{PreferenceLearner, Ucb1};
+
+        let arrivals = 3.0;
+        let abandon = 0.02;
+        let ticks = 600;
+        let policies = [
+            Policy::Greedy,
+            Policy::Batched(2),
+            Policy::Batched(4),
+            Policy::Batched(8),
+        ];
+        // Net value: each match worth 1, minus the distance travelled.
+        let net = |s: OnlineStats| s.matched as f64 - s.total_distance;
+
+        // Monte-Carlo oracle: mean net value per policy.
+        let mut oracle_rng = Rng::new(1);
+        let mut means_true = vec![0.0; policies.len()];
+        let episodes = 25;
+        for _ in 0..episodes {
+            for (k, &pol) in policies.iter().enumerate() {
+                let seed = oracle_rng.below(1_000_000_000) as u64 + 1;
+                means_true[k] += net(OnlineMarket::new(arrivals, abandon, seed).run(ticks, pol));
+            }
+        }
+        for v in &mut means_true {
+            *v /= episodes as f64;
+        }
+        let best = means_true.iter().cloned().fold(f64::MIN, f64::max);
+
+        // Learn online: each pull runs a fresh episode under the chosen policy.
+        let mut learner = Ucb1::new(policies.len(), 200.0);
+        let mut rng = Rng::new(500);
+        for _ in 0..400 {
+            let arm = learner.ranking()[0];
+            let seed = rng.below(1_000_000_000) as u64 + 1;
+            let r = net(OnlineMarket::new(arrivals, abandon, seed).run(ticks, policies[arm]));
+            learner.update(arm, r);
+        }
+        let est = learner.means();
+        let learned = (0..policies.len())
+            .max_by(|&a, &b| est[a].partial_cmp(&est[b]).unwrap())
+            .unwrap();
+
+        // The learned policy's true mean net value is within 3% of the best.
+        assert!(
+            means_true[learned] >= 0.97 * best,
+            "learned policy {learned} (net {}) not near optimal (best {best})",
+            means_true[learned]
+        );
+    }
 }
