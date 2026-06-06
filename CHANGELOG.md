@@ -8,6 +8,11 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `many_to_many` module: stable matching where *both* sides have quotas (workers
+  hold several firms, firms hold several workers) — worker-proposing deferred
+  acceptance with responsive preferences, yielding a pairwise-stable matching
+  (`is_pairwise_stable`), verified against a brute-force oracle. Reduces to
+  Gale-Shapley at quota 1 and to Hospital-Residents when only one side has a quota.
 - `strategyproof` module: brute-force manipulation checks (`proposer_manipulation`,
   `receiver_manipulation`) — verifies Gale-Shapley is strategy-proof for proposers
   but manipulable by receivers.

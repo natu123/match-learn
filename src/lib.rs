@@ -70,6 +70,7 @@ pub mod fairness;
 pub mod joint;
 pub mod learner;
 pub mod linalg;
+pub mod many_to_many;
 pub mod many_to_one;
 pub mod market;
 pub mod marketplace;
@@ -101,6 +102,7 @@ pub use joint::{JointInstance, random_joint_instance};
 pub use learner::{
     DiscountedThompson, ForcedExploreThompson, GaussianThompson, PreferenceLearner, Ucb1,
 };
+pub use many_to_many::{ManyToMany, is_pairwise_stable, many_to_many};
 pub use many_to_one::{ManyToOne, hospital_residents};
 pub use market::Market;
 pub use marketplace::{Demand, Marketplace, RoundOutcome, Supply};
