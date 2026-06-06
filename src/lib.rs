@@ -65,6 +65,7 @@ pub mod assignment;
 pub mod auction;
 pub mod boston;
 pub mod contextual;
+pub mod contracts;
 pub mod coordinated;
 pub mod data;
 pub mod eval;
@@ -104,6 +105,7 @@ pub use assignment::{max_weight_assignment, min_cost_assignment};
 pub use auction::{AuctionResult, double_auction, efficient_quantity, mcafee_auction};
 pub use boston::boston_mechanism;
 pub use contextual::LinearThompson;
+pub use contracts::{Contract, ContractMatch, cumulative_offer_process, is_stable_with_contracts};
 pub use coordinated::{
     CoordinatedMarket, GatedCoordinatedMarket, StabilityCoordinatedMarket, near_tie_rankings,
 };

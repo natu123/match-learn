@@ -206,6 +206,10 @@ Real platforms.
 - [x] **Stable-matching lattice** — `lattice`: Conway's join/meet of stable
   matchings and the Teo-Sethuraman median stable matching, the principled
   fairness compromise between the proposer- and receiver-optimal extremes.
+- [x] **Matching with contracts** — `contracts`: the Hatfield-Milgrom cumulative
+  offer process, where a contract carries terms (wage / length of service) and
+  hospitals choose through substitutable choice functions — stable, and reducing
+  to Hospital-Residents; the framework behind cadet-branch matching.
 
 ---
 

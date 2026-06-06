@@ -8,6 +8,15 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `contracts` module: matching with contracts via the cumulative offer process
+  (Hatfield-Milgrom). A `Contract` bundles a doctor, a hospital, and `terms`
+  (a wage band, a position, a length of service); doctors rank whole contracts
+  and hospitals choose *sets* through a substitutable, capacity-limited
+  responsive choice function, so the cumulative offer process yields a stable
+  allocation (`is_stable_with_contracts`). With one contract per doctor-hospital
+  pair it reduces to Hospital-Residents (verified). This is the framework behind
+  cadet-branch matching and labor markets with wages; verified stable, against a
+  brute-force oracle, and with a cadet-branch terms-competition example.
 - `StabilityCoordinatedMarket` — a live near-tie coordinator that fixes the
   *objective* behind the negative finding rather than gating it. The research
   track's controlled A/B (`docs/theory-identifiability.md` §4a) showed that
