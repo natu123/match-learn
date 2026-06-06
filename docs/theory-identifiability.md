@@ -52,48 +52,73 @@ escapes Lemma 1. Concretely:
 ## 3. A per-agent regret floor from cascades (proposition + sketch)
 
 The cascade cost is driven by *another* agent's gap, gated by the near-tie agent's
-un-resolvability. We state it for the clean two-decision instance the dissection
-exhibits and sketch the general claim.
+un-resolvability. We prove the **individual** floor rigorously on an explicit
+parametric family (GS computed by hand on both branches), then separate out the
+harder *net*-floor claim.
 
-> **Proposition 2.** There is a family of markets, parameterized by `(Δ_p, Δ_q)`
-> with `Δ_p ≪ σ ≪ Δ_q = Θ(1)`, in which: proposer `p` is near-indifferent between
-> two receivers `a,b` (gap `Δ_p`); the proposer-optimal stable matching `M*`
-> requires `p` to rank `a` before `b`; and if `p` instead ranks `b` before `a`,
-> Gale-Shapley yields a matching in which proposer `q` loses its `M*` partner, a
-> per-round regret `≥ Δ_q`. Consequently, for **any decentralized policy** (each
-> agent rankings depending only on its own reward history) run for `T` rounds,
+> **Proposition 2 (individual cascade floor — rigorous).** There is an explicit
+> family of `3×3` markets, parameterized by `(Δ_p, Δ_q)` with
+> `Δ_p ≪ σ ≪ Δ_q = Θ(1)`, in which proposer `q`'s per-round regret is **exactly
+> `Δ_q`** on every round that proposer `p` mis-orders its near-tie pair. Hence for
+> **any decentralized policy** (each agent's ranking depends only on its own reward
+> history) run for `T` rounds,
 > ```
-> E[R_T] ≥ Δ_q · Σ_{t≤T} P(p ranks b before a at round t) ≥ c · Δ_q · (T − T₀),
+> E[R_T^q] = Δ_q · Σ_{t≤T} P(p ranks b before a at t) ≥ c · Δ_q · (T − T₀),
 > ```
-> where `T₀ = Θ(σ²/Δ_p²)` is the horizon before `p` could even in principle
-> resolve the pair, and `c > 0` is an absolute constant. With `Δ_p` fixed below
-> the noise floor and finite `T`, the bracket is `Θ(T)`: a **linear** regret floor
-> that no exploration schedule removes.
+> with `T₀ = Θ(σ²/Δ_p²)` and an absolute constant `c > 0`. For `Δ_p` below the
+> noise floor and finite `T` the bracket is `Θ(T)`: a **linear** floor on the
+> victim's regret that no exploration schedule removes.
 
-*Proof sketch.* (i) The instance is the dissected `4×4` market (seed 235418470)
-made parametric: scale `p`'s two top utilities to differ by `Δ_p` and `q`'s by
-`Δ_q`; receiver preferences fixed so that `p`'s order is the unique swing variable
-deciding `q`'s partner (verified for the base instance in `dissect_stall.rs`).
-(ii) By Lemma 1, until `T₀ = Θ(σ²/Δ_p²)` pulls, *any* estimator of `p` orders
-`a,b` correctly with probability `≤ 1/2 + o(1)`; a decentralized `p` sees only its
-own rewards, so this applies regardless of the other agents. Hence
-`P(p ranks b before a) ≥ c` for `t ≤ T₀`, and (since the pair never resolves for
-`Δ_p` below the floor) for the whole horizon when `Δ_p ≲ σ/√T`. (iii) Each such
-round costs `≥ Δ_q` by construction. Summing gives the bound. ∎
+**The instance** (`σ = 0.2`, `Δ_q = 0.6`; proposers `p,q,s`, receivers `A,B,C`):
 
-**What kind of floor (sharpening).** The cascade does not produce an *unstable*
-matching: it lands on a *different stable* matching in which `q` is worse off but
-cannot block (the receiver it covets prefers its current holder). So the floor of
-Prop. 2 is on **proposer-optimality-gap regret**, not on instability — consistent
-with `eps_stability.rs` finding the settled stalls exactly/ε-stable. The bound
-stands as a regret statement; "regret" here means distance from the proposer-
-optimal stable matching.
+| util | A | B | C | true order |
+|------|----|----|----|-----------|
+| `p` | `0.80` | `0.80−Δ_p` | `0.00` | `A ≻ B ≻ C` (top gap `Δ_p`) |
+| `q` | `0.05` | `0.70` | `0.70−Δ_q` | `B ≻ C ≻ A` (gap `Δ_q` at `B,C`) |
+| `s` | `0.90` | `0.50` | `0.30` | `A ≻ B ≻ C` |
 
-**Gaps to close (for full rigor).** The base-instance "unique swing variable"
-claim is checked numerically, not proved in general; a fully general lower bound
-needs an instance family with a proved GS sensitivity. The constant `c` and the
-coupling between `p`'s pull count and the matching dynamics are stated for the
-single-swing instance; the multi-pair case is conjectured to add over pairs.
+Receiver preferences (known, exact): `A: p≻s≻q`, `B: p≻q≻s`, `C: q≻s≻p`.
+(This is the parametric form of `examples/cascade_lower_bound.rs`.)
+
+*Proof.* Both branches are finite GS runs, computed by hand.
+
+- **Correct branch** (`p` reports `A≻B≻C`). Propose: `p→A`, `q→B`, `s→A`. `A` holds
+  `p` (`p≻s`), rejects `s`. `s→B`; `B` holds `q` (`q≻s`), rejects `s`. `s→C`; `C`
+  holds `s`. Result `M* = {p-A, q-B, s-C}` — the proposer-optimal stable matching
+  (GS with proposers proposing). Here `q` gets `B` (utility `0.70`).
+- **Mis-order branch** (`p` reports `B≻A≻C`, free to `p` since `A,B` differ by
+  `Δ_p`). Propose: `p→B`, `q→B`, `s→A`. `B` holds `p` (`p≻q`), rejects `q`. `q→C`;
+  `C` holds `q`. `A` holds `s`. Result `{p-B, q-C, s-A}`. Now `q` gets `C` (utility
+  `0.70−Δ_q`).
+
+So `q`'s loss is exactly `0.70 − (0.70−Δ_q) = Δ_q` on every mis-order round, and
+`p`'s order of `A,B` is **provably the only swing variable**: it is the sole input
+that changes between the two branches, and the two hand-computed GS runs give the
+two different partners for `q`. By Lemma 1, until `T₀ = Θ(σ²/Δ_p²)` pulls any
+estimator orders `p`'s pair correctly with probability `≤ ½ + o(1)`, and since a
+decentralized `p` sees only its own rewards this is unconditional on the others;
+for `Δ_p ≲ σ/√T` the pair never resolves, so `P(p mis-orders) ≥ c` throughout.
+Multiplying by the per-round cost `Δ_q` and summing gives the bound. ∎
+
+**What kind of floor (sharpening).** The mis-order branch is **not exactly
+stable** but it **is `Δ_p`-stable**: its only true blocking pair is `(p, A)` —
+`p` truly prefers `A` over its match `B` by `Δ_p`, and `A` prefers `p` over `s`.
+That gain is the *near-tie gap* `Δ_p ≪ ε`, so the matching is ε-stable for any
+`ε ≥ Δ_p`. The victim `q` cannot block: it covets `B`, but `B` prefers its holder
+`p` to `q`. So the floor of Prop. 2 is on **proposer-optimality-gap regret**, not
+on (ε-)instability — consistent with `eps_stability.rs` finding the settled stalls
+ε-stable. ("Regret" here = distance from the proposer-optimal stable matching.)
+
+**Individual vs net (the honest caveat).** In this `3×3` family the cascade is a
+**redistribution**: while `q` loses `Δ_q`, proposer `s` *gains* (`C→A`,
+`+0.60`), so the *net* proposer regret is `Δ_p + Δ_q − 0.60 < 0` — a per-victim
+floor, not a net one. A **net** `Θ(1)` floor needs the swing to push the market
+onto an `M*`-dominated matching where no one absorbs the loss; the dissected `4×4`
+(seed 235418470, `dissect_stall.rs`) is such an instance numerically, but a hand
+proof of its GS sensitivity is the remaining work. The multi-pair case (several
+independent near-tie swings) is conjectured to add the individual floors. So:
+**Prop. 2 is rigorous as an individual-regret floor; the net-floor generalization
+is the open part.**
 
 ## 4. Why coordination escapes the floor (rigorous, given the band)
 
