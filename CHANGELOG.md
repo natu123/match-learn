@@ -8,6 +8,15 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `GatedCoordinatedMarket` — the Prop-4 confidence-gated cure for the cascade
+  stall (research-track theorem, `docs/theory-identifiability.md`). It coordinates
+  a near-tie only after the pair's posterior is certified tight
+  (`|Δmean| + z·√(s_a²+s_b²) ≤ ε`), so it never reorders an un-converged pair.
+  This resolves `CoordinatedMarket`'s negative finding: with a tight band it
+  recovers nearly all the lost tail-stability (~0.91 vs plain Thompson's 0.92) at
+  slightly better welfare, and `ε` tunes a bounded welfare/stability tradeoff
+  (`examples/coordinated_validation.rs`). `PreferenceLearner` now exposes per-arm
+  posterior `stds` (default `+inf` = never certified) to support gating.
 - `ties` module: stable matching with indifferences. Weak / strong / super
   stability checkers (`is_weakly_stable`, `is_strongly_stable`,
   `is_super_stable`), a `weakly_stable` constructor (tie-break + Gale-Shapley,

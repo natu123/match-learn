@@ -189,6 +189,9 @@ Real platforms.
 - [x] **Ties / indifferences** — `ties`: weak / strong / super stability with
   indifferent preferences (the school-choice setting), checkers plus constructors,
   collapsing to ordinary stability when preferences are strict.
+- [x] **Confidence-gated coordination** — `GatedCoordinatedMarket`: the Prop-4 cure
+  that coordinates a near-tie only once its posterior is certified tight, resolving
+  the ungated coordinator's instability with a bounded, tunable tradeoff.
 
 ---
 

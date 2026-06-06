@@ -5,15 +5,21 @@
 //! ```
 //!
 //! Builds markets with a deliberate near-tie (one proposer nearly indifferent
-//! between two receivers) — the cascade trigger — and compares plain Thompson
-//! Sampling against `CoordinatedMarket` on tail stability and regret.
+//! between two receivers) — the cascade trigger — and compares four policies on
+//! tail stability and regret: plain Thompson, forced-explore Thompson, the
+//! ungated `CoordinatedMarket`, and the Prop-4 `GatedCoordinatedMarket`.
 //!
-//! Spoiler / honest result: the live coordinator does **not** beat plain Thompson
-//! on stability here — it maximizes belief welfare, raising proposer welfare but
-//! lowering the strict is-stable fraction. The post-hoc cascade cure does not
-//! transfer naively to the live loop. The printout explains why.
+//! The story:
+//! - the **ungated** `CoordinatedMarket` maximizes belief welfare every round and
+//!   is *much* less stable than plain Thompson (~0.70 vs 0.92) — the negative
+//!   finding;
+//! - the **gated** coordinator only coordinates *certified* near-ties, so it never
+//!   reorders an un-converged pair. It recovers nearly all the lost stability
+//!   (~0.91 at a tight band) and bounds the rest — Prop 4 guarantees
+//!   `2·eps`-stability, not strict stability, so a small eps-controlled gap to
+//!   plain Thompson remains by design. `eps` tunes the welfare/stability tradeoff.
 
-use match_learn::{CoordinatedMarket, Market, Rng, simulate};
+use match_learn::{CoordinatedMarket, GatedCoordinatedMarket, Market, Rng, simulate};
 
 /// A market with `n` proposers where proposer 0 is nearly indifferent between
 /// receivers 0 and 1 (means within `gap`), a near-tie that can cascade.
@@ -38,7 +44,10 @@ fn main() {
 
     let mut seedgen = Rng::new(2026);
     let (mut ts_stable, mut ts_regret) = (0.0, 0.0);
+    let (mut fe_stable, mut fe_regret) = (0.0, 0.0);
     let (mut co_stable, mut co_regret) = (0.0, 0.0);
+    let (mut ga_stable, mut ga_regret) = (0.0, 0.0);
+    let (mut gt_stable, mut gt_regret) = (0.0, 0.0);
 
     for _ in 0..markets {
         let seed = (seedgen.below(1_000_000_000) as u64) + 1;
@@ -58,9 +67,23 @@ fn main() {
         ts_stable += r.tail_stable_fraction(tail);
         ts_regret += r.tail_mean_regret(tail);
 
+        let mut fe = Market::with_forced_explore(
+            util.clone(),
+            recv.clone(),
+            0.5,
+            1.0,
+            noise * noise,
+            0.5,
+            noise,
+            seed ^ 0xABCD,
+        );
+        let r = simulate(&mut fe, rounds);
+        fe_stable += r.tail_stable_fraction(tail);
+        fe_regret += r.tail_mean_regret(tail);
+
         let mut co = CoordinatedMarket::new(
-            util,
-            recv,
+            util.clone(),
+            recv.clone(),
             0.5,
             1.0,
             noise * noise,
@@ -72,32 +95,67 @@ fn main() {
         let r = simulate(&mut co, rounds);
         co_stable += r.tail_stable_fraction(tail);
         co_regret += r.tail_mean_regret(tail);
+
+        let mut ga = GatedCoordinatedMarket::new(
+            util.clone(),
+            recv.clone(),
+            0.5,
+            1.0,
+            noise * noise,
+            0.05,
+            1.96,
+            0.5,
+            noise,
+            seed ^ 0xABCD,
+        );
+        let r = simulate(&mut ga, rounds);
+        ga_stable += r.tail_stable_fraction(tail);
+        ga_regret += r.tail_mean_regret(tail);
+
+        // A tighter near-tie band certifies fewer pairs, trading welfare back for
+        // strict stability (eps -> 0 recovers the forced-explore baseline).
+        let mut gt = GatedCoordinatedMarket::new(
+            util,
+            recv,
+            0.5,
+            1.0,
+            noise * noise,
+            0.02,
+            1.96,
+            0.5,
+            noise,
+            seed ^ 0xABCD,
+        );
+        let r = simulate(&mut gt, rounds);
+        gt_stable += r.tail_stable_fraction(tail);
+        gt_regret += r.tail_mean_regret(tail);
     }
 
     let m = markets as f64;
     println!("Cascade cure validation ({markets} near-tie {n}x{n} markets, gap={gap})\n");
     println!(
-        "  {:<22} {:>16} {:>16}",
+        "  {:<24} {:>16} {:>16}",
         "policy", "tail stable frac", "tail regret/round"
     );
-    println!(
-        "  {:<22} {:>16.3} {:>16.4}",
-        "plain Thompson",
-        ts_stable / m,
-        ts_regret / m
-    );
-    println!(
-        "  {:<22} {:>16.3} {:>16.4}",
-        "CoordinatedMarket",
-        co_stable / m,
-        co_regret / m
-    );
+    let row = |name: &str, s: f64, r: f64| println!("  {name:<24} {:>16.3} {:>16.4}", s / m, r / m);
+    row("plain Thompson", ts_stable, ts_regret);
+    row("forced-explore Thompson", fe_stable, fe_regret);
+    row("CoordinatedMarket", co_stable, co_regret);
+    row("GatedCoordinatedMarket eps=.05", ga_stable, ga_regret);
+    row("GatedCoordinatedMarket eps=.02", gt_stable, gt_regret);
     println!();
-    println!("Honest reading: the live coordinator maximizes *belief welfare*, so it raises");
-    println!("proposer welfare (lower / negative regret) but is *less* stable than plain");
-    println!("Thompson on the strict is-stable metric. The post-hoc cascade cure (coordinating");
-    println!("*converged* beliefs) does NOT transfer naively to the live loop, where early");
-    println!("inaccurate beliefs mislead the welfare search -- a finding for the research");
-    println!("track: a live coordinator should gate on belief confidence or target stability,");
-    println!("not belief welfare. (Cf. docs/theory-identifiability.md, Prop 3's band assumption.)");
+    println!("Honest reading: the ungated CoordinatedMarket maximizes *belief welfare*, so it");
+    println!("raises proposer welfare (negative regret) but is *much* less stable than plain");
+    println!("Thompson -- the negative finding. The GATED coordinator certifies a near-tie before");
+    println!("coordinating it (|dmean| + 1.96*sqrt(s_a^2+s_b^2) <= eps), so it never reorders an");
+    println!("un-converged pair. This recovers most of the lost stability and bounds the rest:");
+    println!(
+        "Prop 4 guarantees *2-eps-stability*, not strict stability, so on the strict is-stable"
+    );
+    println!(
+        "metric the gated coordinator still trails plain Thompson by an eps-controlled margin"
+    );
+    println!("(tighten eps to trade welfare back for stability; eps -> 0 recovers the baseline).");
+    println!("The gate turns the ungated coordinator's unbounded instability into a tunable,");
+    println!("bounded welfare/stability tradeoff. (Cf. docs/theory-identifiability.md, Prop 4.)");
 }

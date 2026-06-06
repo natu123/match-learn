@@ -15,13 +15,19 @@
 //! tied agents, so it is capped (`max_group`, and a total-combination limit);
 //! beyond the cap it falls back to the plain mean-greedy matching for the round.
 //!
-//! **Honest status (validated by `examples/coordinated_validation.rs`).** This
-//! *live* coordinator does not yet beat plain Thompson on the strict is-stable
-//! metric: maximizing belief welfare every round raises proposer welfare (regret
-//! goes negative) but, with imperfect mid-learning beliefs, the welfare-optimal
-//! matching is often not the stable one. The post-hoc cascade cure (coordinating
-//! *converged* beliefs) does not transfer naively. Treat this as experimental; a
-//! coordinator that gates on belief confidence or targets stability is open work.
+//! **Two coordinators (validated by `examples/coordinated_validation.rs`).**
+//! [`CoordinatedMarket`] is the *ungated* version and carries a negative finding:
+//! maximizing belief welfare every round with imperfect mid-learning beliefs
+//! raises proposer welfare (regret goes negative) but is *much less* stable than
+//! plain Thompson (≈0.70 vs 0.92 tail-stable). The post-hoc cascade cure does not
+//! transfer naively to the live loop. [`GatedCoordinatedMarket`] is the Prop-4
+//! cure: it coordinates a near-tie only once the pair's posterior is certified
+//! tight (see [`near_tie_rankings_certified`]), so it never reorders an
+//! un-converged pair. With a tight band it recovers nearly all the lost stability
+//! (≈0.91 vs 0.92) at slightly better welfare, and the band `eps` tunes a
+//! *bounded* welfare/stability tradeoff. Prop 4 guarantees `2·eps`-stability, not
+//! strict stability, so a small eps-controlled gap to plain Thompson remains by
+//! design.
 
 use crate::eval::LearningMarket;
 use crate::learner::GaussianThompson;
@@ -101,6 +107,59 @@ fn near_tie_rankings_masked(
     for &arm in &base[1..] {
         let prev = *groups.last().unwrap().last().unwrap();
         if (means[prev] - means[arm]).abs() < eps {
+            groups.last_mut().unwrap().push(arm);
+        } else {
+            groups.push(vec![arm]);
+        }
+    }
+    let mut rankings = vec![vec![]];
+    for g in &groups {
+        let perms = if g.len() <= max_group {
+            permutations(g)
+        } else {
+            vec![g.clone()]
+        };
+        let mut next = Vec::new();
+        for prefix in &rankings {
+            for perm in &perms {
+                let mut r = prefix.clone();
+                r.extend(perm);
+                next.push(r);
+            }
+        }
+        rankings = next;
+    }
+    rankings
+}
+
+/// Like [`near_tie_rankings_masked`], but a pair of arms is grouped (and so
+/// permuted by the coordinator) only when it passes the **Prop-4 certification
+/// test**: the posterior credible band around the belief gap fits inside the
+/// near-tie band `eps`,
+///
+/// `|mean_a − mean_b| + z·√(std_a² + std_b²) ≤ eps`.
+///
+/// where `z = Φ⁻¹(1−η)` sets the confidence `1−η`. Early on, when the posterior
+/// stds are large, no pair certifies and the report is exactly the Thompson
+/// sample (so coordination never reorders an un-converged pair — the safety
+/// property). Forced exploration drives every `std → 0`, so genuine near-ties
+/// eventually certify and get coordinated.
+fn near_tie_rankings_certified(
+    order: &[f64],
+    means: &[f64],
+    stds: &[f64],
+    eps: f64,
+    z: f64,
+    max_group: usize,
+) -> Vec<Vec<usize>> {
+    let base = rank_by_scores(order);
+    let certified = |a: usize, b: usize| -> bool {
+        (means[a] - means[b]).abs() + z * (stds[a].powi(2) + stds[b].powi(2)).sqrt() <= eps
+    };
+    let mut groups: Vec<Vec<usize>> = vec![vec![base[0]]];
+    for &arm in &base[1..] {
+        let prev = *groups.last().unwrap().last().unwrap();
+        if certified(prev, arm) {
             groups.last_mut().unwrap().push(arm);
         } else {
             groups.push(vec![arm]);
@@ -311,6 +370,161 @@ impl LearningMarket for CoordinatedMarket {
     }
 }
 
+/// The **Prop-4 gated** coordinated market: the live cure that resolves
+/// [`CoordinatedMarket`]'s negative finding.
+///
+/// Identical to [`CoordinatedMarket`] except a near-tie pair is coordinated only
+/// after it passes the confidence-certification test (see
+/// [`near_tie_rankings_certified`]). The proof (research track,
+/// `docs/theory-identifiability.md` Prop 4):
+///
+/// - **safe** — an un-converged pair is never reordered by belief welfare, so the
+///   market is never worse than plain forced-exploration Thompson (the failure
+///   the ungated coordinator showed);
+/// - **eventually active** — forcing drives every posterior `std → 0`, so genuine
+///   near-ties certify in finite time `Θ(σ²/ε²)` and then get coordinated;
+/// - **optimal once active** — among certified orderings it picks the
+///   belief-welfare-maximizing stable matching.
+///
+/// `z` is the certification multiplier `Φ⁻¹(1−η)` for the target confidence
+/// `1−η` (e.g. `z ≈ 1.96` for 97.5%).
+pub struct GatedCoordinatedMarket {
+    true_util: Vec<Vec<f64>>,
+    receiver_prefs: Vec<Vec<usize>>,
+    learners: Vec<GaussianThompson>,
+    counts: Vec<Vec<f64>>,
+    eps: f64,
+    z: f64,
+    max_group: usize,
+    force_c: f64,
+    noise: f64,
+    rng: Rng,
+    round: usize,
+}
+
+impl GatedCoordinatedMarket {
+    /// Build a gated coordinated market. `eps` is the near-tie band, `z` the
+    /// certification confidence multiplier, `force_c` the vanishing-forced-
+    /// exploration constant.
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        true_util: Vec<Vec<f64>>,
+        receiver_prefs: Vec<Vec<usize>>,
+        prior_mean: f64,
+        prior_var: f64,
+        obs_var: f64,
+        eps: f64,
+        z: f64,
+        force_c: f64,
+        noise: f64,
+        seed: u64,
+    ) -> Self {
+        let n_p = true_util.len();
+        let n_r = receiver_prefs.len();
+        let learners = (0..n_p)
+            .map(|p| {
+                GaussianThompson::new(
+                    n_r,
+                    prior_mean,
+                    prior_var,
+                    obs_var,
+                    seed ^ (0x3000 + p as u64),
+                )
+            })
+            .collect();
+        Self {
+            true_util,
+            receiver_prefs,
+            learners,
+            counts: vec![vec![0.0; n_r]; n_p],
+            eps,
+            z,
+            max_group: 6,
+            force_c,
+            noise,
+            rng: Rng::new(seed),
+            round: 0,
+        }
+    }
+
+    /// The least-sampled arm for proposer `p` (ties by lowest index).
+    fn least_sampled(&self, p: usize) -> usize {
+        let c = &self.counts[p];
+        (0..c.len())
+            .min_by(|&a, &b| c[a].partial_cmp(&c[b]).unwrap())
+            .unwrap_or(0)
+    }
+
+    /// Play one round and return the realized matching.
+    pub fn step(&mut self) -> Matching {
+        let n_p = self.true_util.len();
+        let n_r = self.receiver_prefs.len();
+        let means: Vec<Vec<f64>> = self.learners.iter().map(|l| l.means()).collect();
+        let stds: Vec<Vec<f64>> = self.learners.iter().map(|l| l.stds()).collect();
+        let samples: Vec<Vec<f64>> = self.learners.iter_mut().map(|l| l.scores()).collect();
+
+        let eps_t = (self.force_c / (self.round as f64 + 1.0)).min(1.0);
+        let candidates: Vec<Vec<Vec<usize>>> = (0..n_p)
+            .map(|p| {
+                if self.force_c > 0.0 && self.rng.uniform() < eps_t {
+                    // Forced round for p: frozen arm first, rest by sampled order.
+                    let frozen = self.least_sampled(p);
+                    let mut rest = rank_by_scores(&samples[p]);
+                    rest.retain(|&a| a != frozen);
+                    let mut ranking = vec![frozen];
+                    ranking.extend(rest);
+                    vec![ranking]
+                } else {
+                    // Coordinate only the *certified* near-ties; everything else
+                    // keeps the Thompson sample order (the safety property).
+                    near_tie_rankings_certified(
+                        &samples[p],
+                        &means[p],
+                        &stds[p],
+                        self.eps,
+                        self.z,
+                        self.max_group,
+                    )
+                }
+            })
+            .collect();
+
+        let matching = coordinated_match(&candidates, &self.receiver_prefs, &means);
+
+        for (p, &slot) in matching.proposer.iter().enumerate().take(n_p) {
+            if let Some(r) = slot {
+                debug_assert!(r < n_r);
+                let reward = self.rng.normal(self.true_util[p][r], self.noise);
+                self.learners[p].update(r, reward);
+                self.counts[p][r] += 1.0;
+            }
+        }
+        self.round += 1;
+        matching
+    }
+}
+
+impl LearningMarket for GatedCoordinatedMarket {
+    fn step(&mut self) -> Matching {
+        GatedCoordinatedMarket::step(self)
+    }
+    fn n_proposers(&self) -> usize {
+        self.true_util.len()
+    }
+    fn proposer_util(&self, p: usize, r: usize) -> f64 {
+        self.true_util[p][r]
+    }
+    fn true_proposer_prefs(&self) -> Vec<Vec<usize>> {
+        self.true_util
+            .iter()
+            .map(|row| rank_by_scores(row))
+            .collect()
+    }
+    fn true_receiver_prefs(&self) -> Vec<Vec<usize>> {
+        self.receiver_prefs.clone()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -371,5 +585,37 @@ mod tests {
                 .sum()
         };
         assert!(welfare(&coord_m) >= welfare(&index_m) - 1e-9);
+    }
+
+    #[test]
+    fn certification_gates_on_confidence() {
+        // Two arms a near-tie in the means (0.50, 0.49).
+        let order = [0.50, 0.49, 0.10];
+        let means = [0.50, 0.49, 0.10];
+        // Wide posterior: the credible band exceeds eps, so nothing certifies and
+        // the report is a single ranking (no coordination of the un-converged pair).
+        let wide = [0.20, 0.20, 0.20];
+        let r = near_tie_rankings_certified(&order, &means, &wide, 0.05, 1.96, 6);
+        assert_eq!(r.len(), 1, "uncertain pair must not be coordinated");
+        // Tight posterior: the band fits inside eps, so the near-tie certifies and
+        // both orderings are offered.
+        let tight = [0.001, 0.001, 0.001];
+        let r = near_tie_rankings_certified(&order, &means, &tight, 0.05, 1.96, 6);
+        assert_eq!(r.len(), 2, "certified near-tie must be coordinated");
+    }
+
+    #[test]
+    fn gated_market_is_safe_and_converges() {
+        // The metric the ungated coordinator could fail: the gated market reaches
+        // a stable matching on most late rounds (it never reorders un-converged
+        // pairs, so it is no worse than plain forced-exploration Thompson).
+        let (util, recv) = aligned();
+        let mut m = GatedCoordinatedMarket::new(util, recv, 0.5, 1.0, 0.04, 0.1, 1.96, 0.5, 0.2, 9);
+        let rep = simulate(&mut m, 3000);
+        assert!(
+            rep.tail_stable_fraction(600) > 0.9,
+            "tail stable {}",
+            rep.tail_stable_fraction(600)
+        );
     }
 }

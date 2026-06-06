@@ -39,6 +39,17 @@ pub trait PreferenceLearner: Send + Sync {
     /// Deterministic point estimate of each arm's mean utility (diagnostics).
     fn means(&self) -> Vec<f64>;
 
+    /// Per-arm posterior standard deviation — the calibrated uncertainty of each
+    /// `means` estimate.
+    ///
+    /// The default returns `+inf` for every arm: a learner without a calibrated
+    /// posterior is treated as never certain, so confidence-gated callers (e.g.
+    /// the Prop-4 gated coordinator) never act on its estimates. Bayesian learners
+    /// override this with their true posterior std.
+    fn stds(&self) -> Vec<f64> {
+        vec![f64::INFINITY; self.n_arms()]
+    }
+
     /// A full preference ranking for this round, most preferred first.
     ///
     /// Ties are broken by arm index, keeping the ranking deterministic given the
@@ -144,6 +155,12 @@ impl PreferenceLearner for GaussianThompson {
 
     fn means(&self) -> Vec<f64> {
         (0..self.count.len()).map(|a| self.posterior(a).0).collect()
+    }
+
+    fn stds(&self) -> Vec<f64> {
+        (0..self.count.len())
+            .map(|a| self.posterior(a).1.sqrt())
+            .collect()
     }
 }
 
@@ -285,6 +302,12 @@ impl PreferenceLearner for DiscountedThompson {
 
     fn means(&self) -> Vec<f64> {
         (0..self.count.len()).map(|a| self.posterior(a).0).collect()
+    }
+
+    fn stds(&self) -> Vec<f64> {
+        (0..self.count.len())
+            .map(|a| self.posterior(a).1.sqrt())
+            .collect()
     }
 }
 
@@ -436,6 +459,12 @@ impl PreferenceLearner for ForcedExploreThompson {
 
     fn means(&self) -> Vec<f64> {
         (0..self.count.len()).map(|a| self.posterior(a).0).collect()
+    }
+
+    fn stds(&self) -> Vec<f64> {
+        (0..self.count.len())
+            .map(|a| self.posterior(a).1.sqrt())
+            .collect()
     }
 }
 
