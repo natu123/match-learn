@@ -63,6 +63,7 @@ pub mod allocation;
 pub mod applications;
 pub mod assignment;
 pub mod auction;
+pub mod boston;
 pub mod contextual;
 pub mod coordinated;
 pub mod data;
@@ -99,6 +100,7 @@ pub use applications::{
 };
 pub use assignment::{max_weight_assignment, min_cost_assignment};
 pub use auction::{AuctionResult, double_auction, efficient_quantity, mcafee_auction};
+pub use boston::boston_mechanism;
 pub use contextual::LinearThompson;
 pub use coordinated::{CoordinatedMarket, GatedCoordinatedMarket, near_tie_rankings};
 pub use data::{correlated_market, from_text, to_text};

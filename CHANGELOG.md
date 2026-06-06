@@ -8,6 +8,11 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `boston` module: the Boston (immediate-acceptance) school-choice mechanism — each
+  round students apply to their next choice and schools admit by priority up to
+  remaining capacity *permanently* (no deferral). Demonstrates, against the
+  deferred-acceptance core, why Boston is unstable and manipulable yet
+  Pareto-efficient for truthful students (all three verified in tests).
 - `GatedCoordinatedMarket` — the Prop-4 confidence-gated cure for the cascade
   stall (research-track theorem, `docs/theory-identifiability.md`). It coordinates
   a near-tie only after the pair's posterior is certified tight
