@@ -90,9 +90,12 @@ total pulls or a doubling schedule) so the cure works without knowing `T`.
   near-tie modes vanish under it. Could reframe the whole problem.
 - **Welfare vs stability under learning.** The coordinator optimizes welfare via
   free tie-breaks; when does that conflict with strategy-proofness / stability?
-- **Receiver-informed tie-breaking.** Receiver preferences are known; use them
-  (not just belief welfare) to break proposer near-ties — possibly a cleaner,
-  search-free coordinator.
+- **Receiver-informed tie-breaking** (partial result, `examples/receiver_informed.rs`).
+  A search-free `O(n log n)` rule — an indifferent proposer takes the receiver that
+  prefers it *least* — fixes **5/10** cascades (mean cascade regret `0.359 → 0.129`),
+  vs **9/10** for the exponential belief-welfare search. So the known receiver
+  preferences alone carry about half the coordination signal; closing the gap to
+  the full coordinator cheaply is open.
 - **Coupled-exploration lower bound.** Is there an instance-dependent lower bound
   showing the cascade externality is unavoidable for *any* decentralized
   (per-agent) policy, making a coordinator provably necessary?
