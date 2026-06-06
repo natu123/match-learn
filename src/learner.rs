@@ -318,6 +318,24 @@ impl PreferenceLearner for DiscountedThompson {
 /// Targeting the **least-sampled** arm (rather than a uniformly random one)
 /// spends the forced-exploration budget precisely on the frozen arm, which is by
 /// definition the one with the fewest pulls.
+///
+/// # Annealing (optional, for the *near-tie churn* failure mode)
+///
+/// Forced exploration cures the *frozen-arm* stall, but it is not the only way a
+/// matching market fails to settle. When two receivers have true utilities closer
+/// than the noise floor, their posteriors never separate, and plain Thompson
+/// Sampling keeps *re-sampling* them in different orders forever — the matching
+/// churns and never settles, even though the posterior **means** are already
+/// correct. Forcing makes this *worse* (more perturbation).
+///
+/// The cure for churn is the opposite of forcing: **anneal** the sampling
+/// temperature. With [`with_anneal`](Self::with_anneal) set to `tau`, the
+/// Thompson sample's standard deviation is scaled by `sqrt(tau / (tau + t))`, so
+/// it starts at full Thompson exploration and decays toward pure exploitation of
+/// the posterior mean. Late in the run the learner stops flipping near-tie arms,
+/// so the matching settles. Forcing (frozen-arm insurance) and annealing (churn
+/// suppression) compose: a small `c` with a finite `tau` is robust to both
+/// failure modes. `tau = inf` (the default) disables annealing.
 #[derive(Debug, Clone)]
 pub struct ForcedExploreThompson {
     obs_var: f64,
@@ -325,6 +343,9 @@ pub struct ForcedExploreThompson {
     prior_var: f64,
     /// Forced-exploration constant: `eps_t = min(1, c / t)`.
     c: f64,
+    /// Annealing timescale: Thompson sample std is scaled by
+    /// `sqrt(tau / (tau + t))`. `inf` disables annealing (full Thompson forever).
+    anneal_tau: f64,
     /// Rounds elapsed (the `t` in `eps_t`); incremented once per `scores` call.
     t: u64,
     count: Vec<f64>,
@@ -356,10 +377,33 @@ impl ForcedExploreThompson {
             prior_mean,
             prior_var,
             c,
+            anneal_tau: f64::INFINITY,
             t: 0,
             count: vec![0.0; n_arms],
             sum: vec![0.0; n_arms],
             rng: Rng::new(seed),
+        }
+    }
+
+    /// Anneal the Thompson sampling temperature (a builder method).
+    ///
+    /// The posterior-sample standard deviation is multiplied by
+    /// `sqrt(tau / (tau + t))`, decaying from full Thompson exploration toward
+    /// pure posterior-mean exploitation. Smaller `tau` cools faster. This
+    /// suppresses the near-tie churn that keeps a matching from settling. `tau`
+    /// must be positive; the default (no call) leaves annealing off.
+    pub fn with_anneal(mut self, tau: f64) -> Self {
+        assert!(tau > 0.0, "annealing timescale must be positive");
+        self.anneal_tau = tau;
+        self
+    }
+
+    /// The annealing factor applied to the Thompson sample std this round.
+    fn anneal_factor(&self) -> f64 {
+        if self.anneal_tau.is_infinite() {
+            1.0
+        } else {
+            (self.anneal_tau / (self.anneal_tau + self.t as f64)).sqrt()
         }
     }
 
@@ -407,11 +451,13 @@ impl PreferenceLearner for ForcedExploreThompson {
                 })
                 .collect()
         } else {
-            // Ordinary Thompson round: one posterior sample per arm.
+            // Ordinary Thompson round: one posterior sample per arm, with the
+            // sampling std optionally annealed toward zero to stop near-tie churn.
+            let a_factor = self.anneal_factor();
             (0..self.count.len())
                 .map(|a| {
                     let (mean, var) = self.posterior(a);
-                    self.rng.normal(mean, var.sqrt())
+                    self.rng.normal(mean, a_factor * var.sqrt())
                 })
                 .collect()
         }
@@ -697,6 +743,55 @@ mod tests {
         // best-arm identification, no forced probes.
         let true_means = [0.1, 0.5, 0.9, 0.3];
         let mut fe = ForcedExploreThompson::new(4, 0.0, 1.0, 0.25, 0.0, 1);
+        run_bandit(&mut fe, &true_means, 2000, 0.5, 99);
+        let means = fe.means();
+        let best = (0..4).max_by(|&a, &b| means[a].partial_cmp(&means[b]).unwrap());
+        assert_eq!(best, Some(2));
+    }
+
+    /// Count how often the top-ranked arm flips over `rounds` of bandit play.
+    fn top_arm_flips(tau: Option<f64>, true_means: &[f64], warmup: usize, rounds: usize) -> usize {
+        let mut l = ForcedExploreThompson::new(true_means.len(), 0.0, 1.0, 0.25, 0.0, 7);
+        if let Some(t) = tau {
+            l = l.with_anneal(t);
+        }
+        let mut env = Rng::new(11);
+        for _ in 0..warmup {
+            let arm = l.ranking()[0];
+            l.update(arm, env.normal(true_means[arm], 0.5));
+        }
+        let mut prev = l.ranking()[0];
+        let mut flips = 0;
+        for _ in 0..rounds {
+            let arm = l.ranking()[0];
+            if arm != prev {
+                flips += 1;
+            }
+            prev = arm;
+            l.update(arm, env.normal(true_means[arm], 0.5));
+        }
+        flips
+    }
+
+    #[test]
+    fn annealing_suppresses_near_tie_churn() {
+        // Two arms with (near-)equal value: plain Thompson keeps re-sampling them
+        // in different orders forever, so the top arm flips constantly. Annealing
+        // cools the sampling temperature so it settles on one.
+        let near_tie = [0.5, 0.5];
+        let plain = top_arm_flips(None, &near_tie, 2000, 2000);
+        let annealed = top_arm_flips(Some(50.0), &near_tie, 2000, 2000);
+        assert!(
+            annealed * 2 < plain,
+            "annealing should cut near-tie churn: plain={plain}, annealed={annealed}"
+        );
+    }
+
+    #[test]
+    fn annealing_still_identifies_best_arm() {
+        // Cooling the temperature must not stop it from finding the best arm.
+        let true_means = [0.1, 0.5, 0.9, 0.3];
+        let mut fe = ForcedExploreThompson::new(4, 0.0, 1.0, 0.25, 0.5, 1).with_anneal(200.0);
         run_bandit(&mut fe, &true_means, 2000, 0.5, 99);
         let means = fe.means();
         let best = (0..4).max_by(|&a, &b| means[a].partial_cmp(&means[b]).unwrap());
