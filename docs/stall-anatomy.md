@@ -11,19 +11,22 @@ mode.*
 
 We set out to kill one bug — greedy Thompson Sampling occasionally locking a
 learned matching into a wrong stable outcome — and found that "the stall" is
-really **two phenomena with opposite cures**, both ultimately caused by **near-ties
-in the true preferences relative to the reward noise**.
+really **three failure modes with three different cures**, all ultimately caused
+by **near-ties in the true preferences relative to the reward noise**.
 
 1. **Frozen-arm stall** (rare): an arm stops being matched, its posterior
    freezes at an underestimate, and the agent never revisits its true partner.
    *Cure: more exploration* — a vanishing forced-exploration schedule
    (`ForcedExploreThompson`, `O(log T)` regret, §3).
-2. **Near-tie stall** (dominant): two receivers a proposer values within the
-   noise floor cannot be ordered reliably, and either (a) the wrong order
-   **cascades** through Gale-Shapley into a far matching, or (b) Thompson keeps
-   **re-sampling** the near-equal arms forever, so the matching never settles.
-   *Cure: less tail exploration* — annealing the sampling temperature
-   (`with_anneal`, §4). Forcing makes this mode **worse**.
+2. **Near-tie churn** (dominant): two receivers a proposer values within the
+   noise floor cannot be ordered, so Thompson keeps **re-sampling** them forever
+   and the matching never settles. *Cure: less tail exploration* — annealing the
+   sampling temperature (`with_anneal`, §4). Forcing makes this mode **worse**.
+3. **Near-tie cascade** (the hard residue): a near-indifferent proposer's
+   arbitrary order is **amplified by Gale-Shapley** into a far matching that costs
+   *other* proposers large regret. No per-agent policy fixes this. *Cure:
+   coordination* — a market-level tie-break among near-equal arms that maximizes
+   total belief welfare (§4.2). Fixes 9/10 cascades, oracle-free.
 
 An honest correction to our first result: the clean 40-market gate
 (`tests/gate.rs`) where forced exploration took every market sublinear was partly
@@ -144,6 +147,31 @@ hard commit." The safe regime is **slow** cooling (`tau` on the order of the
 horizon), with a small forcing constant as frozen-arm insurance. Forcing and
 annealing compose in one learner (`c > 0` and finite `tau`).
 
+## 4.2 The cascade cure: coordinated near-tie tie-breaking
+
+Annealing settles the *churn*, but the **cascade** residue is different: a
+near-indifferent proposer's order, once amplified by Gale-Shapley, lands on a
+matching that hurts *others*. No per-agent exploration or annealing schedule can
+fix it, because the proposer's beliefs are already correct — it is genuinely
+indifferent, and the damage is an externality on the rest of the market.
+
+The cure is **coordination**. Since the proposer is indifferent among its
+near-tie arms (belief means within `ε`), reordering them is free for it, so a
+market-level coordinator may choose the order. The practical objective is **total
+belief welfare**: enumerate the near-tie orderings and pick the matching
+maximizing `Σ_p mean_p[partner(p)]` — no true utilities needed. Crucially this is
+not the indifferent proposer's own preference (which slightly favors the wrong
+arm); it is the *total*, in which the indifferent proposer's `0.005` loss is
+dwarfed by another proposer's `0.84` gain.
+
+`examples/coordinated_poc.rs`: on the dissected worst lock-in it recovers the
+exact true stable matching (regret `0.93 → 0.00`), matching the true-regret-
+optimal (oracle) choice. Over 800 markets it **fully fixes 9/10 settled cascades**
+(mean settled regret `0.359 → 0.012`); the one it misses is a frozen-arm case
+(wrong beliefs) — forcing's job, not the coordinator's. This validates the
+coordinator concept; folding it into the live market loop (a `CoordinatedMarket`
+above `PreferenceLearner`) is the natural next build.
+
 ### Generality: two-sided markets
 
 The same picture holds when *both* sides learn (`examples/two_sided_stall.rs`,
@@ -158,7 +186,8 @@ artifacts of the one-sided setting.
 
 - **Default**: annealed Thompson with slow cooling (`tau ≈ horizon`) and light
   forcing (`c ≈ 0.25–0.5`). Annealing handles the dominant near-tie churn;
-  forcing insures the rare frozen arm.
+  forcing insures the rare frozen arm. Add **coordinated near-tie tie-breaking**
+  at the matching layer to remove the cascade residue (§4.2).
 - **Report regret honestly**: the `is_stable` flag and regret-vs-unique-stable
   both punish near-tie swaps that the proposer is indifferent to. An ε-stability
   or welfare-based benchmark would not charge a proposer for a swap below its own
@@ -166,11 +195,12 @@ artifacts of the one-sided setting.
 
 ## 6. Open problems
 
-- **Coordinated escape for cascades.** The cascade mode is a *coordination*
-  failure: one proposer's indifferent swap hurts others. A market-level
-  mechanism that breaks a proposer's near-ties in the direction of higher global
-  welfare (free for the indifferent proposer) could remove cascades that no
-  per-agent policy can. This needs an abstraction above `PreferenceLearner`.
+- **Live coordinated market.** §4.2 validates coordinated near-tie tie-breaking
+  post-hoc; the next build is a `CoordinatedMarket` that applies it every round in
+  the live loop and a broad-study confirmation that it removes cascade stalls
+  end-to-end (not just on converged beliefs). Scaling the near-tie ordering search
+  beyond small `n` (it is exponential in the largest near-tie group) is the open
+  engineering question.
 - **Anytime annealing.** `tau ≈ horizon` needs the horizon. A pull-count-based or
   doubling schedule would be horizon-free.
 - **Identifiability-aware regret bound.** A bound of the form
