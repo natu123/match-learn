@@ -2,8 +2,9 @@
 
 **Stable matching that learns.** Online preference learning x stable matching, in Rust.
 
-> **Status: Phase 4 (real data & benchmarks), built in public.**
-> Early and incomplete. The core is built from scratch, one phase at a time.
+> **Status: Phases 1–4 done + Phase 5 in progress, built in public.**
+> The core is built from scratch, one phase at a time. Verified against an
+> established library (identical matchings) and benchmarked across languages.
 
 ---
 
@@ -96,7 +97,7 @@ Make the learning predictive and adaptive.
 From synthetic to real, and against the competition.
 
 - [x] Dataset adapter + correlated market generator (`data` module, text format)
-- [ ] Benchmarks vs Python (MABWiser / matching) — *deferred: needs a Python env; not faked*
+- [x] Benchmarks vs Python (MABWiser / `matching`) — GS identical + ~520×, UCB1 ~600×, integrated ~11× (see [`bench/`](bench/))
 - [x] Cross-check against published regret bounds — empirical slope ≈ 0.49 (≈ √T), baseline 1.0
 - [x] Visualization of matching and preference evolution — `export_csv` + `benchmark` examples
 
