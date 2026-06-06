@@ -80,7 +80,10 @@ pub mod rng;
 pub mod ttc;
 pub mod two_sided;
 
-pub use applications::{Delivery, RideHailing, random_delivery, random_ride_hailing};
+pub use applications::{
+    Crowdsourcing, Delivery, RideHailing, random_crowdsourcing, random_delivery,
+    random_ride_hailing,
+};
 pub use auction::{AuctionResult, double_auction, efficient_quantity, mcafee_auction};
 pub use contextual::LinearThompson;
 pub use data::{correlated_market, from_text, to_text};
