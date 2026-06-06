@@ -37,6 +37,50 @@ fn prefs_from_util(util: &[Vec<f64>]) -> Vec<Vec<usize>> {
 }
 
 impl TwoSidedMarket {
+    /// Build a two-sided market from explicit per-agent learners.
+    ///
+    /// `util_p` is `[n_proposers][n_receivers]` and `util_r` is
+    /// `[n_receivers][n_proposers]`; `proposer_learners` has one learner per
+    /// proposer (each over `n_receivers` arms) and `receiver_learners` one per
+    /// receiver (each over `n_proposers` arms). This lets both sides use any
+    /// [`PreferenceLearner`] — e.g. annealed [`ForcedExploreThompson`] to test the
+    /// stall cures when *both* sides learn.
+    pub fn new(
+        util_p: Vec<Vec<f64>>,
+        util_r: Vec<Vec<f64>>,
+        proposer_learners: Vec<Box<dyn PreferenceLearner>>,
+        receiver_learners: Vec<Box<dyn PreferenceLearner>>,
+        noise: f64,
+        seed: u64,
+    ) -> Self {
+        let n_p = util_p.len();
+        let n_r = util_r.len();
+        assert!(n_p > 0 && n_r > 0, "market must be non-empty");
+        for row in &util_p {
+            assert_eq!(row.len(), n_r, "util_p row must cover all receivers");
+        }
+        for row in &util_r {
+            assert_eq!(row.len(), n_p, "util_r row must cover all proposers");
+        }
+        assert_eq!(proposer_learners.len(), n_p, "one learner per proposer");
+        assert_eq!(receiver_learners.len(), n_r, "one learner per receiver");
+        for l in &proposer_learners {
+            assert_eq!(l.n_arms(), n_r, "proposer learner needs n_receivers arms");
+        }
+        for l in &receiver_learners {
+            assert_eq!(l.n_arms(), n_p, "receiver learner needs n_proposers arms");
+        }
+        Self {
+            util_p,
+            util_r,
+            proposer_learners,
+            receiver_learners,
+            noise,
+            rng: Rng::new(seed),
+            round: 0,
+        }
+    }
+
     /// Build a two-sided market where every agent on both sides uses Gaussian
     /// Thompson Sampling.
     ///
@@ -53,13 +97,6 @@ impl TwoSidedMarket {
     ) -> Self {
         let n_p = util_p.len();
         let n_r = util_r.len();
-        assert!(n_p > 0 && n_r > 0, "market must be non-empty");
-        for row in &util_p {
-            assert_eq!(row.len(), n_r, "util_p row must cover all receivers");
-        }
-        for row in &util_r {
-            assert_eq!(row.len(), n_p, "util_r row must cover all proposers");
-        }
         let proposer_learners = (0..n_p)
             .map(|p| {
                 Box::new(GaussianThompson::new(
@@ -82,15 +119,14 @@ impl TwoSidedMarket {
                 )) as Box<dyn PreferenceLearner>
             })
             .collect();
-        Self {
+        Self::new(
             util_p,
             util_r,
             proposer_learners,
             receiver_learners,
             noise,
-            rng: Rng::new(seed),
-            round: 0,
-        }
+            seed,
+        )
     }
 
     /// Number of receivers.

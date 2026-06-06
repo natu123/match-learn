@@ -144,6 +144,16 @@ hard commit." The safe regime is **slow** cooling (`tau` on the order of the
 horizon), with a small forcing constant as frozen-arm insurance. Forcing and
 annealing compose in one learner (`c > 0` and finite `tau`).
 
+### Generality: two-sided markets
+
+The same picture holds when *both* sides learn (`examples/two_sided_stall.rs`,
+`TwoSidedMarket`, 300 random 5×5 markets, horizon 20000): plain Thompson on both
+sides stalls 9/300 with mean total regret 51, while annealed Thompson on both
+sides stalls 4–5/300 with mean total regret ~29. Here the improvement is *cleaner*
+than one-sided — both the stall count and the (positive) regret drop consistently
+across cooling rates — so the near-tie phenomenon and the annealing cure are not
+artifacts of the one-sided setting.
+
 ## 5. Recommendations
 
 - **Default**: annealed Thompson with slow cooling (`tau ≈ horizon`) and light
