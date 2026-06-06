@@ -8,6 +8,15 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `lattice` module: the lattice of stable matchings and median stable matchings.
+  Conway's lattice operations (`stable_join` / `stable_meet`: each proposer keeps
+  the better / worse of its two partners, again a stable matching) and the
+  Teo-Sethuraman `generalized_medians` — for each proposer its `i`-th-ranked
+  partner across all stable matchings, each itself stable — with
+  `median_stable_matching` as the balanced compromise between the proposer- and
+  receiver-optimal extremes (a fairness counterpart to `fairness`'s egalitarian
+  matchings). Stated for the classic marriage model (complete strict
+  preferences); every median is verified stable against the brute-force set.
 - `kidney` module: kidney exchange for incompatible patient-donor pairs, the
   market-design problem that has given tens of thousands of patients a transplant.
   Models the pool as a housing market (each patient is endowed with its own

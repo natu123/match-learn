@@ -71,6 +71,7 @@ pub mod eval;
 pub mod fairness;
 pub mod joint;
 pub mod kidney;
+pub mod lattice;
 pub mod learner;
 pub mod linalg;
 pub mod many_to_many;
@@ -109,6 +110,7 @@ pub use eval::{LearningMarket, Report, simulate};
 pub use fairness::{egalitarian_cost, egalitarian_stable, sex_equal_stable, sex_equality_cost};
 pub use joint::{JointInstance, random_joint_instance};
 pub use kidney::{Blood, Pair, abo_compatible, kidney_exchange, ttc_kidney_exchange};
+pub use lattice::{generalized_medians, median_stable_matching, stable_join, stable_meet};
 pub use learner::{
     DiscountedThompson, ForcedExploreThompson, GaussianThompson, PreferenceLearner, Ucb1,
 };

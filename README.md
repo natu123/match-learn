@@ -199,6 +199,9 @@ Real platforms.
   by Top Trading Cycles (ABO blood-type compatibility), finding multi-way exchange
   cycles that are individually rational, Pareto efficient, and strategy-proof
   (Roth-Sönmez-Ünver) — market design that saves lives.
+- [x] **Stable-matching lattice** — `lattice`: Conway's join/meet of stable
+  matchings and the Teo-Sethuraman median stable matching, the principled
+  fairness compromise between the proposer- and receiver-optimal extremes.
 
 ---
 
