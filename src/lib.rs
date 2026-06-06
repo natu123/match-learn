@@ -59,6 +59,7 @@
 //! assert!((pricer.best_price() - clearing).abs() < 3.0);
 //! ```
 
+pub mod applications;
 pub mod contextual;
 pub mod data;
 pub mod eval;
@@ -78,6 +79,7 @@ pub mod rng;
 pub mod ttc;
 pub mod two_sided;
 
+pub use applications::{RideHailing, random_ride_hailing};
 pub use contextual::LinearThompson;
 pub use data::{correlated_market, from_text, to_text};
 pub use eval::{LearningMarket, Report, simulate};

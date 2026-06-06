@@ -159,7 +159,7 @@ Add the price axis: from matching to market.
 ### Phase 8 — Productionization
 Real platforms.
 
-- [ ] Application adapters (ride-hailing / delivery / crowdsourcing)
+- [x] Application adapters — `RideHailing` (riders/drivers + proximity → `JointInstance`, surge pricing learned); delivery / crowdsourcing to follow
 - [ ] Large-scale / production deployment
 - [ ] Market design extensions (auctions, mechanisms)
 - [ ] Price-as-preference, deepened
