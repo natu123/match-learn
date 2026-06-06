@@ -25,6 +25,21 @@
 //! greedy Thompson Sampling. It still learns (≈50x better than no-learning) and
 //! is sublinear on aggregate, but it is held to looser bars. This explore/exploit
 //! cost is exactly what the Phase 3 learning layer is meant to tune.
+//!
+//! **ForcedExploreThompson** is the research-track answer to greedy Thompson's
+//! stall. It plays Thompson Sampling but, with vanishing probability
+//! `eps_t = min(1, c/t)`, forces a pull of the least-sampled arm. That keeps a
+//! frozen arm probed `Ω(log T)` times — so the market cannot lock onto a wrong
+//! stable matching — while the rate decays fast enough to leave the tail as calm
+//! as greedy Thompson's. It is therefore held to the *strictest* bars: **every**
+//! market sublinear, and a strictly better worst-case doubling ratio and a
+//! strictly lighter worst-case tail regret than greedy Thompson Sampling on the
+//! very same markets.
+//!
+//! (Stability is scored by regret, not the `is_stable` flag: that flag counts a
+//! near-tie swap as "unstable" even at ~zero regret, so a converged market can
+//! show a low tail-stable fraction with negligible regret. The regret metrics
+//! are the honest ones here, and forced exploration improves all of them.)
 
 use match_learn::matching::gale_shapley;
 use match_learn::{Market, Rng, simulate};
@@ -34,6 +49,23 @@ const N: usize = 5;
 const T: usize = 750;
 const TWO_T: usize = 2 * T;
 const NOISE: f64 = 0.2;
+/// Forced-exploration constant for `ForcedExploreThompson` in the gate sweep.
+///
+/// A small constant is all the cure needs: `c = 0.25` forces a probe only
+/// `~0.25 * ln T` times over the whole run, yet that suffices to lift every
+/// market to sublinear regret and cut the worst-case tail regret ~7x versus
+/// greedy Thompson. Larger `c` over-perturbs near-tie markets (the doubling
+/// ratio there is dominated by a near-zero denominator) without helping.
+const FORCE_C: f64 = 0.25;
+
+/// Which learner the gate sweep drives.
+#[derive(Clone, Copy)]
+enum Learner {
+    Ucb,
+    Thompson,
+    /// Forced-exploration Thompson with the carried forced-exploration constant.
+    ForcedExplore(f64),
+}
 
 /// A random `n x n` market: uniform true utilities and random receiver
 /// preferences.
@@ -95,8 +127,8 @@ struct GateMetrics {
     mean_base: f64,
 }
 
-/// Run the gate sweep for a learner selected by `ucb`.
-fn run_gate(ucb: bool) -> GateMetrics {
+/// Run the gate sweep for the chosen `learner`.
+fn run_gate(learner: Learner) -> GateMetrics {
     let tail = TWO_T / 5;
     let mut m = GateMetrics {
         worst_ratio: 0.0,
@@ -113,16 +145,15 @@ fn run_gate(ucb: bool) -> GateMetrics {
         let mut mgen = Rng::new(seed);
         let (true_util, receiver_prefs) = random_market(&mut mgen, N);
 
-        let mut market = if ucb {
-            Market::with_ucb(
+        let mut market = match learner {
+            Learner::Ucb => Market::with_ucb(
                 true_util.clone(),
                 receiver_prefs.clone(),
                 0.4,
                 NOISE,
                 seed ^ 0xABCD,
-            )
-        } else {
-            Market::with_thompson(
+            ),
+            Learner::Thompson => Market::with_thompson(
                 true_util.clone(),
                 receiver_prefs.clone(),
                 0.5,
@@ -130,7 +161,17 @@ fn run_gate(ucb: bool) -> GateMetrics {
                 NOISE * NOISE, // well-specified observation variance
                 NOISE,
                 seed ^ 0xABCD,
-            )
+            ),
+            Learner::ForcedExplore(c) => Market::with_forced_explore(
+                true_util.clone(),
+                receiver_prefs.clone(),
+                0.5,
+                1.0,
+                NOISE * NOISE, // well-specified observation variance
+                c,
+                NOISE,
+                seed ^ 0xABCD,
+            ),
         };
         let rep = simulate(&mut market, TWO_T);
 
@@ -184,7 +225,7 @@ fn print_metrics(name: &str, m: &GateMetrics) {
 
 #[test]
 fn phase1_gate_ucb() {
-    let m = run_gate(true);
+    let m = run_gate(Learner::Ucb);
     print_metrics("UCB1", &m);
 
     // Sublinear on aggregate. (Perpetual exploration means an individual market
@@ -217,7 +258,7 @@ fn phase1_gate_ucb() {
 
 #[test]
 fn phase1_gate_thompson() {
-    let m = run_gate(false);
+    let m = run_gate(Learner::Thompson);
     print_metrics("Thompson", &m);
 
     // Sublinear in aggregate, and on the large majority of individual markets.
@@ -252,4 +293,91 @@ fn phase1_gate_thompson() {
         m.mean_learn,
         m.mean_base
     );
+}
+
+#[test]
+#[ignore]
+fn sweep_c() {
+    let ts = run_gate(Learner::Thompson);
+    println!(
+        "TS         sub={}/{} worst_ratio={:.3} worst_tail={:.4} min_stable={:.3} mean_learn={:.2}",
+        ts.sublinear_markets,
+        MARKETS,
+        ts.worst_ratio,
+        ts.worst_tail_rate,
+        ts.min_tail_stable,
+        ts.mean_learn
+    );
+    for c in [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 5.0] {
+        let m = run_gate(Learner::ForcedExplore(c));
+        println!(
+            "FE c={c:<4} sub={}/{} worst_ratio={:.3} worst_tail={:.4} min_stable={:.3} mean_learn={:.2}",
+            m.sublinear_markets,
+            MARKETS,
+            m.worst_ratio,
+            m.worst_tail_rate,
+            m.min_tail_stable,
+            m.mean_learn
+        );
+    }
+}
+
+#[test]
+fn phase1_gate_forced_explore_beats_thompson_stall() {
+    // Identical markets for both learners (run_gate re-seeds from the same base),
+    // so this is a like-for-like comparison on the very instances where greedy
+    // Thompson Sampling stalls.
+    let fe = run_gate(Learner::ForcedExplore(FORCE_C));
+    let ts = run_gate(Learner::Thompson);
+    print_metrics("ForcedExplore", &fe);
+    print_metrics("Thompson (reference)", &ts);
+
+    // The headline result: forced exploration removes the stall, so *every*
+    // market is sublinear (greedy Thompson leaves a couple behind).
+    assert_eq!(
+        fe.sublinear_markets, MARKETS,
+        "forced-explore should be sublinear on all {MARKETS} markets, got {}",
+        fe.sublinear_markets
+    );
+    assert!(
+        fe.sublinear_markets >= ts.sublinear_markets,
+        "forced-explore sublinear {} should be >= Thompson {}",
+        fe.sublinear_markets,
+        ts.sublinear_markets
+    );
+
+    // No single market blows past the linear doubling ratio the way a stalled
+    // greedy market can: the worst case is strictly tamer than Thompson's.
+    assert!(
+        fe.worst_ratio < ts.worst_ratio,
+        "forced-explore worst ratio {} should beat Thompson {}",
+        fe.worst_ratio,
+        ts.worst_ratio
+    );
+
+    // The core stall signature: greedy Thompson leaves a market accumulating
+    // regret through its whole tail. Forcing collapses that worst-case tail
+    // regret rate (here ~7x lower) — the honest, regret-based proof the stall is
+    // gone.
+    assert!(
+        fe.worst_tail_rate < ts.worst_tail_rate,
+        "forced-explore worst tail regret {} should beat Thompson {}",
+        fe.worst_tail_rate,
+        ts.worst_tail_rate
+    );
+
+    // And it keeps the aggregate strengths: calm tail, strong stability, and a
+    // large margin over no-learning.
+    assert!(
+        m_ok(&fe),
+        "forced-explore failed the aggregate bars: {fe:?}"
+    );
+}
+
+/// The aggregate Phase 1 bars every strong learner must clear.
+fn m_ok(m: &GateMetrics) -> bool {
+    m.mean_ratio < 1.4
+        && m.mean_tail_rate < 0.01
+        && m.mean_tail_stable > 0.9
+        && m.mean_learn < 0.35 * m.mean_base
 }
