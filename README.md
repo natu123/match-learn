@@ -171,6 +171,8 @@ Real platforms.
 - [x] **Online (dynamic) matching** — `OnlineMarket`: agents arrive and depart over
   time; the greedy-vs-batched policy captures the *when to match* tradeoff
   between match quality and abandonment (`online_matching` example).
+- [x] **Fairness / equity** — `fairness`: rank-cost metrics plus egalitarian and
+  sex-equal stable matchings that correct Gale-Shapley's one-sidedness.
 
 ---
 

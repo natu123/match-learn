@@ -8,6 +8,9 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `fairness` module: rank-cost metrics and egalitarian / sex-equal stable
+  matchings (correcting Gale-Shapley's proposer-optimal one-sidedness), plus a
+  public `all_stable_matchings` enumerator.
 - `online` module: dynamic matching where agents arrive and depart over time
   (`OnlineMarket`, `Policy`), with the greedy-vs-batched timing tradeoff between
   match quality and abandonment. A bandit can learn the net-value-maximizing

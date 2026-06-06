@@ -137,6 +137,60 @@ pub fn is_stable(
     true
 }
 
+/// Enumerate *every* stable matching of a (small) instance.
+///
+/// Brute force over all assignments — `O((R+1)^P)` — so this is for small
+/// instances only (e.g. fairness analysis, testing). For complete preferences
+/// the proposer- and receiver-optimal matchings are the extremes of the set.
+pub fn all_stable_matchings(
+    proposer_prefs: &[Vec<usize>],
+    receiver_prefs: &[Vec<usize>],
+) -> Vec<Matching> {
+    let n_p = proposer_prefs.len();
+    let n_r = receiver_prefs.len();
+    let mut out = Vec::new();
+    // Each proposer maps to a receiver index in `0..n_r` or "unmatched" (`n_r`).
+    let mut assign = vec![0usize; n_p];
+    'outer: loop {
+        // Reject assignments where two proposers share a receiver.
+        let mut receiver = vec![None; n_r];
+        let mut ok = true;
+        for (p, &a) in assign.iter().enumerate() {
+            if a < n_r {
+                if receiver[a].is_some() {
+                    ok = false;
+                    break;
+                }
+                receiver[a] = Some(p);
+            }
+        }
+        if ok {
+            let proposer: Vec<Option<usize>> = assign
+                .iter()
+                .map(|&a| if a < n_r { Some(a) } else { None })
+                .collect();
+            let m = Matching { proposer, receiver };
+            if is_stable(proposer_prefs, receiver_prefs, &m) {
+                out.push(m);
+            }
+        }
+        // Increment the mixed-radix counter (base `n_r + 1` per proposer).
+        let mut i = 0;
+        loop {
+            if i == n_p {
+                break 'outer;
+            }
+            assign[i] += 1;
+            if assign[i] <= n_r {
+                break;
+            }
+            assign[i] = 0;
+            i += 1;
+        }
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -184,53 +238,6 @@ mod tests {
         assert_eq!(m.proposer[0], None);
         assert_eq!(m.proposer[1], Some(1));
         assert!(is_stable(&prop, &recv, &m));
-    }
-
-    /// Brute-force oracle: enumerate all stable matchings, confirm GS produces one.
-    fn all_stable_matchings(prop: &[Vec<usize>], recv: &[Vec<usize>]) -> Vec<Matching> {
-        let n_p = prop.len();
-        let n_r = recv.len();
-        let mut out = Vec::new();
-        // Each proposer maps to a receiver index in 0..n_r or "unmatched" (n_r).
-        let mut assign = vec![0usize; n_p];
-        'outer: loop {
-            // Reject assignments where two proposers share a receiver.
-            let mut receiver = vec![None; n_r];
-            let mut ok = true;
-            for p in 0..n_p {
-                if assign[p] < n_r {
-                    if receiver[assign[p]].is_some() {
-                        ok = false;
-                        break;
-                    }
-                    receiver[assign[p]] = Some(p);
-                }
-            }
-            if ok {
-                let proposer: Vec<Option<usize>> = assign
-                    .iter()
-                    .map(|&a| if a < n_r { Some(a) } else { None })
-                    .collect();
-                let m = Matching { proposer, receiver };
-                if is_stable(prop, recv, &m) {
-                    out.push(m);
-                }
-            }
-            // Increment the mixed-radix counter (base n_r+1 per proposer).
-            let mut i = 0;
-            loop {
-                if i == n_p {
-                    break 'outer;
-                }
-                assign[i] += 1;
-                if assign[i] <= n_r {
-                    break;
-                }
-                assign[i] = 0;
-                i += 1;
-            }
-        }
-        out
     }
 
     #[test]
