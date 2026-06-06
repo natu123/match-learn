@@ -163,7 +163,7 @@ Real platforms.
 
 - [x] Application adapters — `RideHailing` (riders/drivers + proximity → `JointInstance`, surge pricing learned); delivery / crowdsourcing to follow
 - [ ] Large-scale / production deployment
-- [ ] Market design extensions (auctions, mechanisms)
+- [x] Market design extensions — double auction + truthful McAfee mechanism (`auction` module)
 - [ ] Price-as-preference, deepened
 
 ---

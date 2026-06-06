@@ -60,6 +60,7 @@
 //! ```
 
 pub mod applications;
+pub mod auction;
 pub mod contextual;
 pub mod data;
 pub mod eval;
@@ -80,6 +81,7 @@ pub mod ttc;
 pub mod two_sided;
 
 pub use applications::{Delivery, RideHailing, random_delivery, random_ride_hailing};
+pub use auction::{AuctionResult, double_auction, efficient_quantity, mcafee_auction};
 pub use contextual::LinearThompson;
 pub use data::{correlated_market, from_text, to_text};
 pub use eval::{LearningMarket, Report, simulate};
