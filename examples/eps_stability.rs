@@ -61,6 +61,7 @@ fn worst_blocking(util: &[Vec<f64>], recv: &[Vec<usize>], m: &Matching, eps: f64
     }
     let pos = |r: usize, p: usize| recv[r].iter().position(|&q| q == p).unwrap_or(usize::MAX);
     let mut worst = 0.0_f64;
+    #[allow(clippy::needless_range_loop)] // p also indexes the matching
     for p in 0..n {
         let cur = m.proposer[p].map_or(f64::MIN, |r| util[p][r]);
         for r in 0..recv.len() {
