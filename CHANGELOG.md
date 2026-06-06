@@ -8,6 +8,9 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `online` module: dynamic matching where agents arrive and depart over time
+  (`OnlineMarket`, `Policy`), with the greedy-vs-batched timing tradeoff between
+  match quality and abandonment.
 - `Report` now records per-round `welfare` (realized proposer-side utility), with
   `tail_mean_welfare`.
 - Optional `serde` feature deriving `Serialize`/`Deserialize` on the public data

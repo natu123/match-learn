@@ -166,6 +166,12 @@ Real platforms.
 - [x] Market design extensions — double auction + truthful McAfee mechanism (`auction` module)
 - [x] Price-as-preference, deepened — a single price recovers ~98% of efficient welfare (`price_as_preference` example)
 
+### Beyond the roadmap
+
+- [x] **Online (dynamic) matching** — `OnlineMarket`: agents arrive and depart over
+  time; the greedy-vs-batched policy captures the *when to match* tradeoff
+  between match quality and abandonment (`online_matching` example).
+
 ---
 
 ## License
