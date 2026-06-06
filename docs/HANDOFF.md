@@ -40,9 +40,25 @@ All tests green; `cargo fmt`/`clippy` clean. Nothing here touches `master`/`dev`
 
 ## 3. Implementation handoff (delegate these)
 
-### 3a. Live `CoordinatedMarket` — ⚠ BUILT, and the naive version FAILED live
+### 3a. Live coordinator — ✅ RESOLVED: stability-targeting wins
 
-**Status update (implementation team):** the spec below was built and **lost
+**Resolution (build + theory done).** The recommended live coordinator is
+`StabilityCoordinatedMarket`: among near-tie reorderings, **minimize estimated
+blocking pairs** (not belief welfare). Dev live loop (200 near-tie `5×5`,
+gap `0.01`): tail-stable **`0.961`**, the best of all six policies, beating
+plain (`0.919`), forced-explore (`0.924`), and gated belief-welfare
+(`0.804`/`0.909`) — with **no `2ε` ceiling**. Theory:
+[`theory-stability-objective.md`](theory-stability-objective.md) (Prop. 5: the
+belief-welfare objective is stability-*biased* even at perfect info, `27.4 %`
+unstable, while the stability objective is unbiased, `0 %`; Prop. 6: the regret
+sign — `+` for stability, `−` for welfare — diagnoses the objective). The two
+coordinators below (gated belief-welfare, Prop. 4) remain as `2ε`-bounded siblings
+for proposer-welfare-weighted settings.
+
+---
+
+**Earlier status (belief-welfare line, for the record).** the spec below was built
+and **lost
 stability to plain Thompson** (tail-stable `0.699` vs `0.919`, tail regret
 `−0.096` vs `0.0011`). Belief-welfare maximization on *inaccurate mid-learning*
 beliefs picks welfare-optimal-but-**unstable** matchings (welfare-max ≠
