@@ -3,6 +3,16 @@
 *Research-track note. Companion to `src/learner.rs` (`ForcedExploreThompson`) and
 `tests/gate.rs` (`phase1_gate_forced_explore_beats_thompson_stall`).*
 
+> **Scope correction (read first).** This note analyzes the **frozen-arm** stall
+> and its cure, forced exploration. A later broad multi-seed study found that the
+> frozen-arm mode is *rare*, and the **dominant** genuine stall in random markets
+> is a **near-tie** effect that forced exploration does **not** fix (and can
+> worsen). The 40-market gate result below — every market sublinear under forced
+> exploration — was partly seed-specific. For the full, honest picture and the
+> complementary cure (annealing), see [`stall-anatomy.md`](stall-anatomy.md). The
+> theory in this note (forced exploration ⟹ `O(log T)` regret, stall probability
+> → 0) remains correct *for the frozen-arm mode*.
+
 ## 1. The phenomenon
 
 In the Phase 1 market each proposer treats the receivers as a multi-armed

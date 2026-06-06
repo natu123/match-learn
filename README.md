@@ -99,25 +99,30 @@ cargo test --test gate -- --nocapture   # the gate
 cargo run  --example converge           # watch regret flatten
 ```
 
-#### Research track — beating the Thompson stall
+#### Research track — anatomy of the Thompson stall
 
-Greedy Thompson Sampling explores only through posterior variance, which
-**freezes** for an arm once the match stops pulling it. On rare hard markets a
-proposer's true partner is frozen out and the market locks into a *wrong* stable
-matching. `ForcedExploreThompson` cures this: it plays Thompson Sampling but,
-with vanishing probability `ε_t = min(1, c/t)`, forces a pull of the
-least-sampled arm — enough to keep a frozen arm probed `Ω(log T)` times, yet
-decaying so the tail stays calm (unlike UCB's perpetual bonus). On the same 40
-markets (`c = 0.25`):
+Greedy Thompson Sampling sometimes locks a learned matching into a *wrong* stable
+outcome. Investigating it turned up **two distinct failure modes, with opposite
+cures**, both rooted in **near-ties** (true preference gaps below the noise floor):
 
-| metric | greedy Thompson | forced-explore |
-| --- | :---: | :---: |
-| sublinear markets (of 40) | 38 | **40** |
-| worst-case `R(2T)/R(T)` | 2.52 | **1.47** |
-| worst-case tail regret rate | 0.315 | **0.046** (~7× lighter) |
+- **Frozen-arm stall** (rare): an arm stops being matched, its posterior freezes
+  at an underestimate, and the agent never returns. *Cure: more exploration* —
+  `ForcedExploreThompson` adds a vanishing forced probe `ε_t = min(1, c/t)` of the
+  least-sampled arm (regret `O(log T)`, stall probability → 0).
+- **Near-tie stall** (dominant): two near-equal receivers can't be ordered, so
+  Gale-Shapley either cascades the wrong order into a far matching or Thompson
+  churns between them forever. *Cure: less tail exploration* — `with_anneal(tau)`
+  cools the sampling temperature so the matching settles. Forcing **worsens** this.
 
-Theory (regret `O(log T)` for `c > 8nσ²/Δ²`, sublinear for any `c > 0`, and
-stall probability → 0) is in [`docs/stall-avoidance.md`](docs/stall-avoidance.md).
+A multi-seed study (400 markets, long horizon) bears this out: slow annealing cuts
+the 5×5 genuine-stall rate **3.5% → 1.25%** and mean regret `29 → ≈0`, where
+forced exploration alone could not. (An earlier 40-market gate where forcing took
+every market sublinear was partly seed luck.)
+
+Full write-up with the dissection and experiments: [`docs/stall-anatomy.md`](docs/stall-anatomy.md);
+the frozen-arm theory: [`docs/stall-avoidance.md`](docs/stall-avoidance.md).
+Reproduce: `cargo run --release --example stall_study` (and `dissect_stall`,
+`neartie_analysis`, `anneal_study`).
 
 ### Phase 2 — Matching coverage
 From the textbook 1:1 case to real matching shapes.
