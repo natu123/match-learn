@@ -8,6 +8,19 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `embedding` module: lifts a pivotal near-tie into a general `n × n` market, so
+  the *whole market's* admissible gap equals one deciding gap. `embed` builds a
+  market from a pivotal gadget (`a*` near-ties `f₁, f₂` at `Δ_A`; both firms top
+  `a*`, second `a_s`) plus a rigid aligned-diagonal core (gaps `≥ Δ_big ≫ Δ_A`).
+  Because every matching-relevant gap except the pivot is `Δ_big`, the smallest
+  gap whose blurring breaks super stability is `a*`'s `Δ_A`, so
+  `admissible_gap(market) == Δ_A` *independent of `Δ_big`* — the wide core gaps are
+  outcome-relatively free. Verified: the admissible gap equals the pivot across
+  sizes / instances / core gaps, is invariant to `Δ_big`, and the market has a
+  unique stable matching that swings only on the pivot (the rigid core untouched).
+  This is the structural half of the theory-parameter = computed-object trinity
+  for match-learn paper (1); the value the `admissible` utility computes on the
+  full market is exactly the pivotal gap that drives the irreversible-market regret.
 - `irreversible` module + `examples/irreversible_interviews.rs`: the falsifiable
   experiment for *interviews substitute for reversibility* (match-learn paper 1).
   `simulate` sweeps the 2x2 of {recoverable, irreversible} matching ×

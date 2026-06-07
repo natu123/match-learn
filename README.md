@@ -224,6 +224,11 @@ Real platforms.
   catastrophe); reversibility *or* interviews each make it learnable (`log T`),
   and both give `O(1)`. So interviews substitute for an undo — an accelerator in
   recoverable markets, a necessary condition in irreversible ones.
+- [x] **General-market embedding** — `embedding`: `embed` plants a pivotal
+  near-tie (`a*` at gap `Δ_A`) in an `n × n` market with a rigid `Δ_big`-gap core,
+  so `admissible_gap` of the *whole market* equals the single pivot `Δ_A`,
+  independent of the core — the outcome-relative bridge from one deciding gap to a
+  general market's learning difficulty.
 
 ---
 
