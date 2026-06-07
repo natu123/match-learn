@@ -18,9 +18,16 @@ contain breaking changes).
   outcome-relatively free. Verified: the admissible gap equals the pivot across
   sizes / instances / core gaps, is invariant to `Δ_big`, and the market has a
   unique stable matching that swings only on the pivot (the rigid core untouched).
-  This is the structural half of the theory-parameter = computed-object trinity
-  for match-learn paper (1); the value the `admissible` utility computes on the
-  full market is exactly the pivotal gap that drives the irreversible-market regret.
+  `simulate_market` + `examples/embedding_trinity.rs` complete the
+  theory-parameter = computed-object = measured-driver trinity: a two-sided
+  stable-regret simulation lifts the four-regime 2×2 onto this market (agents
+  learn firm utilities, firms have fixed preferences, regret counts rounds whose
+  Gale-Shapley matching differs from the true stable one). Verified (mean of 12
+  seeds): only irreversible + no-interview is linear (`Ω(T)`); the other three are
+  sublinear; the irreversible interviewer's regret is `∝ 1/Δ_A²`; and it is
+  invariant to the core gap `Δ_big` — so the regret is driven by exactly the value
+  `admissible_gap` returns on the whole market (the pivot). This is the
+  general-market figure for match-learn paper (1).
 - `irreversible` module + `examples/irreversible_interviews.rs`: the falsifiable
   experiment for *interviews substitute for reversibility* (match-learn paper 1).
   `simulate` sweeps the 2x2 of {recoverable, irreversible} matching ×

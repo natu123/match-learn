@@ -227,8 +227,11 @@ Real platforms.
 - [x] **General-market embedding** — `embedding`: `embed` plants a pivotal
   near-tie (`a*` at gap `Δ_A`) in an `n × n` market with a rigid `Δ_big`-gap core,
   so `admissible_gap` of the *whole market* equals the single pivot `Δ_A`,
-  independent of the core — the outcome-relative bridge from one deciding gap to a
-  general market's learning difficulty.
+  independent of the core. `simulate_market` then lifts the four-regime 2×2 onto
+  it in stable regret — only irreversible + no-interview is `Ω(T)`, the
+  irreversible interviewer is `∝ 1/Δ_A²`, and the regret is invariant to the core —
+  so the theory parameter, the computed `admissible_gap`, and the measured regret
+  driver coincide (`examples/embedding_trinity.rs`).
 
 ---
 
