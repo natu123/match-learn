@@ -217,6 +217,13 @@ Real platforms.
   super-stability-preserving coarsening guarantees. Computed by a threshold scan
   and verified against an exhaustive partial-rank search; the cardinal-utility
   counterpart of the research track's `σ²/Δ²` identifiability floor.
+- [x] **Irreversible matching + interviews** — `irreversible`: when a match is
+  absorbing (no undo), is a market still learnable? The `irreversible_interviews`
+  example sweeps the 2×2 of {recoverable, irreversible} × {no-interview,
+  interview}: only *irreversible + no-interview* is `Ω(T)` (commit blind →
+  catastrophe); reversibility *or* interviews each make it learnable (`log T`),
+  and both give `O(1)`. So interviews substitute for an undo — an accelerator in
+  recoverable markets, a necessary condition in irreversible ones.
 
 ---
 

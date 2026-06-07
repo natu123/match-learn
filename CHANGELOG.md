@@ -8,6 +8,23 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `irreversible` module + `examples/irreversible_interviews.rs`: the falsifiable
+  experiment for *interviews substitute for reversibility* (match-learn paper 1).
+  `simulate` sweeps the 2x2 of {recoverable, irreversible} matching ×
+  {no-interview, interview} on a Heaven-or-Hell market (a commit is absorbing
+  under irreversibility; interviews are safe pre-application samples), reporting
+  catastrophe rate and cumulative regret. The regret *shape* reproduces the
+  theory: **irreversible + no interview ⇒ `Ω(T)`** (commit blind, a constant
+  catastrophe rate — Heaven-or-Hell, Plaut et al. 2025); **recoverable + no
+  interview ⇒ `log T`** (a UCB bandit learns by matching and correcting);
+  **recoverable + interview ⇒ `O(1)`** (a constant confidence suffices, Mirfakhar
+  et al. 2026); and **irreversible + interview ⇒ `log T/Δ²`** — catastrophes → 0,
+  but *not* horizon-independent: an absorbing commit demands error `≈ 1/T`, so the
+  `log T` returns. Each missing channel (reversibility or interviews) costs a
+  factor and only their joint absence is unlearnable, so under irreversibility
+  interviews are upgraded from accelerator to *necessary condition*. The example
+  prints the 2x2 growth column and the `1/Δ²` law; `Δ` is the `admissible`
+  module's admissible gap.
 - `admissible` module: Basu's (2025) **admissible gap** `Δ_A`, the central
   difficulty parameter of competing bandits in matching markets, where the stable
   regret scales as `Θ(log T / Δ_A²)` (both the upper bound and the matching

@@ -71,6 +71,7 @@ pub mod coordinated;
 pub mod data;
 pub mod eval;
 pub mod fairness;
+pub mod irreversible;
 pub mod joint;
 pub mod kidney;
 pub mod lattice;
