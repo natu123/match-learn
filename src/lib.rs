@@ -59,6 +59,7 @@
 //! assert!((pricer.best_price() - clearing).abs() < 3.0);
 //! ```
 
+pub mod admissible;
 pub mod allocation;
 pub mod applications;
 pub mod assignment;
@@ -93,6 +94,7 @@ pub mod ties;
 pub mod ttc;
 pub mod two_sided;
 
+pub use admissible::admissible_gap;
 pub use allocation::{
     is_pareto_efficient, probabilistic_serial, random_serial_dictatorship, sd_envy_free,
     serial_dictatorship,

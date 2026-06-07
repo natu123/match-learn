@@ -211,6 +211,12 @@ Real platforms.
   offer process, where a contract carries terms (wage / length of service) and
   hospitals choose through substitutable choice functions — stable, and reducing
   to Hospital-Residents; the framework behind cadet-branch matching.
+- [x] **Admissible gap** — `admissible`: Basu's (2025) `Δ_A`, the instance
+  parameter that sets the `Θ(log T / Δ_A²)` stable-regret rate for competing
+  bandits in matching markets — the largest minimum preference gap that some
+  super-stability-preserving coarsening guarantees. Computed by a threshold scan
+  and verified against an exhaustive partial-rank search; the cardinal-utility
+  counterpart of the research track's `σ²/Δ²` identifiability floor.
 
 ---
 

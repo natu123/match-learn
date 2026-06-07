@@ -8,6 +8,21 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `admissible` module: Basu's (2025) **admissible gap** `Δ_A`, the central
+  difficulty parameter of competing bandits in matching markets, where the stable
+  regret scales as `Θ(log T / Δ_A²)` (both the upper bound and the matching
+  instance-dependent lower bound). `admissible_gap` computes it from cardinal
+  utilities: the largest minimum preference gap that some *admissible* coarsening
+  guarantees, where a coarsening is admissible iff a super-stable matching still
+  exists under it (outcome-relative — you never pay to resolve distinctions that
+  do not change a stable outcome). Found by a threshold scan (keep orderings with
+  gap `≥ θ`, take the coarsest still-admissible `θ`), justified by
+  refinement-monotonicity of super stability and verified to agree with an
+  exhaustive search over all admissible partial ranks. These coarsenings are
+  *partial orders* (semiorders), not tie tiers, so `ties::super_stable_irving`'s
+  weak-order test is the special case; existence is checked over partial orders
+  directly. The cardinal-utility counterpart of the `σ²/Δ²` identifiability floor
+  in `docs/theory-identifiability.md`.
 - `super_stable_irving`: Irving's (1994) polynomial algorithm for super-stable
   matching with ties — the `O((P·R)²)` counterpart to the brute-force
   `super_stable`. Free men propose to a whole indifference class, a woman deletes
