@@ -8,6 +8,16 @@ contain breaking changes).
 ## [Unreleased]
 
 ### Added
+- `super_stable_irving`: Irving's (1994) polynomial algorithm for super-stable
+  matching with ties — the `O((P·R)²)` counterpart to the brute-force
+  `super_stable`. Free men propose to a whole indifference class, a woman deletes
+  every man she ranks *strictly* below a current proposer, and a multiply-engaged
+  woman breaks her engagements and trims her tail class; the settled engagement
+  relation is the proposer-optimal super-stable matching (or `None`), reducing to
+  Gale-Shapley on strict lists. Verified against brute force on existence and
+  validity over strict, complete-tiered, and individually-rational incomplete
+  markets. This is the super-stability mechanism behind Basu's (2025)
+  Extended-Gale-Shapley competing-bandits-in-matching-markets result.
 - `contracts` module: matching with contracts via the cumulative offer process
   (Hatfield-Milgrom). A `Contract` bundles a doctor, a hospital, and `terms`
   (a wage band, a position, a length of service); doctors rank whole contracts

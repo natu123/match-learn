@@ -1,0 +1,21 @@
+feat(ties): add Irving's polynomial super-stable matching algorithm
+
+Add `super_stable_irving`, the O((P*R)^2) counterpart to the brute-force
+`super_stable`. Free men propose to their entire most-preferred indifference
+class; a woman deletes every man she strictly ranks below a current proposer;
+a woman left engaged to two or more men breaks all engagements and deletes her
+tail class. The settled engagement relation is the proposer-optimal
+super-stable matching, or None when none exists. Reduces to Gale-Shapley on
+strict lists.
+
+Verified against the brute-force oracle on existence and validity over strict
+(== Gale-Shapley, 500), complete tiered (3000), and individually-rational
+incomplete tiered (3000) markets. The incomplete case uses an IR-enforcing
+oracle, since the existing blocking-only `is_super_stable` (repo convention)
+does not by itself reject matchings to unacceptable partners.
+
+This is the super-stability mechanism behind Basu's (2025) Extended-Gale-
+Shapley competing-bandits-in-matching-markets result, giving the ties module a
+polynomial super-stable solver for that bridge.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>

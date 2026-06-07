@@ -187,7 +187,8 @@ Real platforms.
   serial dictatorship, random priority, and the probabilistic-serial eating
   algorithm (ordinally efficient, envy-free), with a Pareto-efficiency check.
 - [x] **Ties / indifferences** — `ties`: weak / strong / super stability with
-  indifferent preferences (the school-choice setting), checkers plus constructors,
+  indifferent preferences (the school-choice setting), checkers plus constructors —
+  including Irving's polynomial super-stable algorithm (`super_stable_irving`) —
   collapsing to ordinary stability when preferences are strict.
 - [x] **Confidence-gated coordination** — `GatedCoordinatedMarket`: the Prop-4 cure
   that coordinates a near-tie only once its posterior is certified tight, resolving

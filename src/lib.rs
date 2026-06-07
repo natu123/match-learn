@@ -132,7 +132,7 @@ pub use rng::Rng;
 pub use strategyproof::{proposer_manipulation, receiver_manipulation};
 pub use ties::{
     is_strongly_stable, is_super_stable, is_weakly_stable, strongly_stable, super_stable,
-    weakly_stable,
+    super_stable_irving, weakly_stable,
 };
 pub use ttc::top_trading_cycle;
 pub use two_sided::TwoSidedMarket;
