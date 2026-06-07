@@ -32,10 +32,10 @@ contain breaking changes).
   utilities: the largest minimum preference gap that some *admissible* coarsening
   guarantees, where a coarsening is admissible iff a super-stable matching still
   exists under it (outcome-relative — you never pay to resolve distinctions that
-  do not change a stable outcome). Found by a threshold scan (keep orderings with
-  gap `≥ θ`, take the coarsest still-admissible `θ`), justified by
-  refinement-monotonicity of super stability and verified to agree with an
-  exhaustive search over all admissible partial ranks. These coarsenings are
+  do not change a stable outcome). Found by binary-searching the thresholds (keep
+  orderings with gap `≥ θ`, take the coarsest still-admissible `θ` — admissibility
+  is monotone in `θ` by refinement, validated by test), and verified to agree with
+  an exhaustive search over all admissible partial ranks. These coarsenings are
   *partial orders* (semiorders), not tie tiers, so `ties::super_stable_irving`'s
   weak-order test is the special case; existence is checked over partial orders
   directly. The cardinal-utility counterpart of the `σ²/Δ²` identifiability floor

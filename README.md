@@ -214,9 +214,9 @@ Real platforms.
 - [x] **Admissible gap** — `admissible`: Basu's (2025) `Δ_A`, the instance
   parameter that sets the `Θ(log T / Δ_A²)` stable-regret rate for competing
   bandits in matching markets — the largest minimum preference gap that some
-  super-stability-preserving coarsening guarantees. Computed by a threshold scan
-  and verified against an exhaustive partial-rank search; the cardinal-utility
-  counterpart of the research track's `σ²/Δ²` identifiability floor.
+  super-stability-preserving coarsening guarantees. Computed by a monotone binary
+  search and verified against an exhaustive partial-rank search; the
+  cardinal-utility counterpart of the research track's `σ²/Δ²` identifiability floor.
 - [x] **Irreversible matching + interviews** — `irreversible`: when a match is
   absorbing (no undo), is a market still learnable? The `irreversible_interviews`
   example sweeps the 2×2 of {recoverable, irreversible} × {no-interview,

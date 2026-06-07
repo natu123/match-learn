@@ -101,25 +101,9 @@ fn super_stable_exists_at(
         .any(|mate| is_super_stable_at(proposer_utils, receiver_utils, mate, theta))
 }
 
-/// Basu's **admissible gap** `Δ_A` of a complete, equal-sized market given as
-/// cardinal utilities.
-///
-/// Computed by scanning candidate resolutions `θ` (the distinct preference gaps)
-/// from coarsest to finest and returning the largest at which the threshold
-/// coarsening "keep orderings with gap `≥ θ`" still admits a super-stable
-/// matching. Admissibility is downward-closed in `θ` (refining a partial order
-/// preserves super stability), so the first admissible `θ` in descending order
-/// is the maximum, and it equals that coarsening's minimum retained gap. Returns
-/// `0.0` if no coarsening is admissible (or `n < 2`).
-///
-/// The super-stability existence test brute-forces over perfect matchings, so
-/// this is an analysis tool for small markets, `O(n! · n²)` per candidate gap.
-pub fn admissible_gap(proposer_utils: &[Vec<f64>], receiver_utils: &[Vec<f64>]) -> f64 {
-    let n = proposer_utils.len();
-    if n < 2 {
-        return 0.0;
-    }
-    // Candidate resolutions: every positive within-list preference gap.
+/// The distinct positive within-list preference gaps, ascending — the candidate
+/// resolutions `θ` at which the threshold coarsening can change.
+fn candidate_gaps(proposer_utils: &[Vec<f64>], receiver_utils: &[Vec<f64>]) -> Vec<f64> {
     let mut gaps: Vec<f64> = Vec::new();
     for side in [proposer_utils, receiver_utils] {
         for row in side {
@@ -133,14 +117,57 @@ pub fn admissible_gap(proposer_utils: &[Vec<f64>], receiver_utils: &[Vec<f64>]) 
             }
         }
     }
-    gaps.sort_by(|a, b| b.partial_cmp(a).unwrap()); // descending
+    gaps.sort_by(|a, b| a.partial_cmp(b).unwrap());
     gaps.dedup();
-    for theta in gaps {
-        if super_stable_exists_at(proposer_utils, receiver_utils, theta) {
-            return theta;
+    gaps
+}
+
+/// Basu's **admissible gap** `Δ_A` of a complete, equal-sized market given as
+/// cardinal utilities.
+///
+/// `Δ_A` is the largest resolution `θ` at which the threshold coarsening "keep
+/// orderings with gap `≥ θ`" still admits a super-stable matching. Super
+/// stability is **monotone** in `θ`: a finer coarsening (smaller `θ`) only helps,
+/// because refinement preserves super stability, so `super_stable_exists_at` is
+/// true on a prefix of the ascending candidate gaps and false thereafter. We thus
+/// **binary-search** the boundary — `O(log G)` super-stability checks over the `G`
+/// distinct gaps instead of a linear scan. Returns `0.0` if no coarsening is
+/// admissible (or `n < 2`).
+///
+/// Each super-stability test brute-forces over perfect matchings, so this is an
+/// analysis tool for small markets, `O(n! · n²)` per check.
+pub fn admissible_gap(proposer_utils: &[Vec<f64>], receiver_utils: &[Vec<f64>]) -> f64 {
+    if proposer_utils.len() < 2 {
+        return 0.0;
+    }
+    let gaps = candidate_gaps(proposer_utils, receiver_utils);
+    // Binary-search the monotone predicate: `lo` settles at the first
+    // non-admissible index, so the last admissible gap is `gaps[lo - 1]`.
+    let mut lo = 0;
+    let mut hi = gaps.len();
+    while lo < hi {
+        let mid = lo + (hi - lo) / 2;
+        if super_stable_exists_at(proposer_utils, receiver_utils, gaps[mid]) {
+            lo = mid + 1;
+        } else {
+            hi = mid;
         }
     }
-    0.0
+    if lo == 0 { 0.0 } else { gaps[lo - 1] }
+}
+
+/// The original linear descending scan — the independent reference the binary
+/// search is checked against.
+#[cfg(test)]
+fn admissible_gap_linear(proposer_utils: &[Vec<f64>], receiver_utils: &[Vec<f64>]) -> f64 {
+    if proposer_utils.len() < 2 {
+        return 0.0;
+    }
+    let mut gaps = candidate_gaps(proposer_utils, receiver_utils);
+    gaps.reverse(); // coarsest first
+    gaps.into_iter()
+        .find(|&theta| super_stable_exists_at(proposer_utils, receiver_utils, theta))
+        .unwrap_or(0.0)
 }
 
 #[cfg(test)]
@@ -231,6 +258,43 @@ mod tests {
         );
     }
 
+    /// The monotonicity that licenses the binary search: super-stability holds on
+    /// a prefix of the ascending candidate gaps and never reappears once lost.
+    #[test]
+    fn super_stability_is_monotone_in_theta() {
+        let mut rng = Rng::new(0x3017);
+        for _ in 0..300 {
+            let n = 2 + rng.below(3);
+            let prop = random_utils(n, &mut rng);
+            let recv = random_utils(n, &mut rng);
+            let flags: Vec<bool> = candidate_gaps(&prop, &recv)
+                .iter()
+                .map(|&t| super_stable_exists_at(&prop, &recv, t))
+                .collect();
+            if let Some(k) = flags.iter().position(|&f| !f) {
+                assert!(
+                    flags[k..].iter().all(|&f| !f),
+                    "super stability reappeared after vanishing: {flags:?}"
+                );
+            }
+        }
+    }
+
+    /// The binary search returns exactly what the linear scan does.
+    #[test]
+    fn binary_search_matches_linear_scan() {
+        let mut rng = Rng::new(0x5EA4);
+        for _ in 0..300 {
+            let n = 2 + rng.below(3);
+            let prop = random_utils(n, &mut rng);
+            let recv = random_utils(n, &mut rng);
+            assert_eq!(
+                admissible_gap(&prop, &recv),
+                admissible_gap_linear(&prop, &recv)
+            );
+        }
+    }
+
     // --- test helpers ---
 
     /// Distinct per-agent utilities with *varied* gaps (cumulative random
@@ -256,22 +320,7 @@ mod tests {
     }
 
     fn distinct_gaps(prop: &[Vec<f64>], recv: &[Vec<f64>]) -> Vec<f64> {
-        let mut gaps = Vec::new();
-        for side in [prop, recv] {
-            for row in side {
-                for x in 0..row.len() {
-                    for y in 0..row.len() {
-                        let g = row[x] - row[y];
-                        if g > 0.0 {
-                            gaps.push(g);
-                        }
-                    }
-                }
-            }
-        }
-        gaps.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        gaps.dedup();
-        gaps
+        candidate_gaps(prop, recv)
     }
 
     fn min_positive_gap(prop: &[Vec<f64>], recv: &[Vec<f64>]) -> Option<f64> {
