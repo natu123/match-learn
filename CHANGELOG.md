@@ -5,7 +5,7 @@ All notable changes to this project are documented here. The format is based on
 [Semantic Versioning](https://semver.org/) (during `0.x`, minor releases may
 contain breaking changes).
 
-## [Unreleased]
+## [0.1.2] - 2026-06-16
 
 ### Added
 - `embedding` module: lifts a pivotal near-tie into a general `n × n` market, so
@@ -212,6 +212,6 @@ direction, built from scratch in Rust.
   (identical matchings, ~520x faster) and MABWiser, plus an integrated NumPy
   reference.
 
-[Unreleased]: https://github.com/natu123/match-learn/compare/v0.1.1...HEAD
+[0.1.2]: https://github.com/natu123/match-learn/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/natu123/match-learn/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/natu123/match-learn/releases/tag/v0.1.0
