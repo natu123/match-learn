@@ -1,8 +1,8 @@
 # match-learn
 
-[![crates.io](https://img.shields.io/crates/v/match-learn.svg)](https://crates.io/crates/match-learn)
+[![crates.io](https://img.shields.io/badge/crates.io-v0.1.2-orange)](https://crates.io/crates/match-learn)
 [![docs.rs](https://img.shields.io/docsrs/match-learn)](https://docs.rs/match-learn)
-[![license](https://img.shields.io/crates/l/match-learn.svg)](LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20627356.svg)](https://doi.org/10.5281/zenodo.20627356)
 
 **Stable matching that learns.** Online preference learning x stable matching, in safe and fast Rust.
