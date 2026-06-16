@@ -1,6 +1,6 @@
 //! Application adapters: mapping real platforms onto the core (Phase 8).
 //!
-//! The library's abstractions ([`JointInstance`](crate::joint::JointInstance),
+//! The library's abstractions ([`JointInstance`],
 //! [`Marketplace`](crate::marketplace::Marketplace), the learners) are
 //! domain-agnostic. This module shows how a concrete platform maps onto them, so
 //! the path from "matching library" to "ride-hailing / delivery engine" is

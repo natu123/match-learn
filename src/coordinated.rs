@@ -22,7 +22,7 @@
 //! plain Thompson (≈0.70 vs 0.92 tail-stable). The post-hoc cascade cure does not
 //! transfer naively to the live loop. [`GatedCoordinatedMarket`] is the Prop-4
 //! cure: it coordinates a near-tie only once the pair's posterior is certified
-//! tight (see [`near_tie_rankings_certified`]), so it never reorders an
+//! tight (see `near_tie_rankings_certified`), so it never reorders an
 //! un-converged pair. With a tight band it recovers nearly all the lost stability
 //! (≈0.91 vs 0.92) at slightly better welfare, and the band `eps` tunes a
 //! *bounded* welfare/stability tradeoff. Prop 4 guarantees `2·eps`-stability, not
@@ -32,7 +32,7 @@
 //! The gate, though, only bounds the damage of the *wrong objective*: belief
 //! welfare is unstable even with accurate beliefs (research track §4a). The
 //! [`StabilityCoordinatedMarket`] fixes the objective instead — it minimizes the
-//! expected number of blocking pairs (see [`coordinated_match_stability`]), which
+//! expected number of blocking pairs (see `coordinated_match_stability`), which
 //! targets stability directly, has no `2·eps` ceiling, and reaches the *highest*
 //! tail-stability of all (≈0.96, above plain Thompson) at the cost of some
 //! proposer welfare. It is the recommended live coordinator.
@@ -487,7 +487,7 @@ impl LearningMarket for CoordinatedMarket {
 ///
 /// Identical to [`CoordinatedMarket`] except a near-tie pair is coordinated only
 /// after it passes the confidence-certification test (see
-/// [`near_tie_rankings_certified`]). The proof (research track,
+/// `near_tie_rankings_certified`). The proof (research track,
 /// `docs/theory-identifiability.md` Prop 4):
 ///
 /// - **safe** — an un-converged pair is never reordered by belief welfare, so the
@@ -649,7 +649,7 @@ const STABILITY_SAMPLES: usize = 16;
 /// [`GatedCoordinatedMarket`]'s confidence gate can only *bound* the damage to
 /// `2·eps`-stability — it cannot remove it, because the objective itself is
 /// wrong. This market instead minimizes the **expected number of blocking pairs**
-/// over the near-tie orderings (see [`coordinated_match_stability`]), estimated
+/// over the near-tie orderings (see `coordinated_match_stability`), estimated
 /// from Thompson-sampled preference profiles. That objective targets stability
 /// directly: as the posterior sharpens it converges to a *true stable* matching
 /// (zero blocking pairs), the outcome the welfare objective could never reach.

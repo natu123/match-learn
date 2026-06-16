@@ -17,7 +17,7 @@ use crate::matching::{Matching, gale_shapley, is_stable};
 
 /// A learning matching loop the harness can drive and score.
 ///
-/// Implemented by both the one-sided [`Market`](crate::market::Market) and the
+/// Implemented by both the one-sided [`Market`] and the
 /// two-sided market, so they share the same regret/stability harness. The "true"
 /// preferences are the ground truth the learners are converging toward; on a
 /// one-sided market the receiver side is simply the known fixed preferences.
