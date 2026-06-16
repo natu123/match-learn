@@ -3,6 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/match-learn.svg)](https://crates.io/crates/match-learn)
 [![docs.rs](https://img.shields.io/docsrs/match-learn)](https://docs.rs/match-learn)
 [![license](https://img.shields.io/crates/l/match-learn.svg)](LICENSE)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20627356.svg)](https://doi.org/10.5281/zenodo.20627356)
 
 **Stable matching that learns.** Online preference learning x stable matching, in safe and fast Rust.
 
@@ -232,6 +233,22 @@ Real platforms.
   irreversible interviewer is `∝ 1/Δ_A²`, and the regret is invariant to the core —
   so the theory parameter, the computed `admissible_gap`, and the measured regret
   driver coincide (`examples/embedding_trinity.rs`).
+
+---
+
+## Papers
+
+This library is the reproducible artifact behind two preprints:
+
+1. **Interviews Substitute for Reversibility: Two Regret Floors in Irreversible
+   Matching Markets.** Kenji Masuda, 2026.
+   [doi:10.5281/zenodo.20627356](https://doi.org/10.5281/zenodo.20627356) —
+   the matching theory and experiments implemented here (the `admissible_gap`,
+   super-stability, and irreversible-matching machinery).
+2. **Alignment as Consensus under Irreversibility: a decision-theoretic case for
+   dialogue over verification.** Kenji Masuda, 2026.
+   [doi:10.5281/zenodo.20710440](https://doi.org/10.5281/zenodo.20710440) —
+   reads the same 2x2 spine into AI alignment.
 
 ---
 
