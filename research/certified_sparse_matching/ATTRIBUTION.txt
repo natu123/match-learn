@@ -1,0 +1,24 @@
+License and attribution scope
+
+The authored software and accompanying documentation in this package are
+provided under the MIT License in LICENSE.
+Copyright (c) 2026 natu123
+
+SciPy and NumPy are optional separately installed dependencies. Their source
+code, binaries and licenses are not bundled here, and this package's MIT
+license does not relicense those dependencies. SciPy and its contributors
+provide the LAPJVsp candidate solver used by the optional path.
+
+The sparse doubling construction and min-cost-flow cut/potential optimality
+conditions are established methods; no algorithmic novelty is claimed.
+Credit for the standard theory and relevant implementations is given in
+methods_results.txt and references.json, including SciPy's documentation and
+the Kiraly–Kovacs paper describing LEMON implementations. No SciPy or LEMON
+implementation is copied into this package.
+
+Official MIT license text reference:
+https://opensource.org/license/mit
+
+This example is published on a research branch. Its license does not imply
+upstream endorsement, broader platform validation or stronger scientific
+guarantees. No third-party maintainer outreach accompanies this example.
