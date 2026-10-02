@@ -1,0 +1,71 @@
+Static TBLS: paper-based original Rust reimplementation
+
+Source: https://arxiv.org/html/2409.10575v2 (v2, 2025-08-23).
+Author code URL returned 404; no author source or license was available. This
+implementation was written independently from the algorithm description. No
+author-code equivalence, reproduced performance or SOTA improvement is claimed.
+Implementation is isolated in research/tbls.rs, not the library's public API.
+
+Trace to the paper
+Algorithm 1: seeded strict tie orders, proposer GS, separate current walk and best
+matching/strategy snapshots. Equal scores replace the incumbent; worse walk
+states continue. Section 4.1: paper score is retained literally, including its
+estimated lower bound; selecting smaller cardinality is counted diagnostically.
+Algorithms 2-3: sample one adjustment per free agent on each side, then select
+one; promote the free candidate within its original tie. Otherwise perturb
+sampled rows. Algorithm 4: random deduplicated agent queue, best-first strict
+blocker removal, enqueue displaced endpoints, GS fallback on repair timeout.
+Section 5.2 defaults: c=.9, disruption=.05, one perturbed row per side; repair
+time calibrated from initial GS. Static perfect stop follows the prose.
+
+Explicit implementation choices and limits
+Only equal-sized, unit-capacity SMTI graphs, reciprocal acceptable edges,
+nonempty tiers and unique in-range IDs are accepted. Empty markets work; unequal
+sides, capacities above one and one-sided acceptability are rejected. The
+dynamic wrapper will need separate normalization and unequal-side decisions.
+The research guard allows n<=64 and at most 3000 refinement iterations.
+max_iterations is an exact count, including zero for initialization-only; the
+paper pseudocode's inclusive counter differs by one. No heuristic score is
+silently replaced with the cardinality/retention objective.
+The repository splitmix64 RNG drives Fisher-Yates tie/row shuffles, per-agent
+candidate sampling and random queue pops. This fixes unspecified random choices
+without claiming the author's RNG or identical random trajectories.
+Per-side row sampling is without replacement, clamped to side size for the empty
+market. Promotion preserves every original tier membership and inter-tier order.
+Repair time includes building strict ranks. The implementation checks its limit
+within candidate scans as well as at queue pops. T=0 triggers immediate fallback
+once nonempty work is attempted. A fallback emits GS for the same strict order.
+The reference timing is wall-clock Instant, not measured process CPU. Measured
+timing affects branching, so equal seeds alone do not ensure identical runs.
+CandidateChecks is an explicit deterministic test mode, never paper timing or an
+equal-CPU comparison. Tests use a 256-check repair limit and 16 iterations.
+Every completed repair has a full strict-stability guard. A failed guard triggers
+GS and increments validation_fallbacks. Nonzero counts are reproduction defects
+to investigate, not successes hidden by fallback. Original weak stability is
+checked before scoring. The incumbent matching and strict strategy are paired.
+Global checks and rank reconstruction add overhead; no speed claim is valid.
+Static TBLS has no previous assignment argument, retention archive or recourse
+score. Perfect matching terminates search and does not certify best retention.
+
+Correctness evidence and reproducibility
+Run: cargo test --test tbls_paper
+Run: cargo run --example tbls_paper_smoke -- 17 work
+Measured repair: cargo run --example tbls_paper_smoke -- 17 time
+The example emits complete Table 1 profiles, seed, matching, paired strict
+strategy and diagnostic counters. Ignore diagnostic_calibrated_repair_ns for
+work-mode repeat comparison. Do not compare work-mode timing with time mode.
+Tests independently enumerate all 136 reciprocal 2x2 tiered profiles with two
+search seeds, check original weak stability, strict strategy stability, original
+tier preservation, deterministic repeat output and zero guard-fallback counts.
+Twenty-four separate held-out synthetic profiles (seeds 1001..1024, n=3/4,
+reciprocal edges probability .6, shuffled sides, first two tiers merged with
+probability .7) use search seeds 20001/20002 and exact tiny oracle checks.
+These are static correctness cases, not the held-out dynamic performance study.
+Table 1's optimum is verified by exhaustive feasible enumeration; four bounded
+search seeds must attain size four. Private controls cover receiver-originated
+adjustment, both displaced endpoints, timeout fallback, failed queue detection,
+no-adjustment disruption, perfect initial stop, invalid profiles and zero agents.
+There is no claim all weak-stable maxima are found by a heuristic, even on n<=4.
+Further conditions: author-code access remains unresolved; warm-start adapter
+and retention archive must be separate changes. No performance comparison may
+run until the dynamic input manifest and actual CPU accounting are available.
