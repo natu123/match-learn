@@ -5,6 +5,13 @@ All notable changes to this project are documented here. The format is based on
 [Semantic Versioning](https://semver.org/) (during `0.x`, minor releases may
 contain breaking changes).
 
+## [Unreleased]
+
+### Fixed
+- Strict and tied one-to-one stability checkers now reject malformed matchings
+  and assignments that are not mutually acceptable. Exhaustive strict enumeration
+  and strong/super constructors therefore exclude infeasible pairs on partial lists.
+
 ## [0.1.2] - 2026-06-16
 
 ### Added

@@ -9,7 +9,8 @@
 /// A two-sided matching.
 ///
 /// `proposer[p] == Some(r)` iff proposer `p` is matched to receiver `r`, and
-/// symmetrically for `receiver`. The two views are always consistent.
+/// symmetrically for `receiver`. Constructors keep the two views consistent;
+/// callers modifying these public fields must preserve that invariant.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Matching {
@@ -17,6 +18,36 @@ pub struct Matching {
     pub proposer: Vec<Option<usize>>,
     /// Partner of each receiver, if matched.
     pub receiver: Vec<Option<usize>>,
+}
+
+/// Validate dimensions, reciprocal assignments (hence uniqueness), and mutual
+/// acceptability before a stability checker indexes partners or checks blockers.
+pub(crate) fn is_feasible(
+    prop_rank: &[Vec<Option<usize>>],
+    recv_rank: &[Vec<Option<usize>>],
+    m: &Matching,
+) -> bool {
+    if m.proposer.len() != prop_rank.len() || m.receiver.len() != recv_rank.len() {
+        return false;
+    }
+    for (p, &partner) in m.proposer.iter().enumerate() {
+        if let Some(r) = partner
+            && (r >= recv_rank.len()
+                || m.receiver[r] != Some(p)
+                || prop_rank[p][r].is_none()
+                || recv_rank[r][p].is_none())
+        {
+            return false;
+        }
+    }
+    for (r, &partner) in m.receiver.iter().enumerate() {
+        if let Some(p) = partner
+            && (p >= prop_rank.len() || m.proposer[p] != Some(r))
+        {
+            return false;
+        }
+    }
+    true
 }
 
 impl Matching {
@@ -98,6 +129,7 @@ pub fn gale_shapley(proposer_prefs: &[Vec<usize>], receiver_prefs: &[Vec<usize>]
 /// A matching is stable when no *blocking pair* exists: a proposer `p` and
 /// receiver `r`, mutually acceptable, who would each rather be matched together
 /// than with their current partner (being unmatched counts as worst).
+/// Returns `false` for malformed matchings or mutually unacceptable assignments.
 pub fn is_stable(
     proposer_prefs: &[Vec<usize>],
     receiver_prefs: &[Vec<usize>],
@@ -107,6 +139,10 @@ pub fn is_stable(
     let n_r = receiver_prefs.len();
     let prop_rank = rank_table(proposer_prefs, n_r);
     let recv_rank = rank_table(receiver_prefs, n_p);
+
+    if !is_feasible(&prop_rank, &recv_rank, m) {
+        return false;
+    }
 
     for p in 0..n_p {
         for &r in &proposer_prefs[p] {

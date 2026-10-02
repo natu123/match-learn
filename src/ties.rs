@@ -16,7 +16,7 @@
 //! [`is_stable`](crate::matching::is_stable). Preferences are given as tiers:
 //! `prefs[a]` is a list of indifference classes, better classes first.
 
-use crate::matching::Matching;
+use crate::matching::{Matching, is_feasible};
 
 /// `class[a][b] = Some(k)` if `b` is in `a`'s `k`-th indifference class (0 =
 /// best), else `None` (unacceptable).
@@ -58,6 +58,7 @@ fn weak(row: &[Option<usize>], other: usize, cur: Option<usize>) -> bool {
 
 /// Whether `m` is **weakly stable**: no blocking pair where *both* sides
 /// strictly prefer each other to their assigned partners.
+/// Returns `false` for malformed matchings or mutually unacceptable assignments.
 pub fn is_weakly_stable(
     proposer_prefs: &[Vec<Vec<usize>>],
     receiver_prefs: &[Vec<Vec<usize>>],
@@ -67,6 +68,9 @@ pub fn is_weakly_stable(
         class_table(proposer_prefs, receiver_prefs.len()),
         class_table(receiver_prefs, proposer_prefs.len()),
     );
+    if !is_feasible(&pc, &rc, m) {
+        return false;
+    }
     for (p, prow) in pc.iter().enumerate() {
         for (r, rrow) in rc.iter().enumerate() {
             if prow[r].is_none() || rrow[p].is_none() {
@@ -82,6 +86,7 @@ pub fn is_weakly_stable(
 
 /// Whether `m` is **strongly stable**: no pair where one side strictly prefers
 /// the other while that other is indifferent-or-better off.
+/// Returns `false` for malformed matchings or mutually unacceptable assignments.
 pub fn is_strongly_stable(
     proposer_prefs: &[Vec<Vec<usize>>],
     receiver_prefs: &[Vec<Vec<usize>>],
@@ -91,6 +96,9 @@ pub fn is_strongly_stable(
         class_table(proposer_prefs, receiver_prefs.len()),
         class_table(receiver_prefs, proposer_prefs.len()),
     );
+    if !is_feasible(&pc, &rc, m) {
+        return false;
+    }
     for (p, prow) in pc.iter().enumerate() {
         for (r, rrow) in rc.iter().enumerate() {
             if prow[r].is_none() || rrow[p].is_none() {
@@ -108,6 +116,7 @@ pub fn is_strongly_stable(
 
 /// Whether `m` is **super stable**: no pair where *each* side is
 /// indifferent-or-better off together than with its assigned partner.
+/// Returns `false` for malformed matchings or mutually unacceptable assignments.
 pub fn is_super_stable(
     proposer_prefs: &[Vec<Vec<usize>>],
     receiver_prefs: &[Vec<Vec<usize>>],
@@ -117,6 +126,9 @@ pub fn is_super_stable(
         class_table(proposer_prefs, receiver_prefs.len()),
         class_table(receiver_prefs, proposer_prefs.len()),
     );
+    if !is_feasible(&pc, &rc, m) {
+        return false;
+    }
     for (p, prow) in pc.iter().enumerate() {
         for (r, rrow) in rc.iter().enumerate() {
             if prow[r].is_none() || rrow[p].is_none() || m.proposer[p] == Some(r) {
@@ -482,7 +494,7 @@ mod tests {
             let n = 1 + rng.below(4);
             let prop = random_tiered_incomplete(n, n, &mut rng);
             let recv = random_tiered_incomplete(n, n, &mut rng);
-            let brute = super_stable_brute_ir(&prop, &recv);
+            let brute = super_stable(&prop, &recv);
             let fast = super_stable_irving(&prop, &recv);
             assert_eq!(
                 brute.is_some(),
@@ -501,35 +513,6 @@ mod tests {
             some_cnt > 0 && none_cnt > 0,
             "incomplete test did not exercise both outcomes: some={some_cnt} none={none_cnt}"
         );
-    }
-
-    /// Individual rationality: every matched pair is mutually acceptable. The
-    /// plain [`is_super_stable`] checks only blocking, not that the matching
-    /// itself is valid, which matters once preference lists are incomplete.
-    fn is_ir(
-        proposer_prefs: &[Vec<Vec<usize>>],
-        receiver_prefs: &[Vec<Vec<usize>>],
-        m: &Matching,
-    ) -> bool {
-        let pc = class_table(proposer_prefs, receiver_prefs.len());
-        let rc = class_table(receiver_prefs, proposer_prefs.len());
-        m.proposer.iter().enumerate().all(|(p, &q)| match q {
-            None => true,
-            Some(r) => pc[p][r].is_some() && rc[r][p].is_some(),
-        })
-    }
-
-    /// Brute-force oracle that, unlike [`super_stable`], also requires the
-    /// matching to be individually rational — the correct existence test for
-    /// super stability with incomplete lists.
-    fn super_stable_brute_ir(
-        proposer_prefs: &[Vec<Vec<usize>>],
-        receiver_prefs: &[Vec<Vec<usize>>],
-    ) -> Option<Matching> {
-        find_matching(proposer_prefs.len(), receiver_prefs.len(), |m| {
-            is_super_stable(proposer_prefs, receiver_prefs, m)
-                && is_ir(proposer_prefs, receiver_prefs, m)
-        })
     }
 
     /// A random tiered profile with possibly-incomplete lists: keep a random
