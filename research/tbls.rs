@@ -6,6 +6,11 @@ use match_learn::rng::Rng;
 use match_learn::ties::is_weakly_stable;
 use std::time::{Duration, Instant};
 
+// This separately tested adapter is not invoked by the static-only harness.
+#[allow(dead_code)]
+#[path = "tbls_warm.rs"]
+pub mod warm;
+
 pub type Profile = Vec<Vec<Vec<usize>>>;
 type Ranks = Vec<Vec<Option<usize>>>;
 
@@ -344,14 +349,26 @@ fn score(p: &Profile, r: &Profile, m: &Matching, big_m: f64) -> f64 {
 
 pub fn solve(p: &Profile, r: &Profile, seed: u64, cfg: &Config) -> Result<Output, &'static str> {
     validate(p, r, cfg)?;
+    let mut rng = Rng::new(seed);
+    let s = random_strategy(p, r, &mut rng);
+    let started = Instant::now();
+    let current = gale_shapley(&s.proposer, &s.receiver);
+    let calibrated_repair_time = started.elapsed();
+    search(p, r, cfg, current, s, rng, calibrated_repair_time)
+}
+
+fn search(
+    p: &Profile,
+    r: &Profile,
+    cfg: &Config,
+    mut current: Matching,
+    mut s: Strategy,
+    mut rng: Rng,
+    calibrated_repair_time: Duration,
+) -> Result<Output, &'static str> {
     let n = p.len();
     let pr = ranks(p, n);
     let rr = ranks(r, n);
-    let mut rng = Rng::new(seed);
-    let mut s = random_strategy(p, r, &mut rng);
-    let started = Instant::now();
-    let mut current = gale_shapley(&s.proposer, &s.receiver);
-    let calibrated_repair_time = started.elapsed();
     let budget = cfg
         .repair_budget
         .unwrap_or(RepairBudget::Time(calibrated_repair_time));

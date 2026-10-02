@@ -1,0 +1,61 @@
+Conservative warm-start external-update adapter (original adaptation)
+
+This is separate from paper-based static TBLS. It reuses the previous feasible
+assignment and strict tie strategy, then invokes the same static search kernel.
+No old-partner priority, retention-aware score, output archive or new local
+search algorithm is added. It is not author code or a dynamic SOTA baseline.
+
+Input and state rules
+Use stable numeric IDs; append arrivals. For departure keep an empty inactive
+row and remove incident edges. Truncating dimensions is rejected. Both old and
+new input profiles are validated for unique, in-range entries and nonempty tiers
+before pruning. Old matching must be reciprocal, feasible, weak-stable under old
+profiles and strict-stable under a tier-compatible previous strategy.
+New asymmetric acceptability is normalized to the mutual intersection, dropping
+empty tiers. This preserves original feasible assignments and weak blockers.
+Rebuild both matching views after projecting away newly unacceptable old pairs.
+Within each new tier, keep surviving candidates in their previous strict order;
+append genuinely new candidates in seeded shuffled order. Never move the previous
+partner ahead of earlier surviving candidates just to favor retention.
+The output supplies normalized real profiles and trimmed paired strategy for the
+next Previous state. Keep the raw input separately for original-profile checks.
+
+Repair and score semantics
+Arbitrary external edits invalidate the paper's original changed-subset
+precondition. Initial repair conservatively queues all padded agents. Subsequent
+refinement repairs still use the static subset queue and displaced endpoints.
+Initial projection, initial repair and search counters are separately exposed.
+Calibrate repair T by running GS under the carried strategy, even though its
+matching is discarded; its cardinality is reported separately. This work must
+be charged to a later update budget. eM uses the repaired warm initial matching,
+not the discarded calibration GS assignment. This is an initialization adaptation.
+Unequal sides are padded with empty dummy slots to max(P,R), subject to n<=64.
+Dummy slots cannot match. Paper score uses padded N; perfect stopping is
+unreachable when dummy agents remain free, so the exact iteration cap stops the
+search. Do not compare this padded score directly to unpadded static TBLS scores.
+Trim both matching views and dummy strategy rows; never renumber real IDs.
+The final result is checked against original new profiles and strict strategy.
+Elapsed repair time is wall time; deterministic CandidateChecks is correctness
+mode only. There is no hard equal-CPU update deadline or performance claim.
+
+Bounded evidence
+Run: cargo test --test tbls_warm
+Controls cover stable arrival with cardinality growth, unilateral matched-edge
+deletion, departure, unequal dimensions and padded score/stopping, malformed
+inputs/state, and an anchor proving retained order does not prioritize old partner.
+Additional controls check receiver-side updates, empty-market arrival, explicit
+zero-work GS fallback and measured-time repair. On the receiver-departure control
+(seed17, eight iterations, 256 repair checks), the basic warm method can replace
+the surviving old pair at the same cardinality. Warm access alone does not imply
+minimum recourse; a retention archive would be a separate adaptation.
+Twenty-four synthetic input seeds 3001..3024 exercise unilateral deletion,
+departure, tie split or append-only arrival. n=2/3 before the update, at most4
+after it; search seed20001, then a checked second-step state with seed20002.
+No-op generated edits are kept, not silently replaced by harder instances.
+An independent tiny oracle checks the exact objective survives normalization
+and padding, and verifies emitted weak stability. Repeated work-mode runs must
+match. This is harness correctness coverage, not held-out performance evidence.
+Observed controls and any misses must be reported separately from future timing
+comparisons; the heuristic is not guaranteed to attain exact maximum cardinality
+or conditional retention. Static-versus-warm timing still requires equal inputs,
+CPU accounting and charged calibration/repair/fallback/global checks.
