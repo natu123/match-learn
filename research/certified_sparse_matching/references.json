@@ -1,0 +1,38 @@
+[
+  {
+    "title": "SciPy 1.17.0 minimum weight full bipartite matching documentation",
+    "url": "https://docs.scipy.org/doc/scipy-1.17.0/reference/generated/scipy.sparse.csgraph.min_weight_full_bipartite_matching.html",
+    "verified_date": "2026-10-02"
+  },
+  {
+    "title": "SciPy issue 14041: full matching limitation",
+    "url": "https://github.com/scipy/scipy/issues/14041",
+    "verified_date": "2026-10-02",
+    "scope": "Issue body; no claim about inaccessible comments"
+  },
+  {
+    "title": "SciPy v1.17.0 matching implementation reference",
+    "url": "https://raw.githubusercontent.com/scipy/scipy/v1.17.0/scipy/sparse/csgraph/_matching.pyx",
+    "sha256": "e74e8f794b85be233f30d62fe062490e2eff0c54bbcf3f9c77047413add207dd",
+    "note": "Public source reference only; no upstream source or binary included"
+  },
+  {
+    "title": "Efficient implementations of minimum-cost flow algorithms",
+    "authors": [
+      "Zoltan Kiraly",
+      "Peter Kovacs"
+    ],
+    "version": "arXiv:1207.6381v1",
+    "url": "https://arxiv.org/html/1207.6381v1",
+    "section": "2.2, Theorems 1 and 2",
+    "verified_date": "2026-10-02",
+    "note": "Standard negative-cycle and reduced-cost optimality conditions; describes LEMON implementations. No implementation copied."
+  },
+  {
+    "title": "The MIT License",
+    "url": "https://opensource.org/license/mit",
+    "spdx_identifier": "MIT",
+    "verified_date": "2026-10-02",
+    "scope": "Official license terms, with package copyright notice Copyright (c) 2026 natu123."
+  }
+]

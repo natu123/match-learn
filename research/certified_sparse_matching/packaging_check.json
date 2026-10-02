@@ -1,0 +1,26 @@
+{
+  "license_decision": "MIT",
+  "clean_directory_stdlib_example": "passed",
+  "optional_dependencies_blocked_during_smoke": true,
+  "smoke_stdout": [
+    "Verified cardinality: 1 exact cost: 0",
+    "Costlier candidate rejected: not_minimum_cost: negative_residual_cycle"
+  ],
+  "authored_package_ast_unchanged_except_docstrings": true,
+  "all_authored_python_parses": true,
+  "scientific_experiments_run_for_packaging": false,
+  "adapted_full_test_suite_executed_for_packaging": true,
+  "optional_regression_path_executed_for_packaging": true,
+  "scan_scope": "All payload paths and UTF-8 contents; known private identifiers/paths, credential markers, email addresses, archive/binary exclusions. Not a formal exhaustive secret-detection guarantee.",
+  "privacy_scan": "passed; no flagged private paths, workflow context, credentials or email addresses. Copyright holder natu123 is the approved public identity.",
+  "payload_file_count_excluding_manifest": 20,
+  "verification_evidence": "verification_results.json",
+  "clean_extraction_manifest_verified": true,
+  "copyright_holder": "natu123",
+  "license_file": "LICENSE",
+  "license_sha256": "435695079af6885e351f16c4814b2d48f2137fa28d9aee43c42644ec958e2923",
+  "license_readme_consistency": "passed",
+  "executable_code_unchanged_since_previous_verified_candidate": true,
+  "evidence_status": "historical pre-publication packaged-candidate verification",
+  "publication_note": "This record is not a new branch CI run. Current branch file integrity is described by manifest.json."
+}

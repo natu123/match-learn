@@ -1,0 +1,6896 @@
+[
+  {
+    "suite": "tiny_reference",
+    "name": "empty00",
+    "m": 0,
+    "n": 0,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "empty00_T",
+    "m": 0,
+    "n": 0,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "empty04",
+    "m": 0,
+    "n": 4,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "empty04_T",
+    "m": 4,
+    "n": 0,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "no_edges",
+    "m": 3,
+    "n": 4,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "no_edges_T",
+    "m": 4,
+    "n": 3,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "zero_present",
+    "m": 1,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "zero_present_T",
+    "m": 2,
+    "n": 1,
+    "edges": [
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "negative_cardinality",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.4000000000000p+3"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+1"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "negative_cardinality_T",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.4000000000000p+3"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+1"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "deficient",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "deficient_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "ties",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "ties_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "disconnected",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+1"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "float",
+          "hex": "0x1.4000000000000p+2"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        3
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "disconnected_T",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+1"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.4000000000000p+2"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        3,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "tiny_offset",
+    "m": 1,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-54"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "tiny_offset_T",
+    "m": 2,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-54"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "huge_uniform",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.7e43c8800759cp+996"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.7e43c8800759cp+996"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1000000000000000052504760255204420248704468581108159154915854115511802457988908195786371375080447864043704443832883878176942523235360430575644792184786706982848387200926575803737830233794788090059368953234970799945081119038967640880074652742780142494579258788820056842838115669472196386865459400540160"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "huge_uniform_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.7e43c8800759cp+996"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.7e43c8800759cp+996"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1000000000000000052504760255204420248704468581108159154915854115511802457988908195786371375080447864043704443832883878176942523235360430575644792184786706982848387200926575803737830233794788090059368953234970799945081119038967640880074652742780142494579258788820056842838115669472196386865459400540160"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "subnormal",
+    "m": 1,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0000000000001p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "subnormal_T",
+    "m": 2,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0000000000001p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "mixed_extremes",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.7e43c8800759cp+996"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.56e1fc2f8f359p-997"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.7e43c8800759cp+996"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "mixed_extremes_T",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.7e43c8800759cp+996"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.56e1fc2f8f359p-997"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.7e43c8800759cp+996"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "adjacent_huge",
+    "m": 1,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.7e43c8800759dp+996"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.7e43c8800759cp+996"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "1000000000000000052504760255204420248704468581108159154915854115511802457988908195786371375080447864043704443832883878176942523235360430575644792184786706982848387200926575803737830233794788090059368953234970799945081119038967640880074652742780142494579258788820056842838115669472196386865459400540160"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "adjacent_huge_T",
+    "m": 2,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.7e43c8800759dp+996"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.7e43c8800759cp+996"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "1000000000000000052504760255204420248704468581108159154915854115511802457988908195786371375080447864043704443832883878176942523235360430575644792184786706982848387200926575803737830233794788090059368953234970799945081119038967640880074652742780142494579258788820056842838115669472196386865459400540160"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "decimal_resolution",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.999999999999ap-4"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.999999999999ap-3"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.3333333333333p-2"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.999999999999ap-2"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "1/2"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "decimal_resolution_T",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.999999999999ap-4"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.999999999999ap-3"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.3333333333333p-2"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.999999999999ap-2"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "1/2"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random00",
+    "m": 1,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-1/2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random00_T",
+    "m": 1,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-1/2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random01",
+    "m": 3,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "3/2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random01_T",
+    "m": 3,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "3/2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random02",
+    "m": 1,
+    "n": 1,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random02_T",
+    "m": 1,
+    "n": 1,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random03",
+    "m": 2,
+    "n": 2,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random03_T",
+    "m": 2,
+    "n": 2,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random04",
+    "m": 1,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "3/2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random04_T",
+    "m": 4,
+    "n": 1,
+    "edges": [
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "3/2"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random05",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p-1"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        3,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        3,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random05_T",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p-1"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        0,
+        3,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        3,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random06",
+    "m": 1,
+    "n": 2,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random06_T",
+    "m": 2,
+    "n": 1,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random07",
+    "m": 3,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-1"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-7/4"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random07_T",
+    "m": 1,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-1"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-7/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random08",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        0,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-2"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p-1"
+        }
+      ],
+      [
+        1,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p-1"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "-23/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random08_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        3,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-2"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p-1"
+        }
+      ],
+      [
+        3,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p-1"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "-23/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random09",
+    "m": 2,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        3,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+0"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random09_T",
+    "m": 4,
+    "n": 2,
+    "edges": [
+      [
+        3,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+0"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        3,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random10",
+    "m": 2,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-1"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.4000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random10_T",
+    "m": 4,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-1"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.4000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random11",
+    "m": 2,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random11_T",
+    "m": 4,
+    "n": 2,
+    "edges": [
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random12",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        3,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ],
+      [
+        3,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "17/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        3,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random12_T",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        0,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ],
+      [
+        1,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "17/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        3
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random13",
+    "m": 1,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random13_T",
+    "m": 4,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random14",
+    "m": 3,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+0"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-1"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-2"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "-13/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random14_T",
+    "m": 3,
+    "n": 3,
+    "edges": [
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+0"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-1"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-2"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "-13/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random15",
+    "m": 1,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-1/2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random15_T",
+    "m": 2,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p-1"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-1/2"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random16",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "1/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random16_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "1/4"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random17",
+    "m": 1,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-7/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random17_T",
+    "m": 3,
+    "n": 1,
+    "edges": [
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-7/4"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random18",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-2"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p+0"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "1/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random18_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-2"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p+0"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "1/4"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random19",
+    "m": 3,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+1"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "7/4"
+    },
+    "recorded_candidate": [
+      [
+        2,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random19_T",
+    "m": 1,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+1"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "7/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random20",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.4000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "3"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random20_T",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.4000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "3"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random21",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-1"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-2"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random21_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-1"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.c000000000000p+0"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.8000000000000p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-2"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random22",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        0,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-1"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "0x1.4000000000000p+0"
+        }
+      ],
+      [
+        3,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 4,
+      "exact_cost": "-11/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        3,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random22_T",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        3,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p-1"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "0x1.4000000000000p+0"
+        }
+      ],
+      [
+        0,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "float",
+          "hex": "0x1.0000000000000p-2"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.8000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 4,
+      "exact_cost": "-11/4"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        3,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random23",
+    "m": 1,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ],
+      [
+        0,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-2"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        3
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random23_T",
+    "m": 4,
+    "n": 1,
+    "edges": [
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+0"
+        }
+      ],
+      [
+        3,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x1.0000000000000p+1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "-2"
+    },
+    "recorded_candidate": [
+      [
+        3,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random24",
+    "m": 3,
+    "n": 3,
+    "edges": [
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x1.4000000000000p+0"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-5/4"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random24_T",
+    "m": 3,
+    "n": 3,
+    "edges": [
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.4000000000000p+0"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x1.c000000000000p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-5/4"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random25",
+    "m": 1,
+    "n": 2,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "tiny_reference",
+    "name": "random25_T",
+    "m": 2,
+    "n": 1,
+    "edges": [],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 0,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": []
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "row_gap1_boundary-1",
+    "m": 1,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "3909374676535"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "3909374676534"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "3909374676534"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "row_gap1_boundary-1_T",
+    "m": 2,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "3909374676535"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "3909374676534"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "3909374676534"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "row_gap1_boundary+0",
+    "m": 1,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "3909374676536"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "3909374676535"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "3909374676535"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "row_gap1_boundary+0_T",
+    "m": 2,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "3909374676536"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "3909374676535"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "3909374676535"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "row_gap1_boundary+1",
+    "m": 1,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "3909374676537"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "3909374676536"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "3909374676536"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "row_gap1_boundary+1_T",
+    "m": 2,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "3909374676537"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "3909374676536"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "3909374676536"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "row_gap1_subnormal_boundary",
+    "m": 1,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0038e38e38e38p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0038e38e38e37p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "3909374676535/202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494784"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "row_gap1_subnormal_boundary_T",
+    "m": 2,
+    "n": 1,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0038e38e38e38p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0038e38e38e37p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 1,
+      "exact_cost": "3909374676535/202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494784"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "cancel_gap1_boundary-1",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604440"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "1759218604439"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-1759218604439"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604439"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "cancel_gap1_boundary-1_T",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604440"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604439"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604439"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604439"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "cancel_gap1_boundary+0",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604441"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "1759218604440"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-1759218604440"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604440"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "cancel_gap1_boundary+0_T",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604441"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604440"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604440"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604440"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "cancel_gap1_boundary+1",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604442"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "1759218604441"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-1759218604441"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604441"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "cancel_gap1_boundary+1_T",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604442"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604441"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604441"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604441"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "cancel_gap1_subnormal_boundary",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0019999999999p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0019999999998p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.0019999999998p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.0019999999998p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "cancel_gap1_subnormal_boundary_T",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0019999999999p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0019999999998p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.0019999999998p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.0019999999998p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "deficient_cancel_boundary-1",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409975"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "718048409974"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-718048409974"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409974"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "deficient_cancel_boundary-1_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409975"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "718048409974"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409974"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409974"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "deficient_cancel_boundary+0",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409976"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "718048409975"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-718048409975"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409975"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "deficient_cancel_boundary+0_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409976"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "718048409975"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409975"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409975"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "deficient_cancel_boundary+1",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409977"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "718048409976"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-718048409976"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409976"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "deficient_cancel_boundary+1_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409977"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "718048409976"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409976"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409976"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "deficient_cancel_subnormal_boundary",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.000a72f053978p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.000a72f053977p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.000a72f053977p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.000a72f053977p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "deficient_cancel_subnormal_boundary_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.000a72f053978p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.000a72f053977p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.000a72f053977p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.000a72f053977p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "rectangular_full_boundary-1",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409975"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "718048409974"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-718048409974"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409974"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "0"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "rectangular_full_boundary-1_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409975"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "718048409974"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409974"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409974"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "0"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "rectangular_full_boundary+0",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409976"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "718048409975"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-718048409975"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409975"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "0"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "rectangular_full_boundary+0_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409976"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "718048409975"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409975"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409975"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "0"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "rectangular_full_boundary+1",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409977"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "718048409976"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-718048409976"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409976"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "0"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "rectangular_full_boundary+1_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "718048409977"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "718048409976"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409976"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-718048409976"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "0"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "rectangular_full_subnormal_boundary",
+    "m": 3,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.000a72f053978p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.000a72f053977p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.000a72f053977p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.000a72f053977p-1022"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "float",
+          "hex": "0x0.0000000000001p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "rectangular_full_subnormal_boundary_T",
+    "m": 4,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.000a72f053978p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.000a72f053977p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.000a72f053977p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.000a72f053977p-1022"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0000000000001p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 3,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "four_cancel_gap1_boundary-1",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "488671834566"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "488671834565"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-488671834565"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-488671834565"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "-488671834566"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "int",
+          "value": "-488671834565"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "int",
+          "value": "488671834566"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "int",
+          "value": "488671834566"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 4,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        3
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "four_cancel_gap1_boundary-1_T",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "488671834566"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "488671834565"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-488671834565"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-488671834565"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "-488671834566"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "int",
+          "value": "-488671834565"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "int",
+          "value": "488671834566"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "int",
+          "value": "488671834566"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 4,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        3
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "four_cancel_gap1_boundary+0",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "488671834567"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "488671834566"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-488671834566"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-488671834566"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "-488671834567"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "int",
+          "value": "-488671834566"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "int",
+          "value": "488671834567"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "int",
+          "value": "488671834567"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 4,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        3
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "four_cancel_gap1_boundary+0_T",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "488671834567"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "488671834566"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-488671834566"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-488671834566"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "-488671834567"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "int",
+          "value": "-488671834566"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "int",
+          "value": "488671834567"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "int",
+          "value": "488671834567"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 4,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        3
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "four_cancel_gap1_boundary+1",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "488671834568"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "488671834567"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-488671834567"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-488671834567"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "-488671834568"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "int",
+          "value": "-488671834567"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "int",
+          "value": "488671834568"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "int",
+          "value": "488671834568"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 4,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "four_cancel_gap1_boundary+1_T",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "488671834568"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "488671834567"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-488671834567"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-488671834567"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "int",
+          "value": "-488671834568"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "int",
+          "value": "-488671834567"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "int",
+          "value": "488671834568"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "int",
+          "value": "488671834568"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 4,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "four_cancel_gap1_subnormal_boundary",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.00071c71c71c7p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.00071c71c71c6p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.00071c71c71c6p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.00071c71c71c6p-1022"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x0.00071c71c71c7p-1022"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "float",
+          "hex": "-0x0.00071c71c71c6p-1022"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.00071c71c71c7p-1022"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "float",
+          "hex": "0x0.00071c71c71c7p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 4,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        3
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "four_cancel_gap1_subnormal_boundary_T",
+    "m": 4,
+    "n": 4,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.00071c71c71c7p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.00071c71c71c6p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.00071c71c71c6p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.00071c71c71c6p-1022"
+        }
+      ],
+      [
+        2,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x0.00071c71c71c7p-1022"
+        }
+      ],
+      [
+        3,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x0.00071c71c71c6p-1022"
+        }
+      ],
+      [
+        2,
+        3,
+        {
+          "type": "float",
+          "hex": "0x0.00071c71c71c7p-1022"
+        }
+      ],
+      [
+        3,
+        3,
+        {
+          "type": "float",
+          "hex": "0x0.00071c71c71c7p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 4,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        3,
+        3
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "equal_optima_boundary-1",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1407374883552"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "1407374883551"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-1407374883551"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883552"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "int",
+          "value": "-1407374883552"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "equal_optima_boundary-1_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1407374883552"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "1407374883551"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883551"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883552"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883552"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "equal_optima_boundary+0",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1407374883553"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "1407374883552"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-1407374883552"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883553"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "int",
+          "value": "-1407374883553"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "equal_optima_boundary+0_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1407374883553"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "1407374883552"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883552"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883553"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883553"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "equal_optima_boundary+1",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1407374883554"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "1407374883553"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-1407374883553"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883554"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "int",
+          "value": "-1407374883554"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "equal_optima_boundary+1_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1407374883554"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "1407374883553"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883553"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883554"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "int",
+          "value": "-1407374883554"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "equal_optima_subnormal_boundary",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.00147ae147ae1p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.00147ae147ae0p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.00147ae147ae0p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.00147ae147ae1p-1022"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x0.00147ae147ae1p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1/202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494784"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "equal_optima_subnormal_boundary_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.00147ae147ae1p-1022"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.00147ae147ae0p-1022"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.00147ae147ae0p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.00147ae147ae1p-1022"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.00147ae147ae1p-1022"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1/202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494784"
+    },
+    "recorded_candidate": [
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "mixed_negative_zero",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "mixed_negative_zero_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "permuted_negative_zero",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        1,
+        2,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "permuted_negative_zero_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        2,
+        1,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-1"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "all_equal_negative_zero",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ],
+      [
+        0,
+        2,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "all_equal_negative_zero_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ],
+      [
+        2,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "integer_subnormal_mix",
+    "m": 2,
+    "n": 3,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "float",
+          "hex": "0x0.0000000000001p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ],
+      [
+        1,
+        2,
+        {
+          "type": "int",
+          "value": "-1"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494783/202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494784"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "integer_subnormal_mix_T",
+    "m": 3,
+    "n": 2,
+    "edges": [
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "float",
+          "hex": "0x0.0000000000001p-1022"
+        }
+      ],
+      [
+        1,
+        1,
+        {
+          "type": "float",
+          "hex": "-0x0.0p+0"
+        }
+      ],
+      [
+        2,
+        1,
+        {
+          "type": "int",
+          "value": "-1"
+        }
+      ]
+    ],
+    "expected_status": "unsupported",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "-202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494783/202402253307310618352495346718917307049556649764142118356901358027430339567995346891960383701437124495187077864316811911389808737385793476867013399940738509921517424276566361364466907742093216341239767678472745068562007483424692698618103355649159556340810056512358769552333414615230502532186327508646006263307707741093494784"
+    },
+    "recorded_candidate": null
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "permuted_costgap",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604440"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "-1759218604440"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "1759218604440"
+        }
+      ],
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604441"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "suite": "numeric_boundary",
+    "name": "permuted_costgap_T",
+    "m": 2,
+    "n": 2,
+    "edges": [
+      [
+        1,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604440"
+        }
+      ],
+      [
+        0,
+        1,
+        {
+          "type": "int",
+          "value": "-1759218604440"
+        }
+      ],
+      [
+        1,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604440"
+        }
+      ],
+      [
+        0,
+        0,
+        {
+          "type": "int",
+          "value": "1759218604441"
+        }
+      ]
+    ],
+    "expected_status": "verified",
+    "expected": {
+      "cardinality": 2,
+      "exact_cost": "0"
+    },
+    "recorded_candidate": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ]
+  }
+]

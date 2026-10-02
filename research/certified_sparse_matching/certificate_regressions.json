@@ -1,0 +1,719 @@
+{
+  "wrong_candidates": [
+    {
+      "name": "lost_cardinality",
+      "m": 1,
+      "n": 1,
+      "edges": [
+        [
+          0,
+          0,
+          {
+            "int": "1"
+          }
+        ]
+      ],
+      "candidate": [],
+      "status": "rejected",
+      "reason": "not_maximum_cardinality: residual_s_t_path"
+    },
+    {
+      "name": "cost1_over0_through_t",
+      "m": 1,
+      "n": 2,
+      "edges": [
+        [
+          0,
+          0,
+          {
+            "int": "1"
+          }
+        ],
+        [
+          0,
+          1,
+          {
+            "int": "0"
+          }
+        ]
+      ],
+      "candidate": [
+        [
+          0,
+          0
+        ]
+      ],
+      "status": "rejected",
+      "reason": "not_minimum_cost: negative_residual_cycle",
+      "negative_cycle": [
+        [
+          3,
+          4,
+          0
+        ],
+        [
+          4,
+          2,
+          0
+        ],
+        [
+          2,
+          1,
+          -1
+        ],
+        [
+          1,
+          3,
+          0
+        ]
+      ],
+      "negative_cycle_exact_scaled_cost": -1,
+      "reachable_cut": [
+        0
+      ]
+    },
+    {
+      "name": "cost1_over0_through_s",
+      "m": 2,
+      "n": 1,
+      "edges": [
+        [
+          0,
+          0,
+          {
+            "int": "1"
+          }
+        ],
+        [
+          1,
+          0,
+          {
+            "int": "0"
+          }
+        ]
+      ],
+      "candidate": [
+        [
+          0,
+          0
+        ]
+      ],
+      "status": "rejected",
+      "reason": "not_minimum_cost: negative_residual_cycle",
+      "negative_cycle": [
+        [
+          3,
+          1,
+          -1
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          2,
+          3,
+          0
+        ]
+      ],
+      "negative_cycle_exact_scaled_cost": -1,
+      "reachable_cut": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "name": "unreachable_negative_cycle",
+      "m": 3,
+      "n": 3,
+      "edges": [
+        [
+          0,
+          0,
+          {
+            "int": "1"
+          }
+        ],
+        [
+          0,
+          1,
+          {
+            "int": "0"
+          }
+        ],
+        [
+          1,
+          0,
+          {
+            "int": "0"
+          }
+        ],
+        [
+          1,
+          1,
+          {
+            "int": "1"
+          }
+        ],
+        [
+          2,
+          2,
+          {
+            "int": "-2"
+          }
+        ]
+      ],
+      "candidate": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "status": "rejected",
+      "reason": "not_minimum_cost: negative_residual_cycle",
+      "negative_cycle": [
+        [
+          4,
+          1,
+          -1
+        ],
+        [
+          1,
+          5,
+          0
+        ],
+        [
+          5,
+          2,
+          -1
+        ],
+        [
+          2,
+          4,
+          0
+        ]
+      ],
+      "negative_cycle_exact_scaled_cost": -2,
+      "reachable_cut": [
+        0
+      ]
+    },
+    {
+      "name": "absent_candidate_edge",
+      "m": 1,
+      "n": 2,
+      "edges": [
+        [
+          0,
+          0,
+          {
+            "int": "0"
+          }
+        ]
+      ],
+      "candidate": [
+        [
+          0,
+          1
+        ]
+      ],
+      "status": "rejected",
+      "reason": "candidate_absent_edge"
+    },
+    {
+      "name": "duplicate_candidate_endpoint",
+      "m": 1,
+      "n": 2,
+      "edges": [
+        [
+          0,
+          0,
+          {
+            "int": "0"
+          }
+        ],
+        [
+          0,
+          1,
+          {
+            "int": "1"
+          }
+        ]
+      ],
+      "candidate": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "status": "rejected",
+      "reason": "candidate_duplicate_endpoint"
+    },
+    {
+      "name": "naive_offset_wrong_candidate",
+      "m": 1,
+      "n": 2,
+      "edges": [
+        [
+          0,
+          0,
+          {
+            "float_hex": "0x1.0000000000000p-54"
+          }
+        ],
+        [
+          0,
+          1,
+          {
+            "float_hex": "0x0.0p+0"
+          }
+        ]
+      ],
+      "candidate": [
+        [
+          0,
+          0
+        ]
+      ],
+      "status": "rejected",
+      "reason": "not_minimum_cost: negative_residual_cycle",
+      "negative_cycle": [
+        [
+          3,
+          4,
+          0
+        ],
+        [
+          4,
+          2,
+          0
+        ],
+        [
+          2,
+          1,
+          -1
+        ],
+        [
+          1,
+          3,
+          0
+        ]
+      ],
+      "negative_cycle_exact_scaled_cost": -1,
+      "reachable_cut": [
+        0
+      ]
+    }
+  ],
+  "certificate_tampers": [
+    {
+      "name": "cost_numerator",
+      "status": "rejected",
+      "reason": "original_objective",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 1,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [
+          0
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "wrong_cut_capacity",
+      "status": "rejected",
+      "reason": "cut_capacity",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [
+          0
+        ],
+        "cut_capacity": 2,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "missing_source_cut",
+      "status": "rejected",
+      "reason": "cut_separation",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "sink_in_cut",
+      "status": "rejected",
+      "reason": "cut_separation",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [
+          0,
+          4
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "positive_scale_wrong",
+      "status": "rejected",
+      "reason": "original_cost_scale_identity",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 2,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [
+          0
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "rounded_scaled_costs",
+      "status": "rejected",
+      "reason": "original_cost_scale_identity",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          0,
+          0
+        ],
+        "reachable_cut": [
+          0
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "zero_scale",
+      "status": "rejected",
+      "reason": "positive_scale",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 0,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [
+          0
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "sink_potential",
+      "status": "rejected",
+      "reason": "negative_reduced_cost",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [
+          0
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "potential_wrong_length",
+      "status": "rejected",
+      "reason": "potentials",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [
+          0
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "potential_float",
+      "status": "rejected",
+      "reason": "potentials",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [
+          0
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0.0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "false_cardinality",
+      "status": "rejected",
+      "reason": "cardinality",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 0,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [
+          0
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "duplicate_cut_node",
+      "status": "rejected",
+      "reason": "cut_separation",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          1,
+          0
+        ],
+        "reachable_cut": [
+          0,
+          0
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    },
+    {
+      "name": "rounded_problem_substitution",
+      "status": "rejected",
+      "reason": "original_cost_scale_identity",
+      "tampered_certificate": {
+        "schema": "matching-cut-potentials-v1",
+        "cardinality": 1,
+        "cost_numerator": 0,
+        "cost_denominator": 1,
+        "scale_numerator": 1,
+        "scale_denominator": 1,
+        "scaled_costs": [
+          0,
+          0
+        ],
+        "reachable_cut": [
+          0
+        ],
+        "cut_capacity": 1,
+        "potentials": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "bf_passes": 1,
+        "residual_arc_count": 5
+      }
+    }
+  ]
+}

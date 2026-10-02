@@ -1,0 +1,43 @@
+{
+  "all_passed": true,
+  "executed_from_clean_candidate_extraction": true,
+  "original_manifest_verified": true,
+  "python": "3.12.14",
+  "platform": "linux",
+  "commands": [
+    {
+      "command": "python -B example_certificate.py",
+      "returncode": 0,
+      "stdout": "Verified cardinality: 1 exact cost: 0\nCostlier candidate rejected: not_minimum_cost: negative_residual_cycle\n",
+      "stderr": "",
+      "cpu_seconds": 0.025210999999999997,
+      "wall_seconds": 0.025758357000086107
+    },
+    {
+      "command": "python -B test_matching.py",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.088s\n\nOK\n",
+      "cpu_seconds": 0.18166999999999997,
+      "wall_seconds": 0.20413489199927426
+    },
+    {
+      "command": "python -B test_matching.py --with-scipy",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.294s\n\nOK\n",
+      "cpu_seconds": 0.40989699999999996,
+      "wall_seconds": 0.4242293260012957
+    }
+  ],
+  "total_child_cpu_seconds": 0.6167779999999999,
+  "total_wall_seconds": 0.6542907980001473,
+  "cpu_limit_seconds_per_command": 15,
+  "wall_timeout_seconds_per_command": 45,
+  "scientific_scope": "Existing packaged cases only; no new experiments, dependencies or benchmark.",
+  "license_decision": "MIT",
+  "copyright_holder": "natu123",
+  "license_sha256": "435695079af6885e351f16c4814b2d48f2137fa28d9aee43c42644ec958e2923",
+  "evidence_status": "historical pre-publication packaged-candidate verification",
+  "publication_note": "This record is not a new branch CI run. Current branch file integrity is described by manifest.json."
+}

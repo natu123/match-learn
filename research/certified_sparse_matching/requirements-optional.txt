@@ -1,0 +1,4 @@
+# Optional candidate generation and numerical regression path only.
+# Previously tested with CPython 3.12.14 on Linux.
+numpy==2.3.5
+scipy==1.17.0

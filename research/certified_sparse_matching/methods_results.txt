@@ -1,0 +1,77 @@
+Methods, recorded results and limits
+
+Known doubling reduction. Let N=m+n, q=min(m,n). Convert each original built-in
+integer or represented binary64 weight exactly to a positive-rational multiple
+of primitive integer z. Let A=max|z| and B=2qA+1. In a square N-by-N sparse
+biadjacency graph, place z-B on original and transposed edge blocks and cost 1
+on the two diagonal dummy blocks. All other entries are absent. Storage contains
+exactly 2E+m+n entries. A perfect doubled matching contains k original and k
+transposed edges; its objective is z(M1)+z(M2)-2k(B+1)+N. The cardinality reward
+dominates every possible cost difference, so minimizing first maximizes k and
+then minimizes original cost. Dummy arcs extend any matching and guarantee a
+full doubled matching. No novelty is claimed for this construction.
+
+The optional solver uses SciPy's min_weight_full_bipartite_matching (LAPJVsp).
+SciPy's full-cardinality/nonzero-weight contract motivates the construction;
+SciPy issue 14041 supplies the public motivating question. Credit belongs to
+SciPy and its contributors for the candidate solver. Its documentation/source
+links and a source hash are in references.json; no SciPy code is redistributed.
+
+Numerics. Exact input scaling is preserved; no silent rounded offset fallback
+is used. The candidate accepts only N*max(B+A,1)<=2^45. This heuristic is NOT an
+algorithm-level bound on every LAPJVsp intermediate. Naive float64 offsetting
+fails on present weights [2^-54,0]: adding 1 yields [1,1], erasing the correct
+ordering. This is representational loss, not a new SciPy defect. Some familiar
+decimal binary64 values exceed the exact-encoding guard and are rejected.
+
+Exact post-check. Form original unit-capacity arcs s->u, u->v, v->t. A matching
+sets flow on its paths. Every unused arc contributes a forward residual arc at
+original exact scaled cost; every used arc contributes its reverse at negative
+cost, including source and sink arcs. No freely adjustable t->s arc is added.
+A reachable residual cut excluding t, with original capacity equal to matching
+size k, certifies maximum cardinality. Bellman-Ford initialized to zero at all
+vertices finds potentials or rejects a negative cycle anywhere. An independent
+checker binds scaled costs to original integer ratios, rebuilds every residual
+arc and checks c+p(a)-p(b)>=0 exactly. Cycle potentials telescope, so no residual
+cycle decreases cost; differences between feasible flows of equal value are
+circulations. This proves minimum cost at the independently certified maximum k.
+These standard conditions are credited to min-cost-flow theory; a primary LEMON
+implementation paper, Kiraly and Kovacs, arXiv:1207.6381v1 section 2.2, states the
+negative-cycle and reduced-cost conditions. No LEMON implementation is copied.
+
+For V=m+n+2 and R=E+m+n, certificate construction uses O(VR) arithmetic operations
+and O(V+R) storage. The checker uses O(V+R) graph/arithmetic work and storage.
+Arbitrary-precision bit costs are additional. The two implementations share only
+strict input snapshots, not cost conversion, residual construction or algorithm
+logic. Software correctness is not formally verified.
+
+Recorded evidence (not new package experiments):
+- Initial 40 base fixtures plus transposes: 80 oriented cases, 74 passes (=37
+  passing base cases plus transposes), 6 explicit numerical guard rejections.
+- Boundary 29 base fixtures plus transposes: 58 cases, 44 passes, 14 rejections.
+  Accepted tests reach the 2^45 guard exactly with large primitive integers,
+  cancellation and a cost gap of 1; neighboring over-bound inputs are rejected.
+- Every tiny graph has dimensions <=4 per partition. All partial injective row
+  assignments were independently enumerated with exact rational sums, comparing
+  cardinality before cost. This exhausts matchings per fixture, not all graphs.
+- All 118 saved accepted candidates verified; 20 rejected inputs stayed rejected.
+- Seven deliberately wrong candidates were rejected by certificate construction;
+  thirteen tampered certificates were rejected by the independent checker.
+  Tests cover negative cycles through s/t and cycles unreachable from s.
+- Import/snapshot/type-bound regressions passed in the recorded implementation.
+
+fixtures.json fixes the exact data rather than relying on mutable random
+libraries; the initial pseudo-random subset used seed 14041. The boundary cases
+were fixed before evaluation. Tied optimal matchings need not have identical
+edge identities. Code in test_matching.py can reconstruct the exact oracle and
+check recorded candidate objectives without third-party dependencies; optional
+SciPy execution regenerates candidates.
+
+Decision: bounded wrapper/tests/certificate engineering potential. No new solver,
+float-domain exactness proof, broad benchmark, guaranteed completion, algorithm
+novelty or production readiness is claimed. Only results whose original-data
+cut and exact potentials independently verify are certified. The repackaged dependency-free and optional-SciPy test entrypoints passed on
+a clean extraction using the installed pinned environment. The authored software
+and accompanying documentation are MIT-licensed. Branch publication exposes
+this standalone example; it does not establish a release or stronger scientific
+guarantee.

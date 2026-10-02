@@ -1,0 +1,32 @@
+{
+  "test_environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "os": "Linux"
+  },
+  "recorded_results_only": true,
+  "packaging_note": "Historical candidate verification: both dependency-free and optional-SciPy repackaged suites passed, using existing cases only. Documentation/status changes for branch publication do not claim a new scientific run.",
+  "tiny_reference": {
+    "base_cases": 40,
+    "oriented_cases": 80,
+    "passed": 74,
+    "guard_rejections": 6,
+    "passed_base_cases": 37
+  },
+  "numeric_boundary": {
+    "base_cases": 29,
+    "oriented_cases": 58,
+    "passed": 44,
+    "guard_rejections": 14,
+    "largest_accepted_objective_budget": 35184372088832
+  },
+  "combined": {
+    "oriented_cases": 138,
+    "verified": 118,
+    "guard_rejections": 20,
+    "wrong_candidates_constructor_rejected": 7,
+    "tampered_certificates_checker_rejected": 13
+  },
+  "claims": "Returned independently verified results only; no solver-domain exactness, completion, novelty, broad benchmark or production-readiness claim."
+}
