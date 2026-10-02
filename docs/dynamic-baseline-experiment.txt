@@ -1,0 +1,111 @@
+Dynamic weak-stable matching: baseline reproduction specification
+Status: 2026-10-02; original correctness controls, not a solver or SOTA result.
+
+Model and objective
+One-to-one bipartite matching, valid incomplete preference tiers without duplicates.
+IDs stay fixed; departures deactivate a slot and remove incident acceptable edges.
+Every assignment must be reciprocal, injective, mutually acceptable and weakly
+stable. Optimize cardinality first, then retained feasible previous pairs.
+Cardinality may decrease when updates make old pairs infeasible; do not equate
+preserving old cardinality with achieving maximum feasible weak-stable cardinality.
+Report cardinality gap and conditional retention gap separately. The retention
+gap is undefined below optimal cardinality. Decompose old-pair loss into newly
+infeasible pairs, stability-forced eligible-pair loss at any cardinality, and
+additional loss from prioritizing maximum cardinality.
+
+Sources and reproduction gate
+Primary paper: https://arxiv.org/html/2409.10575v2 (Algorithms 1-4; sections 4-5).
+Author-linked code: https://github.com/Junyuan-Qiu/Stable-Matching-Local-Search
+Read-only authenticated GitHub repository and recursive tree requests returned
+404 on 2026-10-02. Public repository-name search found no replacement. Therefore
+license, README, source, pinned revision and dependencies remain unavailable.
+404 does not distinguish removal, rename or missing access. No third-party code
+has been downloaded/executed and no runtime or dependency has been installed.
+Python executable paths now exist, unlike the earlier report; environment
+readiness and author dependencies are not established by that path observation.
+Gate: obtain an accessible author archive/repository with provenance and license,
+or explicitly choose a paper-based original reimplementation. Neither route may
+be described as reproducing author code until its provenance is verified.
+
+TBLS baseline fidelity
+The paper's algorithm refines tie orders, repairs from the current assignment
+using changed-agent queues, and falls back to GS after a repair time threshold.
+Its equal-cardinality search score uses free-agent list lengths, not retention.
+The paper uses c=0.9, disruption probability 0.05 and a repair threshold calibrated
+from initial base-algorithm time. Its static stopping rule can stop at a perfect
+matching. An external-update adapter and retention-aware incumbent selection are
+explicit adaptations, not author-unmodified TBLS. Do not claim local repair or
+prior-matching reuse as new merely because the application is dynamic.
+
+Comparison arms (not yet implemented)
+1. Author-unmodified static TBLS cold run: reproduction sanity check only.
+2. Warm TBLS adapter: same prior assignment, retained tie strategy, projection,
+   changed-agent initialization and repair/fallback; keep author search score.
+3. Same warm adapter with retention-aware output incumbent: ablation, not SOTA.
+4. Same adapter with cold initial state: isolate warm-start benefit.
+Fixed-ID GS and keep-if-stable-GS remain diagnostic controls, not serious SOTA.
+All dynamic arms receive identical profiles and prior matching. Warm arms may
+retain equivalent state across updates; disclose and charge state preparation.
+Do not stop a maximum-cardinality search merely because the old state is stable.
+For retention-aware search, a perfect incumbent does not certify best retention.
+Changed-row-only repair is not sufficient after discarding unacceptable pairs:
+enqueue both newly unmatched endpoints and affected neighbors. Check all original
+weak blockers after repair; fail closed or use charged fallback if repair fails.
+Invalidate rank/tie caches after external edits. Put the previous partner first
+within its original tie for a compatible refinement; insert newly acceptable
+candidates using a recorded seed, without changing the original tier ordering.
+Test unequal side sizes explicitly. Any preprocessing must be recomputed or
+certified valid after updates; never reuse stale reductions blindly.
+
+Bounded next experiments
+Stage A (completed controls): four deterministic 2x2 transitions, no search
+algorithm. Test unilateral matched-edge deletion, departure with fixed IDs,
+one-sided tie split, and two-row tie split. Independent feasible enumeration and
+production weak validator verify outputs; hand-derived objective/loss tuples.
+Run: cargo test --test dynamic_update_controls
+Stage B (proposed after baseline gate): n<=4; maximum 120 transitions per arm.
+Development seeds 101..110 for adjacent tier swaps and additions. Held-out seeds
+1001..1010 for unilateral/bilateral edge deletion, tie splitting/merging,
+departure and mixed updates (one to three changed rows). Keep family results
+separate; rejection/retries/no-op handling must be logged, never selected by
+baseline failure. Keep original 20 smoke cases as regression controls only.
+Allocate 20 raw transitions to each of six families (swap, addition, deletion,
+split/merge, departure, mixed); two transitions per family seed. Each raw
+transition receives two search seeds and two budgets, totaling at most 480
+timed calls per arm. Development has 40 and held-out has 80 raw transitions.
+Use separate seed streams for inputs, updates and search. The generator and
+rejection rule still require implementation and a frozen input manifest before
+execution; this specification alone is not a reproduced Stage B experiment.
+Generate identical accepted profiles/update streams for every arm; store them.
+Use a common initial matching from proposer GS with ascending IDs within ties.
+For the maximum-cardinality-old-state ablation, choose the lexicographically
+smallest proposer partner vector among old maximum-cardinality weak-stable
+assignments, encoding unmatched as the opposite-side length. Never let each arm select
+its own initial state for the primary per-update comparison. Sequential-state
+experiments, where arms diverge, form a separate evaluation with cumulative loss.
+
+Budget and reporting
+Stage B is limited to a single worker, 120 transitions, two search seeds per
+transition (20001,20002), and 10ms/50ms per-update budgets on the same machine.
+These are specified bounds, not a sweep already executed or performance evidence.
+Charge solver preprocessing, projection, initialization, repair, fallback and
+search, including the in-solver global stability check. Exclude compile, common
+input decoding and the separate evaluation-only exact correctness oracle.
+Equal iterations do not imply equal CPU. Record actual process CPU and wall time,
+deadline overshoot, candidates, repairs/fallbacks and peak memory. Use a hard
+outer watchdog (max 1s per transition) and stop if budget enforcement is absent.
+Cross-language author/reimplementation time is not an algorithm-only comparison;
+report separately. Until process CPU accounting is available use diagnostic work
+counts only; do not publish an equal-CPU claim based on wall time alone.
+Exact oracle is exponential and used only through n=4, outside solver budget.
+Report all failures/timeouts, feasible/stable rate, cardinality hit rate, paired
+conditional retention difference and family counts. No filtering invalid runs
+out of denominators. Every emitted incumbent must pass independent and production
+checks. Compare repeated inputs/results excluding diagnostic timing.
+
+Independent critique incorporated
+The 20-case pilot exercises no newly infeasible old pairs. Departures must rebuild
+both views instead of resizing one side. Cold-only TBLS would be an unfair prior
+state comparison. Static TBLS lacks the intended secondary recourse objective.
+Small controls establish metric semantics, not scalability, global headroom,
+general Irving correctness or superiority over TBLS.
